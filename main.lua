@@ -681,8 +681,8 @@ Runtime.ApplyStrategyPreset = function(preset)
         State.AutoRebirth = false
     elseif preset == "MoneyMachine" then
         State.AutoRoll = false
-        State.AutoBuyTarget = true
-        State.AutoBuyMutation = true
+        State.AutoBuyTarget = false
+        State.AutoBuyMutation = false
         State.AutoBuyRebirthGnomes = false
         State.PauseRollUntilAffordable = false
         State.RollPriority = "TargetFirst"
@@ -725,6 +725,14 @@ Runtime.ApplyStrategyPreset = function(preset)
     end
 
     if preset ~= "Custom" then
+        table.clear(State.BuyRarityTargets)
+        table.clear(State.MutationTargets)
+        table.clear(State.KeepMutationTargets)
+        table.clear(State.KeepRarityTargets)
+        table.clear(State.SellProduceMutationTargets)
+        table.clear(State.UseItemTargets)
+        table.clear(State.ShopTargets)
+        Runtime.SelectionVersion = Runtime.SelectionVersion + 1
         ensurePresetTargets(preset)
     end
 
@@ -2275,21 +2283,53 @@ local function addMultiSelect(parent, title, detail, selection, optionProvider, 
         Parent = list,
     })
 
+    local optionButtons = {}
+    local currentOptionsList = {}
+
+    local function updateSubtitles(visibleCount)
+        local selectedCount = 0
+        for _, enabled in pairs(selection) do
+            if enabled == true then
+                selectedCount = selectedCount + 1
+            end
+        end
+        if State.Language == "TH" then
+            subtitle.Text = string.format(decodeText64("JXMgIHwgIOC5gOC4peC4t+C4reC4gSAlZCAgfCAg4LmB4Liq4LiU4LiHICVk"), translated(detail), selectedCount, visibleCount or #currentOptionsList)
+        else
+            subtitle.Text = string.format("%s  |  selected %d  |  showing %d", translated(detail), selectedCount, visibleCount or #currentOptionsList)
+        end
+    end
+
+    local function updateButtonVisuals()
+        for option, btn in pairs(optionButtons) do
+            if btn and btn.Parent then
+                local selected = isSelected(selection, option)
+                btn.BackgroundColor3 = selected and Theme.AccentDark or Theme.Background
+                btn.TextColor3 = selected and Theme.Text or Theme.Muted
+                btn.Text = (selected and "  [✓]  " or "  [  ]  ") .. tostring(option)
+            end
+        end
+        updateSubtitles()
+    end
+
     connect(selectAllBtn.Activated, function()
         local options = optionProvider()
         for _, opt in ipairs(options) do
             selection[opt] = true
         end
         Runtime.SelectionVersion = Runtime.SelectionVersion + 1
-        render(true)
+        updateButtonVisuals()
     end)
+
     connect(clearAllBtn.Activated, function()
         table.clear(selection)
         Runtime.SelectionVersion = Runtime.SelectionVersion + 1
-        render(true)
+        updateButtonVisuals()
     end)
 
-    local previousSignature = ""
+    local previousFilter = nil
+    local previousOptionsSignature = ""
+
     local function render(force)
         if not parent.Visible then
             return
@@ -2300,31 +2340,38 @@ local function addMultiSelect(parent, title, detail, selection, optionProvider, 
                 return string.lower(a) < string.lower(b)
             end)
         end
-        local signature = table.concat(options, "\0") .. "|" .. string.lower(search.Text)
-            .. "|" .. tostring(Runtime.SelectionVersion)
-        if not force and signature == previousSignature then
+        currentOptionsList = options
+        local optionsSig = table.concat(options, "\0")
+        local filter = string.lower(search.Text)
+
+        if not force and optionsSig == previousOptionsSignature and filter == previousFilter then
+            updateButtonVisuals()
             return
         end
-        previousSignature = signature
+
+        previousOptionsSignature = optionsSig
+        previousFilter = filter
+
         for _, child in ipairs(list:GetChildren()) do
             if child:IsA("GuiButton") then
                 child:Destroy()
             end
         end
-        local filter = string.lower(search.Text)
+        table.clear(optionButtons)
+
         local visibleCount = 0
         for _, option in ipairs(options) do
             if filter == "" or string.find(string.lower(option), filter, 1, true) then
                 visibleCount = visibleCount + 1
                 local selected = isSelected(selection, option)
                 local choice = create("TextButton", {
-                    Name = option,
+                    Name = tostring(option),
                     Size = UDim2.new(1, -6, 0, 30),
                     LayoutOrder = visibleCount,
                     BackgroundColor3 = selected and Theme.AccentDark or Theme.Background,
                     BorderSizePixel = 0,
                     Font = Enum.Font.Gotham,
-                    Text = (selected and "  [✓]  " or "  [  ]  ") .. option,
+                    Text = (selected and "  [✓]  " or "  [  ]  ") .. tostring(option),
                     TextColor3 = selected and Theme.Text or Theme.Muted,
                     TextSize = 11,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -2332,30 +2379,28 @@ local function addMultiSelect(parent, title, detail, selection, optionProvider, 
                     Parent = list,
                 })
                 create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = choice })
+                optionButtons[option] = choice
+
                 connect(choice.Activated, function()
                     Runtime.ToggleSelection(selection, option)
-                    Runtime.RefreshVisibleLists(true)
+                    local nowSelected = isSelected(selection, option)
+                    choice.BackgroundColor3 = nowSelected and Theme.AccentDark or Theme.Background
+                    choice.TextColor3 = nowSelected and Theme.Text or Theme.Muted
+                    choice.Text = (nowSelected and "  [✓]  " or "  [  ]  ") .. tostring(option)
+                    updateSubtitles(visibleCount)
                 end)
             end
         end
-        local selectedCount = 0
-        for _, enabled in pairs(selection) do
-            if enabled == true then
-                selectedCount = selectedCount + 1
-            end
-        end
-        if State.Language == "TH" then
-            subtitle.Text = string.format(decodeText64("JXMgIHwgIOC5gOC4peC4t+C4reC4gSAlZCAgfCAg4LmB4Liq4LiU4LiHICVk"), translated(detail), selectedCount, visibleCount)
-        else
-            subtitle.Text = string.format("%s  |  selected %d  |  showing %d", detail, selectedCount, visibleCount)
-        end
+        updateSubtitles(visibleCount)
     end
+
     connect(search:GetPropertyChangedSignal("Text"), function()
         render(true)
     end)
     table.insert(listRenderers, render)
     table.insert(LanguageRefreshers, function()
-        previousSignature = ""
+        previousOptionsSignature = ""
+        previousFilter = nil
         render(false)
     end)
     render(false)
@@ -4090,6 +4135,24 @@ local function hasKeepMutation(instance)
     return false
 end
 
+local function matchesKeepTargets(instance)
+    if not instance then
+        return false
+    end
+    local hasKeepRarityFilter = Runtime.HasAnySelection(State.KeepRarityTargets)
+    local hasKeepMutationFilter = Runtime.HasAnySelection(State.KeepMutationTargets)
+
+    if hasKeepRarityFilter and hasKeepMutationFilter then
+        return hasKeepRarity(instance) and hasKeepMutation(instance)
+    elseif hasKeepRarityFilter then
+        return hasKeepRarity(instance)
+    elseif hasKeepMutationFilter then
+        return hasKeepMutation(instance)
+    end
+    return false
+end
+Runtime.MatchesKeepTargets = matchesKeepTargets
+
 -- Returns true when the given tool belongs to a gnome ranked within the
 -- Top-N protected set, needed for rebirth, or matching keep rarity/mutation targets.
 -- Used to guard AutoGive from accidentally gifting protected gnomes.
@@ -4100,10 +4163,7 @@ local function isProtectedGnome(tool)
     if Runtime.NeedsRebirthGnome and Runtime.NeedsRebirthGnome(tool) then
         return true
     end
-    if hasKeepRarity(tool) then
-        return true
-    end
-    if hasKeepMutation(tool) then
+    if matchesKeepTargets(tool) then
         return true
     end
     local ranked = getRankedGnomes()
@@ -4228,10 +4288,7 @@ local function policySellsGnome(record)
     if Runtime.NeedsRebirthGnome and Runtime.NeedsRebirthGnome(record.Instance) then
         return false
     end
-    if hasKeepRarity(record.Instance) then
-        return false
-    end
-    if hasKeepMutation(record.Instance) then
+    if matchesKeepTargets(record.Instance) then
         return false
     end
     return true
@@ -5303,10 +5360,29 @@ Runtime.NeedsRebirthGnome = function(instance)
 end
 
 local function isWantedPreview(instance)
-    local rarityMatch = State.AutoBuyTarget and isSelected(State.BuyRarityTargets, getFarmerRarity(instance))
-    local mutationMatch = State.AutoBuyMutation and hasSelectedMutation(instance)
-    return rarityMatch or mutationMatch or Runtime.NeedsRebirthGnome(instance)
+    if not instance then
+        return false
+    end
+    if Runtime.NeedsRebirthGnome and Runtime.NeedsRebirthGnome(instance) then
+        return true
+    end
+
+    local hasRarityFilter = State.AutoBuyTarget and Runtime.HasAnySelection(State.BuyRarityTargets)
+    local hasMutationFilter = State.AutoBuyMutation and Runtime.HasAnySelection(State.MutationTargets)
+
+    if hasRarityFilter and hasMutationFilter then
+        local rarityMatch = isSelected(State.BuyRarityTargets, getFarmerRarity(instance))
+        local mutationMatch = hasSelectedMutation(instance)
+        return rarityMatch and mutationMatch
+    elseif hasRarityFilter then
+        return isSelected(State.BuyRarityTargets, getFarmerRarity(instance))
+    elseif hasMutationFilter then
+        return hasSelectedMutation(instance)
+    end
+
+    return false
 end
+Runtime.IsWantedPreview = isWantedPreview
 
 -- getPlayerMoney moved to early helpers
 
