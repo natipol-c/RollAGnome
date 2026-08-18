@@ -66,6 +66,17 @@ if not LocalPlayer then
     end
 end
 
+local function getPlayerMoney()
+    local stats = type(Replication) == "table" and type(Replication.Data) == "table" and Replication.Data.stats or nil
+    local money = type(stats) == "table" and tonumber(stats.money) or nil
+    if money then
+        return money
+    end
+    local leaderstats = LocalPlayer and LocalPlayer:FindFirstChild("leaderstats")
+    local moneyValue = leaderstats and leaderstats:FindFirstChild("Money")
+    return moneyValue and tonumber(moneyValue.Value) or 0
+end
+
 -- Re-running the file replaces the old instance cleanly.
 if type(Environment.RollAGnomeRuntime) == "table" and type(Environment.RollAGnomeRuntime.Destroy) == "function" then
     pcall(function() Environment.RollAGnomeRuntime.Destroy() end)
@@ -283,6 +294,10 @@ local Defaults = {
     AutoBuyRebirthGnomes = false,
     PauseRollUntilAffordable = true,
     RollPriority = "TargetFirst",
+    AutomationStrategy = "Balanced",
+    MovementPriority = "SmartTimeShare",
+    MoneyReservePercent = 0,
+    InventoryOverflowPolicy = "FlushAll",
     AutoBest30 = false,
     BestGnomeLimit = 30,
     GnomeSellPolicy = "BelowBest",
@@ -311,7 +326,7 @@ local Defaults = {
     SellRarityTargets = {},
     MutationTargets = {},
     KeepMutationTargets = {},
-    SellProduceMutationTargets = {},
+    SellProduceMutationTargets = { Normal = true },
     UseItemTargets = {},
     ShopTargets = {},
     GivePlayers = {},
@@ -356,7 +371,7 @@ Runtime.LegacyAutoSellTarget = State.AutoSellTarget == true
 Runtime.HadGnomeSellPolicy = type(State.GnomeSellPolicy) == "string"
 for key, value in pairs(Defaults) do
     if State[key] == nil then
-        State[key] = type(value) == "table" and {} or value
+        State[key] = type(value) == "table" and table.clone(value) or value
     end
 end
 if not Runtime.HadAutoUseItems then
@@ -376,6 +391,9 @@ if next(State.SellProduceMutationTargets) == nil then
             State.SellProduceMutationTargets[name] = true
         end
     end
+    if next(State.SellProduceMutationTargets) == nil then
+        State.SellProduceMutationTargets["Normal"] = true
+    end
 end
 if not Runtime.HadGnomeSellPolicy and Runtime.LegacyAutoSellTarget and State.AutoBest30 ~= true
     and not Runtime.LegacyAutoPlaceGnome
@@ -391,6 +409,344 @@ State.AutoPlaceGnome = nil
 State.AutoSellTarget = nil
 State.Language = string.upper(tostring(State.Language or "EN")) == "TH" and "TH" or "EN"
 State.TextScale = math.clamp(tonumber(State.TextScale) or 1, 0.7, 1.6)
+
+Runtime.MovementLease = nil
+Runtime.AcquireMovementLease = function(owner, duration)
+    duration = math.clamp(tonumber(duration) or 2, 0.5, 4)
+    local now = os.clock()
+    local lease = Runtime.MovementLease
+    if lease and lease.Owner ~= owner and now < lease.Until then
+        return false, "LEASE ACTIVE BY " .. tostring(lease.Owner)
+    end
+    Runtime.MovementLease = {
+        Owner = owner,
+        Until = now + duration,
+    }
+    return true
+end
+
+Runtime.ReleaseMovementLease = function(owner)
+    if Runtime.MovementLease and (not owner or Runtime.MovementLease.Owner == owner) then
+        Runtime.MovementLease = nil
+    end
+end
+
+Runtime.GetBackpackItemCount = function()
+    local backpack = LocalPlayer and LocalPlayer:FindFirstChild("Backpack")
+    local character = LocalPlayer and LocalPlayer.Character
+    local count = 0
+    if backpack then
+        count = count + #backpack:GetChildren()
+    end
+    if character then
+        for _, child in ipairs(character:GetChildren()) do
+            if child:IsA("Tool") then
+                count = count + 1
+            end
+        end
+    end
+    return count
+end
+
+Runtime.IsBackpackNearFull = function()
+    local count = Runtime.GetBackpackItemCount()
+    return count >= 40
+end
+
+Runtime.EnsureBackpackSpace = function(minFreeSlots)
+    minFreeSlots = math.clamp(tonumber(minFreeSlots) or 1, 1, 5)
+    local count = Runtime.GetBackpackItemCount()
+    if count < 40 then
+        return true
+    end
+    -- Trigger immediate purge if backpack is getting crammed
+    return Runtime.PurgeInventoryOverflow()
+end
+
+
+Runtime.CanSpendDynamic = function(price, purpose)
+    price = math.max(0, tonumber(price) or 0)
+    local pending = Runtime.PendingPurchase
+    local strategy = (State and State.AutomationStrategy) or "Balanced"
+    local rollPriority = (State and State.RollPriority) or "TargetFirst"
+    local money = getPlayerMoney()
+
+    if (strategy == "GnomeHunter" or rollPriority == "TargetFirst") and pending and pending.Parent then
+        return false, "WAITING FOR TARGET GNOME"
+    end
+
+    if (strategy == "MaxProgression" or rollPriority == "RebirthFirst") and State and State.AutoRebirth then
+        local rebirthData = Runtime.GetNextRebirthData()
+        local requiredMoney = type(rebirthData) == "table" and type(rebirthData.requirements) == "table"
+            and tonumber(rebirthData.requirements.money) or 0
+        if purpose ~= "Rebirth" and (money - price < requiredMoney) then
+            return false, "RESERVED FOR REBIRTH"
+        end
+    end
+
+    if State and (tonumber(State.MoneyReservePercent) or 0) > 0 then
+        local reserveThreshold = money * (State.MoneyReservePercent / 100)
+        if money - price < reserveThreshold then
+            return false, "RESERVED PERCENTAGE"
+        end
+    end
+
+    return true
+end
+
+Runtime.EnsureEmptyHands = function(timeout)
+    timeout = timeout or 0.25
+    local character = LocalPlayer and LocalPlayer.Character
+    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+    if not character or not humanoid then
+        return true
+    end
+    if not character:FindFirstChildWhichIsA("Tool") then
+        return true
+    end
+    pcall(function()
+        humanoid:UnequipTools()
+    end)
+    local start = os.clock()
+    while os.clock() - start < timeout and Runtime.Alive do
+        if not character:FindFirstChildWhichIsA("Tool") then
+            return true
+        end
+        task.wait(0.025)
+    end
+    return not character:FindFirstChildWhichIsA("Tool")
+end
+
+
+Runtime.GetShopItemNames = function()
+    local result = {}
+    for name, data in pairs(ItemShop.Items or {}) do
+        if type(data) == "table" and not data.ignore then
+            table.insert(result, tostring(name))
+        end
+    end
+    if #result == 0 then
+        result = { "Basic Sprinkler", "Advanced Sprinkler", "Godly Sprinkler", "Master Sprinkler", "Basic Fertilizer", "Advanced Fertilizer", "Godly Fertilizer", "Master Fertilizer", "Watering Can", "Gnome Coffee" }
+    end
+    return result
+end
+
+-- Ensure target tables have sensible defaults for each preset so features work
+-- out of the box. Only fills empty tables; never overwrites user selections.
+local function ensurePresetTargets(preset)
+    -- 1. UseItemTargets: ใช้ทั้งหมดทุกโหมด (Gnome Coffee, Sprinklers, Fertilizers, Watering Cans)
+    if not Runtime.HasAnySelection(State.UseItemTargets) then
+        State.UseItemTargets["Gnome Coffee"] = true
+        for name, data in pairs(ItemShop.Items or {}) do
+            if type(data) == "table"
+                and (data.type == "Sprinkler" or data.type == "Fertilizer"
+                    or data.type == "WateringCan" or data.type == "GnomeItem")
+            then
+                State.UseItemTargets[name] = true
+            end
+        end
+    end
+
+    -- 2. ShopTargets: ซื้อทั้งหมดทุกโหมด
+    if not Runtime.HasAnySelection(State.ShopTargets) then
+        for _, name in ipairs(Runtime.GetShopItemNames()) do
+            State.ShopTargets[name] = true
+        end
+    end
+
+    -- 3. ProduceMutationTargets: ขายทั้งหมดทุกโหมด (Normal + ทุก mutation)
+    if not Runtime.HasAnySelection(State.SellProduceMutationTargets)
+        or (State.SellProduceMutationTargets["Normal"] and not next(State.SellProduceMutationTargets, "Normal"))
+    then
+        State.SellProduceMutationTargets["Normal"] = true
+        local allMutations = { "Normal", "Golden", "Diamond", "Shiny", "Fire", "Night", "Toxic", "Charged", "Frozen", "Cursed" }
+        for _, mut in ipairs(allMutations) do
+            State.SellProduceMutationTargets[mut] = true
+        end
+    end
+
+    -- 4. Mode-specific Target configurations:
+    if preset == "MoneyMachine" then
+        -- Buy Rarity: impossible, godly, mythic
+        if not Runtime.HasAnySelection(State.BuyRarityTargets) then
+            State.BuyRarityTargets["IMPOSSIBLE"] = true
+            State.BuyRarityTargets["Godly"] = true
+            State.BuyRarityTargets["Mythic"] = true
+        end
+        -- Buy Mutation: Night, Cursed, Shiny
+        if not Runtime.HasAnySelection(State.MutationTargets) then
+            State.MutationTargets["Night"] = true
+            State.MutationTargets["Cursed"] = true
+            State.MutationTargets["Shiny"] = true
+        end
+        -- Keep Mutation: ไม่เลือก
+        -- Keep Rarity: ไม่เลือก
+
+    elseif preset == "GnomeHunter" then
+        -- Buy Rarity: impossible, godly
+        if not Runtime.HasAnySelection(State.BuyRarityTargets) then
+            State.BuyRarityTargets["IMPOSSIBLE"] = true
+            State.BuyRarityTargets["Godly"] = true
+        end
+        -- Buy Mutation: Night, Cursed, Shiny
+        if not Runtime.HasAnySelection(State.MutationTargets) then
+            State.MutationTargets["Night"] = true
+            State.MutationTargets["Cursed"] = true
+            State.MutationTargets["Shiny"] = true
+        end
+        -- Keep Mutation: Night, Cursed, Shiny
+        if not Runtime.HasAnySelection(State.KeepMutationTargets) then
+            State.KeepMutationTargets["Night"] = true
+            State.KeepMutationTargets["Cursed"] = true
+            State.KeepMutationTargets["Shiny"] = true
+        end
+        -- Keep Rarity: impossible, godly
+        if not Runtime.HasAnySelection(State.KeepRarityTargets) then
+            State.KeepRarityTargets["IMPOSSIBLE"] = true
+            State.KeepRarityTargets["Godly"] = true
+        end
+
+    elseif preset == "Balanced" then
+        -- Buy Rarity: impossible, godly, mythic
+        if not Runtime.HasAnySelection(State.BuyRarityTargets) then
+            State.BuyRarityTargets["IMPOSSIBLE"] = true
+            State.BuyRarityTargets["Godly"] = true
+            State.BuyRarityTargets["Mythic"] = true
+        end
+        -- Buy Mutation: Night, Cursed, Shiny
+        if not Runtime.HasAnySelection(State.MutationTargets) then
+            State.MutationTargets["Night"] = true
+            State.MutationTargets["Cursed"] = true
+            State.MutationTargets["Shiny"] = true
+        end
+        -- Keep Mutation: Night, Cursed, Shiny
+        if not Runtime.HasAnySelection(State.KeepMutationTargets) then
+            State.KeepMutationTargets["Night"] = true
+            State.KeepMutationTargets["Cursed"] = true
+            State.KeepMutationTargets["Shiny"] = true
+        end
+        -- Keep Rarity: impossible, godly, mythic
+        if not Runtime.HasAnySelection(State.KeepRarityTargets) then
+            State.KeepRarityTargets["IMPOSSIBLE"] = true
+            State.KeepRarityTargets["Godly"] = true
+            State.KeepRarityTargets["Mythic"] = true
+        end
+
+    elseif preset == "MaxProgression" then
+        -- Buy Rarity: ไม่เลือก
+        -- Buy Mutation: ไม่เลือก
+        -- Keep Mutation: ไม่เลือก
+        -- Keep Rarity: ไม่เลือก
+    end
+end
+
+Runtime.ApplyStrategyPreset = function(preset)
+    if not State then return end
+    State.AutomationStrategy = preset
+    if preset == "MaxProgression" then
+        State.AutoRoll = true
+        State.AutoBuyTarget = false
+        State.AutoBuyMutation = false
+        State.AutoBuyRebirthGnomes = true
+        State.PauseRollUntilAffordable = false
+        State.RollPriority = "RebirthFirst"
+        State.AutoBest30 = true
+        State.AutoCollect = true
+        State.AutoSellProduce = true
+        if next(State.SellProduceMutationTargets) == nil then
+            State.SellProduceMutationTargets["Normal"] = true
+        end
+        State.AutoUseItems = true
+        State.AutoBuyShop = true
+        State.AutoBuyExpansion = true
+        State.AutoUpgrade = true
+        State.AutoRebirth = true
+    elseif preset == "GnomeHunter" then
+        State.AutoRoll = true
+        State.AutoBuyTarget = true
+        State.AutoBuyMutation = true
+        State.AutoBuyRebirthGnomes = false
+        State.PauseRollUntilAffordable = true
+        State.RollPriority = "TargetFirst"
+        State.AutoBest30 = true
+        State.AutoCollect = true
+        State.AutoSellProduce = true
+        if next(State.SellProduceMutationTargets) == nil then
+            State.SellProduceMutationTargets["Normal"] = true
+        end
+        State.AutoUseItems = true
+        State.AutoBuyShop = true
+        State.AutoBuyExpansion = false
+        State.AutoUpgrade = false
+        State.AutoRebirth = false
+    elseif preset == "MoneyMachine" then
+        State.AutoRoll = false
+        State.AutoBuyTarget = true
+        State.AutoBuyMutation = true
+        State.AutoBuyRebirthGnomes = false
+        State.PauseRollUntilAffordable = false
+        State.RollPriority = "TargetFirst"
+        State.AutoBest30 = true
+        State.AutoCollect = true
+        State.AutoSellProduce = true
+        if next(State.SellProduceMutationTargets) == nil then
+            State.SellProduceMutationTargets["Normal"] = true
+        end
+        State.AutoUseItems = true
+        State.AutoBuyShop = true
+        State.AutoBuyExpansion = true
+        State.AutoUpgrade = true
+        State.AutoRebirth = false
+        -- FIX 2: Clear stale PendingPurchase from previous mode
+        Runtime.PendingPurchase = nil
+        Runtime.WaitingForMoney = false
+        Runtime.PendingPurchasePrice = 0
+    elseif preset == "Balanced" then
+        State.AutoRoll = true
+        State.AutoBuyTarget = true
+        State.AutoBuyMutation = true
+        State.AutoBuyRebirthGnomes = true
+        State.PauseRollUntilAffordable = true
+        State.RollPriority = "TargetFirst"
+        State.AutoBest30 = true
+        State.AutoCollect = true
+        State.AutoSellProduce = true
+        if next(State.SellProduceMutationTargets) == nil then
+            State.SellProduceMutationTargets["Normal"] = true
+        end
+        State.AutoBuyShop = true
+        State.AutoUseItems = true
+        State.AutoUpgrade = true
+        State.AutoBuyExpansion = true
+        State.AutoRebirth = true
+    elseif preset == "Custom" then
+        -- Custom Mode: Keep all user toggles and targets intact without overriding
+        State.AutomationStrategy = "Custom"
+    end
+
+    if preset ~= "Custom" then
+        ensurePresetTargets(preset)
+    end
+
+    if type(Runtime.ToggleRefreshers) == "table" then
+        for _, refresh in pairs(Runtime.ToggleRefreshers) do
+            if type(refresh) == "function" then pcall(refresh) end
+        end
+    end
+    if type(Runtime.RefreshRollPriorityUI) == "function" then
+        pcall(Runtime.RefreshRollPriorityUI)
+    end
+    if type(Runtime.RefreshGnomePolicyUI) == "function" then
+        pcall(Runtime.RefreshGnomePolicyUI)
+    end
+    if type(Runtime.RefreshStrategyUI) == "function" then
+        pcall(Runtime.RefreshStrategyUI)
+    end
+    if type(Runtime.RefreshVisibleLists) == "function" then
+        pcall(Runtime.RefreshVisibleLists, true)
+    end
+end
+
 
 local SelectionStateKeys = {
     "BuyRarityTargets",
@@ -847,120 +1203,107 @@ local function textKey(value)
 end
 
 local ThaiText = {
-    [695356572] = decodeText64("4LmD4LiK4LmJ4LiC4Lit4LiH4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [986399584] = decodeText64("4LmD4LiK4LmJ4Liq4Lib4Lij4Li04LiH4LmA4LiB4Lit4Lij4LmMIOC4m+C4uOC5i+C4oiDguJrguLHguKfguKPguJTguJnguYnguLMg4LmB4Lil4Liw4LiC4Lit4LiH4LmD4LiK4LmJIEdub21lIOC4l+C4teC5iOC5gOC4peC4t+C4reC4geC5guC4lOC4ouC4reC4seC4leC5guC4meC4oeC4seC4leC4tA=="),
-    [68911190] = decodeText64("4LiC4Lit4LiH4LmD4LiK4LmJ4LmA4Lib4LmJ4Liy4Lir4Lih4Liy4Lii"),
-    [178505180] = decodeText64("4LmD4LiK4LmJ4LmA4LiJ4Lie4Liy4Liw4LiC4Lit4LiH4LiK4LiZ4Li04LiU4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LmC4LiU4Lii4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [1625187216] = decodeText64("4LiC4Lit4LiH4LmB4Lia4Lia4Lie4Li34LmJ4LiZ4LiX4Li14LmI4LiI4Liw4LiE4Lij4Lit4Lia4LiE4Lil4Li44Lih4Lic4Lil4Lic4Lil4Li04LiV4Lih4Li54Lil4LiE4LmI4Liy4Liq4Li54LiHIOC4muC4seC4p+C4o+C4lOC4meC5ieC4s+C5g+C4iuC5ieC4geC4seC4muC4leC5ieC4meC4l+C4teC5iOC4geC4s+C4peC4seC4h+C5guC4lSDguYHguKXguLDguIHguLLguYHguJ/guYPguIrguYnguIHguLHguJogR25vbWUg4LiX4Li14LmI4LmB4LiC4LmH4LiH4LmB4LiB4Lij4LmI4LiH4LiX4Li14LmI4Liq4Li44LiU4LiL4Li24LmI4LiH4Lii4Lix4LiH4LmE4Lih4LmI4Lih4Li14Lia4Lix4Lif"),
-    [1114237095] = decodeText64("4LiL4Li34LmJ4LitIEdub21lIOC4o+C4teC5gOC4muC4tOC4l+C4reC4seC4leC5guC4meC4oeC4seC4leC4tA=="),
-    [829570975] = decodeText64("4LiL4Li34LmJ4LitIEdub21lIOC4l+C4teC5iOC4ouC4seC4h+C4guC4suC4lOC4quC4s+C4q+C4o+C4seC4muC4o+C4teC5gOC4muC4tOC4l+C4luC4seC4lOC5hOC4mw=="),
-    [1206596458] = decodeText64("TXV0YXRpb24g4Lic4Lil4LmE4Lih4LmJ4LiX4Li14LmI4LiI4Liw4LiC4Liy4Lii"),
-    [828911941] = decodeText64("4LiC4Liy4Lii4LmA4LiJ4Lie4Liy4Liw4Lic4Lil4LmE4Lih4LmJ4LiX4Li14LmI4Lih4Li1IE11dGF0aW9uIOC4l+C4teC5iOC5gOC4peC4t+C4reC4gTsg4LmA4Lil4Li34Lit4LiBIE5vcm1hbCDguKrguLPguKvguKPguLHguJrguJzguKXguYTguKHguYnguJvguIHguJXguLQ="),
-    [1412095332] = decodeText64("4Liq4Lib4Lij4Li04LiH4LmA4LiB4Lit4Lij4LmM4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB"),
-    [323710400] = decodeText64("4Lin4Liy4LiH4LmA4LiJ4Lie4Liy4Liw4Liq4Lib4Lij4Li04LiH4LmA4LiB4Lit4Lij4LmM4LiK4LiZ4Li04LiU4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB"),
-    [1375615649] = decodeText64("4Lib4LmJ4Lit4LiZIEdub21lIENvZmZlZSDguK3guLHguJXguYLguJnguKHguLHguJXguLQ="),
-    [2126174087] = decodeText64("4Lib4LmJ4Lit4LiZ4LiB4Liy4LmB4Lif4LmD4Lir4LmJIEdub21lIOC4l+C4teC5iOC5geC4guC5h+C4h+C5geC4geC4o+C5iOC4h+C4l+C4teC5iOC4quC4uOC4lOC4geC5iOC4reC4mQ=="),
-    [897751219] = decodeText64("4LmC4LiZ4Lih"),
-    [2089098701] = decodeText64("4Lif4Liy4Lij4LmM4Lih"),
-    [812299417] = decodeText64("4LmA4Lib4LmJ4Liy4Lir4Lih4Liy4Lii"),
-    [2089573409] = decodeText64("4Lij4LmJ4Liy4LiZ4LiE4LmJ4Liy"),
-    [530659912] = decodeText64("4Lit4Lix4Lib4LmA4LiB4Lij4LiU"),
-    [1380572431] = decodeText64("4Lij4Liw4Lia4Lia"),
-    [742352128] = decodeText64("4LmC4Lib4Lij4LmE4Lif4Lil4LmM"),
-    [1836895263] = decodeText64("4Lir4Lih4Li44LiZ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [847828358] = decodeText64("4Lir4Lih4Li44LiZ4LiV4LmI4Lit4LmA4LiZ4Li34LmI4Lit4LiH4LmB4Lil4Liw4Lij4Lit4Lic4Lil4LiX4Li44LiB4LiE4Lij4Lix4LmJ4LiH"),
-    [2012168867] = decodeText64("4LiL4Li34LmJ4Lit4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LiV4Liy4Lih4Lij4Liw4LiU4Lix4Lia"),
-    [2055396230] = decodeText64("4LiL4Li34LmJ4LitIEdub21lIOC4l+C4teC5iOC4oeC4teC4o+C4sOC4lOC4seC4muC4leC4suC4oeC4l+C4teC5iOC5gOC4peC4t+C4reC4gQ=="),
-    [2130494790] = decodeText64("4Lir4Lii4Li44LiUIFJvbGwg4Lij4Lit4LmA4LiH4Li04LiZ4LiL4Li34LmJ4Lit"),
-    [1435780865] = decodeText64("4Lil4LmH4Lit4LiB4Lic4Lil4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmE4Lin4LmJ4LiI4LiZ4LiB4Lin4LmI4Liy4LmA4LiH4Li04LiZ4LiI4Liw4Lie4Lit4LiL4Li34LmJ4Lit"),
-    [522108892] = decodeText64("4LiL4Li34LmJ4LitIE11dGF0aW9uIOC4reC4seC4leC5guC4meC4oeC4seC4leC4tA=="),
-    [1708672272] = decodeText64("4LiL4Li34LmJ4LitIEdub21lIOC4l+C4teC5iOC4oeC4tSBNdXRhdGlvbiDguJXguLLguKHguJfguLXguYjguYDguKXguLfguK3guIE="),
-    [1081971480] = decodeText64("4Lin4Liy4LiHIEdub21lIOC4reC4seC4leC5guC4meC4oeC4seC4leC4tA=="),
-    [2114272292] = decodeText64("4Lin4Liy4LiHIEdub21lIOC4l+C4teC5iOC4i+C4t+C5ieC4reC5g+C4q+C4oeC5iOC4peC4h+C4iuC5iOC4reC4h+C4p+C5iOC4suC4h+C4reC4seC4leC5guC4meC4oeC4seC4leC4tA=="),
-    [1475304190] = decodeText64("4LmD4LiK4LmJIEdub21lIOC4l+C4teC5iOC4lOC4teC4l+C4teC5iOC4quC4uOC4lA=="),
-    [385354485] = decodeText64("4LmA4LiB4LmH4Lia4LiV4Lix4Lin4LiX4Li14LmI4LmB4LiC4LmH4LiH4LmB4LiB4Lij4LmI4LiH4LiV4Liy4Lih4LiI4Liz4LiZ4Lin4LiZ4LmB4Lil4Liw4LiC4Liy4Lii4LiV4Lix4Lin4LiX4Li14LmI4Lit4LmI4Lit4LiZ4LiB4Lin4LmI4Liy4Liq4LmI4Lin4LiZ4LmA4LiB4Li04LiZ"),
-    [564665951] = decodeText64("4LiI4Liz4LiZ4Lin4LiZIEdub21lIOC4l+C4teC5iOC4lOC4teC4l+C4teC5iOC4quC4uOC4lA=="),
-    [1402248995] = decodeText64("4LiB4Lij4Lit4LiB4LiI4Liz4LiZ4Lin4LiZ4LiV4Lix4LmJ4LiH4LmB4LiV4LmIIDEg4LiW4Li24LiHIDEwMA=="),
-    [960687958] = decodeText64("4LmA4LiB4LmH4Lia4Lic4Lil4Lic4Lil4Li04LiV4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [1207244955] = decodeText64("4LmA4LiB4LmH4Lia4Lic4Lil4Lic4Lil4Li04LiV4LiX4Lix4LiZ4LiX4Li14LmA4Lih4Li34LmI4Lit4Lie4Lij4LmJ4Lit4Lih"),
-    [734608302] = decodeText64("4LiC4Liy4Lii4Lic4Lil4Lic4Lil4Li04LiV4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [1924551942] = decodeText64("4LiC4Liy4Lii4Lic4Lil4Lic4Lil4Li04LiV4LiX4Li14LmI4LmA4LiB4LmH4Lia4LiX4Lix4LmJ4LiH4Lir4Lih4LiU4LiX4Li44LiB4LmE4Lih4LmI4LiB4Li14LmI4Lin4Li04LiZ4Liy4LiX4Li1"),
-    [2096932973] = decodeText64("4LiC4Liy4Lii4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LiV4Liy4Lih4Lij4Liw4LiU4Lix4Lia"),
-    [612654814] = decodeText64("4LiC4Liy4LiiIEdub21lIOC4l+C4teC5iOC4p+C4suC4h+C5hOC4p+C5ieC4leC4suC4oeC4o+C4sOC4lOC4seC4muC4l+C4teC5iOC5gOC4peC4t+C4reC4gQ=="),
-    [1995119328] = decodeText64("4Lij4Liw4LiU4Lix4Lia4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LiL4Li34LmJ4Lit"),
-    [1977483741] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lij4Liw4LiU4Lix4Lia4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4LijIOC5gOC4o+C4teC4ouC4h+C4iOC4suC4geC4lOC4teC4l+C4teC5iOC4quC4uOC4lOC5hOC4m+C4leC5iOC4s+C4quC4uOC4lA=="),
-    [1423131572] = decodeText64("4Lij4Liw4LiU4Lix4Lia4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LiC4Liy4Lii"),
-    [1572169440] = decodeText64("4LiC4Liy4Lii4LmA4LiJ4Lie4Liy4LiwIEdub21lIOC4l+C4teC5iOC4p+C4suC4h+C5geC4peC4sOC4oeC4teC4o+C4sOC4lOC4seC4muC4leC4suC4oeC4l+C4teC5iOC5gOC4peC4t+C4reC4gQ=="),
-    [1056167687] = decodeText64("TXV0YXRpb24g4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij"),
-    [1071630126] = decodeText64("4LiL4Li34LmJ4Lit4LmA4Lih4Li34LmI4Lit4Lie4LiaIE11dGF0aW9uIOC4l+C4teC5iOC5gOC4peC4t+C4reC4geC5hOC4p+C5iQ=="),
-    [1950563464] = decodeText64("4LiL4Li34LmJ4Lit4LiC4Lit4LiH4LmD4LiZ4Lij4LmJ4Liy4LiZ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [2132620544] = decodeText64("4LiL4Li34LmJ4Lit4LiC4Lit4LiH4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LmA4Lih4Li34LmI4Lit4Lih4Li14Liq4Li04LiZ4LiE4LmJ4Liy"),
-    [1510124033] = decodeText64("4LiC4Lit4LiH4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LiL4Li34LmJ4Lit"),
-    [1699707406] = decodeText64("4Lij4Liy4Lii4LiB4Liy4Lij4LiX4Li14LmI4Lit4LiZ4Li44LiN4Liy4LiV4LmD4Lir4LmJ4Lij4Liw4Lia4Lia4LiL4Li34LmJ4Lit"),
-    [618208355] = decodeText64("4Lit4Lix4Lib4LmA4LiB4Lij4LiU4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [1347313269] = decodeText64("4LiL4Li34LmJ4Lit4Lit4Lix4Lib4LmA4LiB4Lij4LiU4Lie4Li34LmJ4LiZ4LiX4Li14LmI4LmB4Lil4Liw4LmB4Lic4LiZ4Lic4Lix4LiH4LiX4Li14LmI4LiL4Li34LmJ4Lit4LmE4LiU4LmJ"),
-    [196116111] = decodeText64("4LiL4Li34LmJ4Lit4Lie4Li34LmJ4LiZ4LiX4Li14LmI4LmA4Lie4Li04LmI4Lih4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [328824634] = decodeText64("4LiL4Li34LmJ4Lit4Lie4Li34LmJ4LiZ4LiX4Li14LmI4LmA4Lie4Li04LmI4Lih4LiX4Li14LmI4LiW4Li54LiB4LiX4Li14LmI4Liq4Li44LiU4LiB4LmI4Lit4LiZ"),
-    [602048425] = decodeText64("4LmA4LiB4Li04LiU4LmD4Lir4Lih4LmI4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [440181375] = decodeText64("4LmA4LiB4Li04LiU4LmD4Lir4Lih4LmI4LmA4Lih4Li34LmI4Lit4LmA4LiH4Li04LiZ4LmB4Lil4Liw4LiI4Liz4LiZ4Lin4LiZIEdub21lIOC4hOC4o+C4muC5gOC4h+C4t+C5iOC4reC4meC5hOC4gg=="),
-    [895845879] = decodeText64("4Lil4Liz4LiU4Lix4Lia4Lit4Lix4Lib4LmA4LiB4Lij4LiUCjEuIOC4reC4seC4m+C5gOC4geC4o+C4lOC4nuC4t+C5ieC4meC4l+C4teC5iOC4l+C4teC5iOC4i+C4t+C5ieC4reC5hOC4lOC5iQoyLiDguYLguKvguJnguJTguYPguJnguYHguJzguJnguJzguLHguIfguJfguLXguYjguJvguKXguJTguKXguYfguK3guIHguYHguKXguYnguKcK4LmA4LiL4Li04Lij4LmM4Lif4LmA4Lin4Lit4Lij4LmM4LiI4Liw4LiV4Lij4Lin4LiI4Liq4Lit4Lia4Lij4Liy4Lii4LiB4Liy4Lij4LiX4Li14LmI4LiL4Li34LmJ4Lit4LmE4Lih4LmI4LmE4LiU4LmJ4Lir4Lij4Li34Lit4LmA4LiV4LmH4Lih4LmB4Lil4LmJ4Lin"),
-    [574315800] = decodeText64("4Lib4LmJ4Lit4LiH4LiB4Lix4LiZIEFGSw=="),
-    [69350190] = decodeText64("4LiI4Liz4Lil4Lit4LiH4LiB4Liy4Lij4LiB4LiU4LmA4Lih4Li34LmI4LitIFJvYmxveCDguJXguKPguKfguIjguJ7guJrguKfguYjguLLguYTguKHguYjguYTguJTguYnguYDguKXguYjguJk="),
-    [1059741808] = decodeText64("4LmA4LiC4LmJ4Liy4LmA4LiB4Lih4LmD4Lir4Lih4LmI4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [2145984092] = decodeText64("4LmA4LiC4LmJ4Liy4LmA4LiL4Li04Lij4LmM4Lif4LmA4Lin4Lit4Lij4LmM4LmD4Lir4Lih4LmI4LmA4Lih4Li34LmI4Lit4Lir4Lil4Li44LiU4Lir4Lij4Li34Lit4Lie4Lia4LiC4LmJ4Lit4Lic4Li04LiU4Lie4Lil4Liy4LiU"),
-    [1222860624] = decodeText64("Q3RybCArIEFsdCAgfCAg4LmB4Liq4LiU4LiHIC8g4LiL4LmI4Lit4LiZIFVJClBBVVNFIOC4q+C4ouC4uOC4lOC4geC4suC4o+C4l+C4s+C4h+C4suC4meC4l+C4seC5ieC4h+C4q+C4oeC4lCDguYHguKXguLAgUkVTVU1FIOC4iOC4sOC4hOC4t+C4meC4hOC5iOC4suC5gOC4m+C4tOC4lC/guJvguLTguJTguYDguJTguLTguKEK4LiB4Liy4Lij4LiV4Lix4LmJ4LiH4LiE4LmI4Liy4LiI4Liw4Lii4Lix4LiH4LiE4LiH4LiX4Liz4LiH4Liy4LiZ4LmA4Lih4Li34LmI4Lit4Lii4LmI4LitIFVJ"),
-    [822158911] = decodeText64("4LmC4Lir4Lil4LiU4LmC4Lib4Lij4LmE4Lif4Lil4LmM4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [384180709] = decodeText64("4LmC4Lir4Lil4LiU4LmC4Lib4Lij4LmE4Lif4Lil4LmM4LiZ4Li14LmJ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4Lih4Li34LmI4Lit4LmA4Lib4Li04LiU4Liq4LiE4Lij4Li04Lib4LiV4LmM4LiE4Lij4Lix4LmJ4LiH4LiW4Lix4LiU4LmE4Lib"),
-    [98108697] = decodeText64("4LiK4Li34LmI4Lit4LmC4Lib4Lij4LmE4Lif4Lil4LmM"),
-    [1118359840] = decodeText64("4Lia4Lix4LiZ4LiX4Li24LiB4LmC4Lib4Lij4LmE4Lif4Lil4LmM"),
-    [1685611255] = decodeText64("4LmC4Lir4Lil4LiU4LmC4Lib4Lij4LmE4Lif4Lil4LmM"),
-    [212671996] = decodeText64("4Lie4Lij4LmJ4Lit4Lih4Lia4Lix4LiZ4LiX4Li24LiB4LmC4Lib4Lij4LmE4Lif4Lil4LmM"),
-    [737931382] = decodeText64("RXhlY3V0b3Ig4LmE4Lih4LmI4Lij4Lit4LiH4Lij4Lix4Lia4Lij4Liw4Lia4Lia4LmE4Lif4Lil4LmM"),
-    [794030545] = decodeText64("4LiE4LmJ4LiZ4Lir4LiyLi4u"),
-    [225006953] = decodeText64("4LmE4Lit4LmA4LiX4Lih"),
-    [1368126117] = decodeText64("4Liq4LmI4LiH4LiC4Lit4LiH"),
-    [2101212958] = decodeText64("4Lin4Liy4LiH4Liq4Lib4Lij4Li04LiH4LmA4LiB4Lit4Lij4LmM4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [1760819113] = decodeText64("4Lin4Liy4LiH4Liq4Lib4Lij4Li04LiH4LmA4LiB4Lit4Lij4LmM4LiU4Li14LiX4Li14LmI4Liq4Li44LiU4LmD4LiB4Lil4LmJ4Lic4Lil4Lic4Lil4Li04LiV4Lih4Li54Lil4LiE4LmI4Liy4Liq4Li54LiHIOC4nuC4o+C5ieC4reC4oeC4hOC4s+C4meC4p+C4k+C4o+C4sOC4ouC4sOC4q+C5iOC4suC4hw=="),
-    [817268764] = decodeText64("4Lil4Liz4LiU4Lix4Lia4Liq4Lib4Lij4Li04LiH4LmA4LiB4Lit4Lij4LmM"),
-    [1075331389] = decodeText64("4Lin4Liy4LiH4Liq4Lib4Lij4Li04LiH4LmA4LiB4Lit4Lij4LmM4LiX4Li14LmI4LiU4Li14LiX4Li14LmI4Liq4Li44LiU4LiB4LmI4Lit4LiZ4LmD4LiB4Lil4LmJ4Lic4Lil4Lic4Lil4Li04LiV4LiX4Li14LmI4LiU4Li14LiX4Li14LmI4Liq4Li44LiUIOC5geC4peC4sOC5gOC4p+C5ieC4meC4o+C4sOC4ouC4sOC4iOC4suC4geC4quC4m+C4o+C4tOC4h+C5gOC4geC4reC4o+C5jOC4o+C4sOC4lOC4seC4muC5gOC4l+C5iOC4suC4geC4seC4meC4q+C4o+C4t+C4reC4lOC4teC4geC4p+C5iOC4sg=="),
-    [403129408] = decodeText64("4Liq4LmI4LiH4LmE4Lit4LmA4LiX4Lih4LiX4Li14LmI4LiW4Li34Lit4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [1517552053] = decodeText64("4Liq4LmI4LiH4Lic4Lil4Lic4Lil4Li04LiV4Lir4Lij4Li34LitIEdub21lIOC4l+C4teC5iOC4geC4s+C4peC4seC4h+C4luC4t+C4reC5g+C4q+C5ieC4nOC4ueC5ieC5gOC4peC5iOC4meC4l+C4teC5iOC5gOC4peC4t+C4reC4geC4hOC4meC5geC4o+C4gQ=="),
-    [679397871] = decodeText64("4Lij4Lix4Lia4LiC4Lit4LiH4LiC4Lin4Lix4LiN4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-    [634013570] = decodeText64("4Lij4Lix4Lia4LmE4Lit4LmA4LiX4Lih4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4LiJ4Lie4Liy4Liw4LiI4Liy4LiB4Lic4Li54LmJ4LmA4Lil4LmI4LiZ4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB"),
-    [395775933] = decodeText64("4Liq4LmI4LiH4LmD4Lir4LmJ4Lic4Li54LmJ4LmA4Lil4LmI4LiZ"),
-    [2048754197] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lic4Li54LmJ4Lij4Lix4Lia4Lit4Lit4LiZ4LmE4Lil4LiZ4LmMIOC4o+C4sOC4muC4muC4iOC4sOC5g+C4iuC5ieC4iuC4t+C5iOC4reC5geC4o+C4geC4l+C4teC5iOC4nuC4mg=="),
-    [1096463868] = decodeText64("4Lij4Lix4Lia4LiI4Liy4LiB4Lic4Li54LmJ4LmA4Lil4LmI4LiZ"),
-    [381601337] = decodeText64("4Lij4Lix4Lia4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4LiJ4Lie4Liy4Liw4Lic4Li54LmJ4Liq4LmI4LiH4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LmE4Lin4LmJ"),
-    [1974862954] = decodeText64("4LmC4Lir4Lih4LiU4Lil4LiU4Lib4Li04LiH"),
-    [1618525399] = decodeText64("4Lil4LiU4LiB4Liy4Lij4Lii4Li04LiH4LiE4Liz4Liq4Lix4LmI4LiH4LiW4Li14LmI4LiL4LmJ4Lit4LiZ4LiB4Lix4LiZIOC4o+C4sOC4ouC4sOC4l+C4suC4h+C5gOC4i+C4tOC4o+C5jOC4n+C5gOC4p+C4reC4o+C5jOC4ouC4seC4h+C4oeC4teC4nOC4peC4leC5iOC4reC4m+C4tOC4h+C4iOC4o+C4tOC4hw=="),
-    [2034570322] = decodeText64("4LmC4Lir4Lih4LiU4Lig4Liy4Lie4Lib4Lij4Liw4Lir4Lii4Lix4LiU"),
-    [864013862] = decodeText64("4Lib4Li04LiU4LmA4Lit4Lif4LmA4Lif4LiB4LiV4LmM4LiX4Li14LmI4Lir4LiZ4Lix4LiB4LmA4LiE4Lij4Li34LmI4Lit4LiH4LmB4Lil4Liw4LmD4LiK4LmJ4LiE4Li44LiT4Lig4Liy4Lie4LiB4Lij4Liy4Lif4Li04LiB4LiV4LmI4Liz4Liq4Li44LiU"),
-    [790590637] = decodeText64("4Lie4Lix4LiB4Lir4LiZ4LmJ4Liy4LiI4Lit"),
-    [923391854] = decodeText64("4Lij4Liw4Lia4Lia4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04Lii4Lix4LiH4LiX4Liz4LiH4Liy4LiZIOC5guC4lOC4ouC4m+C4tOC4lOC4oOC4suC4niAzIOC4oeC4tOC4leC4tOC5geC4peC4sOC4iOC4s+C4geC4seC4lOC5hOC4p+C5ieC4l+C4teC5iCAxMCBGUFM="),
-    [226089592] = decodeText64("4Lie4Lix4LiB4Lir4LiZ4LmJ4Liy4LiI4Lit"),
-    [237978446] = decodeText64("4LiC4LiZ4Liy4LiU4LiV4Lix4Lin4Lit4Lix4LiB4Lip4Lij"),
-    [1123865154] = decodeText64("4Lib4Lij4Lix4Lia4LiC4LiZ4Liy4LiU4LiC4LmJ4Lit4LiE4Lin4Liy4Lih4LiX4Lix4LmJ4LiH4Lir4Lih4LiU4LmE4LiU4LmJ4LiV4Lix4LmJ4LiH4LmB4LiV4LmIIDcwJSDguJbguLbguIcgMTYwJQ=="),
-    [754771019] = decodeText64("4LmB4LiV4Liw4LmA4Lie4Li34LmI4Lit4Lib4Lil4Li44LiBCuC4o+C4sOC4muC4muC4reC4seC4leC5guC4meC4oeC4seC4leC4tOC4ouC4seC4h+C4l+C4s+C4h+C4suC4meC5g+C4meC5guC4q+C4oeC4lOC4m+C4o+C4sOC4q+C4ouC4seC4lOC4nuC4peC4seC4h+C4h+C4suC4mQ=="),
-    [11884063] = decodeText64("4LiC4Liy4Lii4LmA4LiJ4Lie4Liy4Liw4Lic4Lil4Lic4Lil4Li04LiV4LiX4Li14LmI4LiV4Lij4LiH4LiB4Lix4LiaIE11dGF0aW9uIOC4l+C4teC5iOC5gOC4peC4t+C4reC4geC5hOC4p+C5iQ=="),
-    [390114212] = decodeText64("TXV0YXRpb24g4Lic4Lil4Lic4Lil4Li04LiV4LiX4Li14LmI4LiI4Liw4LiC4Liy4Lii"),
-    [1526727371] = decodeText64("4LiV4Li04LmK4LiBIE11dGF0aW9uIOC4l+C4teC5iOC4leC5ieC4reC4h+C4geC4suC4o+C4guC4suC4oiDguYHguKXguLDguYDguKXguLfguK3guIEgTm9ybWFsIOC4quC4s+C4q+C4o+C4seC4muC4nOC4peC4nOC4peC4tOC4leC4l+C4teC5iOC5hOC4oeC5iOC4oeC4tSBNdXRhdGlvbg=="),
-    [1054944133] = decodeText64("4LiI4Lix4LiU4LiB4Liy4LijIEdub21lIOC4l+C4teC5iOC4lOC4teC4l+C4teC5iOC4quC4uOC4lOC4reC4seC4leC5guC4meC4oeC4seC4leC4tA=="),
-    [247234402] = decodeText64("4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ4LmB4Lil4Liw4Lin4Liy4LiHIEdub21lIOC4l+C4teC5iOC4lOC4teC4l+C4teC5iOC4quC4uOC4lOC4leC4suC4oeC4meC5guC4ouC4muC4suC4ouC4geC4suC4o+C4guC4suC4ouC4l+C4teC5iOC5gOC4peC4t+C4reC4gQ=="),
-    [682276107] = decodeText64("4LiZ4LmC4Lii4Lia4Liy4Lii4LiC4Liy4LiiIEdub21l"),
-    [39530367] = decodeText64("R25vbWUg4LiX4Li14LmI4LiU4Li14LiX4Li14LmI4Liq4Li44LiU4LiV4Liy4Lih4LiI4Liz4LiZ4Lin4LiZ4LiX4Li14LmI4LiV4Lix4LmJ4LiH4LmE4Lin4LmJ4LiI4Liw4LmE4Lih4LmI4LiW4Li54LiB4LiC4Liy4Lii"),
-    [1050317072] = decodeText64("4LiC4Liy4Lii4LiZ4Lit4LiB4LiB4Lil4Li44LmI4Lih4LiU4Li14LiX4Li14LmI4Liq4Li44LiU"),
-    [821630815] = decodeText64("4LiC4Liy4Lii4Lij4Liw4LiU4Lix4Lia4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB"),
-    [814303202] = decodeText64("4LmA4LiB4LmH4Lia4LiV4Lix4Lin4Liq4Liz4Lij4Lit4LiH"),
-    [1633836193] = decodeText64("4LiC4Liy4Lii4LmA4LiJ4Lie4Liy4LiwIEdub21lIOC4meC4reC4geC4geC4peC4uOC5iOC4oeC4l+C4teC5iOC4m+C5ieC4reC4h+C4geC4seC4meC5geC4peC4sOC4oeC4teC4o+C4sOC4lOC4seC4muC4l+C4teC5iOC5gOC4peC4t+C4reC4gQ=="),
-    [1092575591] = decodeText64("4Lil4Liz4LiU4Lix4Lia4LiE4Lin4Liy4Lih4Liq4Liz4LiE4Lix4LiNIFJvbGwg4LiB4Lix4LiaIFJlYmlydGg="),
-    [2058004565] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lin4LmI4Liy4LiI4Liw4Lij4Lix4LiB4Lip4Liy4LmA4Lib4LmJ4Liy4Lir4Lih4Liy4Lii4LiX4Li14LmIIFJvbGwg4LmE4LiU4LmJIOC4q+C4o+C4t+C4rSBSZWJpcnRoIOC4geC5iOC4reC4mQ=="),
-    [211053657] = decodeText64("4LmA4Lib4LmJ4Liy4Lir4Lih4Liy4Lii4LiB4LmI4Lit4LiZ"),
-    [1415884188] = decodeText64("4Lij4Li14LmA4Lia4Li04Lij4LmM4LiY4LiB4LmI4Lit4LiZ"),
-    [478680938] = decodeText64("4LmA4Lib4LmJ4Liy4Lir4Lih4Liy4Lii4LiL4Li34LmJ4LitIE11dGF0aW9u"),
-    [547907862] = decodeText64("4Lij4Liw4LiU4Lix4LiaIEdub21lIOC4l+C4teC5iOC4leC5ieC4reC4h+C4geC4suC4o+C5gOC4geC5h+C4mg=="),
-    [291717418] = decodeText64("R25vbWUg4LiX4Li14LmI4Lih4Li14Lij4Liw4LiU4Lix4Lia4LmA4Lir4Lil4LmI4Liy4LiZ4Li14LmJ4LiI4Liw4LiW4Li54LiB4LmA4LiB4LmH4Lia4LmE4Lin4LmJ4LmA4Liq4Lih4LitIOC5hOC4oeC5iOC4luC4ueC4geC4guC4suC4og=="),
-    [718391362] = decodeText64("TXV0YXRpb24g4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmA4LiB4LmH4Lia"),
-    [1382722799] = decodeText64("R25vbWUg4LiX4Li14LmI4Lih4Li1IE11dGF0aW9uIOC5gOC4q+C4peC5iOC4suC4meC4teC5ieC4iOC4sOC4luC4ueC4geC5gOC4geC5h+C4muC5hOC4p+C5ieC5gOC4quC4oeC4rSAo4LmA4Lil4Li34Lit4LiBIE5vcm1hbCDguKrguLPguKvguKPguLHguJrguJXguLHguKfguYTguKHguYjguKHguLUgTXV0YXRpb24p"),
+    [749662789] = decodeText64("4LiB4Liz4Lir4LiZ4LiU4LmA4Lit4LiH"), -- Custom
+    [1675149125] = decodeText64("4LmB4LiV4Liw4LmA4Lie4Li34LmI4Lit4Lib4Lil4Li44LiBCuC4o+C4sOC4muC4muC4l+C4s+C4h+C4suC4meC4leC5iOC4reC5gOC4meC4t+C5iOC4reC4h+C5g+C4meC5guC4q+C4oeC4lOC4m+C4o+C4sOC4q+C4ouC4seC4lOC4nuC4peC4seC4h+C4h+C4suC4mQ=="), -- TAP TO WAKE
+    [2097717576] = decodeText64("4Lil4Liz4LiU4Lix4Lia4LiB4Liy4Lij4Lit4Lix4Lib4LmA4LiB4Lij4LiUCjEuIOC4reC4seC4m+C5gOC4geC4o+C4lOC5geC4m+C4peC4h+C4l+C4teC5iOC4quC4suC4oeC4suC4o+C4luC4i+C4t+C5ieC4reC5hOC4lOC5iQoyLiDguK3guLHguJvguYDguIHguKPguJTguKrguLLguKLguKrguIHguLTguKXguJfguLXguYjguJvguKXguJTguKXguYfguK3guIHguYHguKXguYnguKcK4Lij4Liw4Lia4Lia4LiI4Liw4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ4LiB4Liy4Lij4LiL4Li34LmJ4Lit4LmA4LiB4Li04LiZ4LiC4LiZ4Liy4LiU4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Upgrade order
+    [1790338205] = decodeText64("Q3RybCArIEFsdCAgfCAg4LmA4Lib4Li04LiUIC8g4LiL4LmI4Lit4LiZ4Lir4LiZ4LmJ4Liy4LiV4LmI4Liy4LiHIFVJClBBVVNFIOC4q+C4ouC4uOC4lOC4geC4suC4o+C4l+C4s+C4h+C4suC4meC4l+C4seC5ieC4h+C4q+C4oeC4lCwgUkVTVU1FIOC4hOC4t+C4meC4hOC5iOC4suC4quC4luC4suC4meC4sOC5gOC4lOC4tOC4oQrguKPguLDguJrguJrguKLguLHguIfguITguIfguJfguLPguIfguLLguJnguJXguYjguK3guYDguJnguLfguYjguK3guIfguYDguKHguLfguYjguK3guJ7guLHguJrguKvguJnguYnguLLguJXguYjguLLguIc="), -- Ctrl + Alt
+
+    [1119051639] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lij4Li54Lib4LmB4Lia4Lia4LiB4Liy4Lij4LiI4Lix4LiU4Liq4Lij4Lij4LmA4LiH4Li04LiZ4LmB4Lil4Liw4Lil4Liz4LiU4Lix4Lia4LiB4Liy4Lij4LiX4Liz4LiH4Liy4LiZ4LiC4Lit4LiH4LiV4Lix4Lin4Lil4Liw4LiE4Lij"), -- Choose how the automation allocates money and movement priorities
+    [847828358] = decodeText64("4Liq4Li44LmI4Lih4LmC4LiZ4Lih4LiV4LmI4Lit4LmA4LiZ4Li34LmI4Lit4LiH4LmB4Lil4Liw4Lij4Lit4Lic4Lil4Lil4Lix4Lie4LiY4LmM4LiX4Li44LiB4Lij4Lit4Lia"), -- Roll continuously and wait for every result
+    [1224226842] = decodeText64("4Lin4Liy4LiH4LmB4Lil4Liw4Lib4LiB4Lib4LmJ4Lit4LiH4LmC4LiZ4Lih4Lil4Liz4LiU4Lix4Lia4LiV4LmJ4LiZ4LmGIOC4leC4suC4oeC4iOC4s+C4meC4p+C4meC4l+C4teC5iOC4geC4s+C4q+C4meC4lA=="), -- Protect and place the strongest gnomes using the selected limit
+    [897751219] = decodeText64("4LmC4LiZ4Lih"), -- Gnomes
+    [2089098701] = decodeText64("4Lif4Liy4Lij4LmM4Lih"), -- Farm
+    [530659912] = decodeText64("4Lit4Lix4Lib4LmA4LiB4Lij4LiU"), -- Upgrade
+    [1368126117] = decodeText64("4LmC4LiL4LmA4LiK4Li14Lii4Lil"), -- Social
+    [1380572431] = decodeText64("4Lij4Liw4Lia4Lia"), -- System
+    [742352128] = decodeText64("4LmC4Lib4Lij4LmE4Lif4Lil4LmM"), -- Config
+    [2106297831] = decodeText64("4LmC4Lir4Lih4LiU4LmB4Lil4Liw4LiB4Lil4Lii4Li44LiX4LiY4LmM"), -- Strategy & Modes
+    [1836895263] = decodeText64("4Liq4Li44LmI4Lih4LmC4LiZ4Lih4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Roll
+    [1475304190] = decodeText64("4LiI4Lix4LiU4LiB4Liy4Lij4LmC4LiZ4Lih4LiX4Li14LmI4LiU4Li14LiX4Li14LmI4Liq4Li44LiU"), -- Auto Best Gnomes
+    [2085587169] = decodeText64("4LmA4LiB4LmH4Lia4LmA4LiB4Li14LmI4Lii4Lin4LmB4Lil4Liw4LiC4Liy4Lii4Lic4Lil4Lic4Lil4Li04LiV"), -- Harvest & Sell Produce
+    [1331036383] = decodeText64("4LmA4Lib4LmJ4Liy4Lir4Lih4Liy4Lii4LiL4Li34LmJ4Lit4LmB4Lil4Liw4LiB4Liy4Lij4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ"), -- Targets & Protection
+    [1735995099] = decodeText64("4LiU4Li54LmB4Lil4Lif4Liy4Lij4LmM4Lih4LmB4Lil4Liw4Lia4Lix4Lif"), -- Farm Care & Buffs
+    [1898137625] = decodeText64("4LiL4Li34LmJ4Lit4LiC4Lit4LiH4Lij4LmJ4Liy4LiZ4LiE4LmJ4Liy4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Item Shop Automation
+    [1216664228] = decodeText64("4LiL4Li34LmJ4Lit4LmC4LiZ4Lih4LiX4Li14LmI4Liq4Li44LmI4Lih4LmE4LiU4LmJ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Buy Rolled Gnomes
+    [1052934764] = decodeText64("4LiL4Li34LmJ4Lit4LmC4LiZ4Lih4LiX4Li14LmI4Liq4Li44LmI4Lih4LmE4LiU4LmJ4LiV4Liy4Lih4Lij4Liw4LiU4Lix4LiaIOC4oeC4tOC4p+C5gOC4leC4iuC4seC5iOC4mSDguKvguKPguLfguK3guJXguLHguKfguYDguIHguLTguJTguYPguKvguKHguYjguJfguLXguYjguYDguKXguLfguK3guIHguYTguKfguYk="), -- Buy rolled gnomes that match your selected rarity, mutation, or rebirth targets
+    [2130494790] = decodeText64("4Lir4Lii4Li44LiU4Liq4Li44LmI4Lih4Lij4Lit4LmA4LiH4Li04LiZ4LmA4Lih4Li34LmI4Lit4LmA4LiI4Lit4LiV4Lix4Lin4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij"), -- Pause Roll Until Affordable
+    [1435780865] = decodeText64("4Lil4LmH4Lit4LiB4Lic4Lil4LiB4Liy4Lij4Liq4Li44LmI4Lih4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmE4Lin4LmJ4LiI4LiZ4LiB4Lin4LmI4Liy4LiI4Liw4Lih4Li14LmA4LiH4Li04LiZ4Lie4Lit4LiL4Li34LmJ4Lit"), -- Hold a wanted result until enough money is available to buy it
+    [1054944133] = decodeText64("4LiI4Lix4LiU4LiB4Liy4Lij4LmC4LiZ4Lih4LiX4Li14LmI4LmA4LiB4LmI4LiH4LiX4Li14LmI4Liq4Li44LiU4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Manage Best Gnomes
+    [247234402] = decodeText64("4Lin4Liy4LiH4LmB4Lil4Liw4Lib4LiB4Lib4LmJ4Lit4LiH4LmC4LiZ4Lih4Lil4Liz4LiU4Lix4Lia4LiV4LmJ4LiZ4LmGIOC4leC4suC4oeC4iOC4s+C4meC4p+C4meC4l+C4teC5iOC4geC4s+C4q+C4meC4lA=="), -- Protect and place the strongest gnomes using the selected limit
+    [960687958] = decodeText64("4LmA4LiB4LmH4Lia4Lic4Lil4Lic4Lil4Li04LiV4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Collect
+    [1207244955] = decodeText64("4Lin4Liy4Lij4LmM4Lib4LmE4Lib4LmA4LiB4LmH4Lia4Lic4Lil4Lic4Lil4Li04LiV4LiX4Li14LmI4Liq4Li44LiB4LmB4Lil4LmJ4Lin4LmB4Lil4Liw4LiB4Lil4Lix4Lia4Lih4Liy4LiX4Li14LmI4LmA4LiU4Li04Lih"), -- Teleport to every ready crop, collect it, then return
+    [734608302] = decodeText64("4LiC4Liy4Lii4Lic4Lil4Lic4Lil4Li04LiV4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Sell Produce
+    [11884063] = decodeText64("4LiC4Liy4Lii4LmA4LiJ4Lie4Liy4Liw4Lic4Lil4Lic4Lil4Li04LiV4LiX4Li14LmI4Lih4Li14Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4LiV4Lij4LiH4LiV4Liy4Lih4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LmE4Lin4LmJ"), -- Sell only collected produce matching the selected mutations
+    [695356572] = decodeText64("4LmD4LiK4LmJ4LmE4Lit4LmA4LiX4Lih4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Use Items
+    [986399584] = decodeText64("4LmD4LiK4LmJ4Liq4Lib4Lij4Li04LiH4LmA4LiB4Lit4Lij4LmMIOC4m+C4uOC5i+C4oiDguJrguLHguKfguKPguJTguJnguYnguLMg4LmB4Lil4Liw4LiB4Liy4LmB4Lif4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Use selected sprinklers, fertilizers, watering cans, and gnome items
+    [1950563464] = decodeText64("4LiL4Li34LmJ4Lit4LiC4Lit4LiH4LmD4LiZ4Lij4LmJ4Liy4LiZ4LiE4LmJ4Liy4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Buy Item Shop
+    [2132620544] = decodeText64("4LiL4Li34LmJ4Lit4LmE4Lit4LmA4LiX4Lih4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LiX4Lix4LiZ4LiX4Li14LmA4Lih4Li34LmI4Lit4Lih4Li14LiC4Lit4LiH4LmD4LiZ4Lij4LmJ4Liy4LiZ"), -- Buy selected items whenever they are in stock
+    [403129408] = decodeText64("4Liq4LmI4LiH4LmE4Lit4LmA4LiX4Lih4LmD4LiZ4Lih4Li34Lit4LmD4Lir4LmJ4LmA4Lie4Li34LmI4Lit4LiZ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Give Held Item
+    [1517552053] = decodeText64("4Liq4LmI4LiH4Lic4Lil4Lic4Lil4Li04LiV4Lir4Lij4Li34Lit4LmC4LiZ4Lih4LiX4Li14LmI4LiW4Li34Lit4Lit4Lii4Li54LmI4LmD4LiZ4Lih4Li34Lit4LmD4Lir4LmJ4Lic4Li54LmJ4LmA4Lil4LmI4LiZ4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB"), -- Give the currently held crop or gnome to the first selected online player
+    [679397871] = decodeText64("4Lij4Lix4Lia4LiC4Lit4LiH4LiC4Lin4Lix4LiN4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Accept Gifts
+    [634013570] = decodeText64("4Lij4Lix4Lia4LiC4Lit4LiH4LiC4Lin4Lix4LiN4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4LiJ4Lie4Liy4Liw4LiI4Liy4LiB4LmA4Lie4Li34LmI4Lit4LiZ4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LmE4Lin4LmJ4LmA4LiX4LmI4Liy4LiZ4Lix4LmJ4LiZ"), -- Automatically accept item gifts only from selected players
+    [618208355] = decodeText64("4Lit4Lix4Lib4LmA4LiB4Lij4LiU4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Upgrade
+    [1347313269] = decodeText64("4LiL4Li34LmJ4Lit4LiB4Liy4Lij4Lit4Lix4Lib4LmA4LiB4Lij4LiU4LmB4Lib4Lil4LiH4LmB4Lil4Liw4Lit4Lix4Lib4Liq4LiB4Li04Lil4LiV4LmJ4LiZ4LmE4Lih4LmJ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Buy eligible plot upgrades and Upgrade Tree nodes
+    [196116111] = decodeText64("4LiC4Lii4Liy4Lii4LiX4Li14LmI4LiU4Li04LiZ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Buy Expansion
+    [328824634] = decodeText64("4LiL4Li34LmJ4Lit4LiB4Liy4Lij4LiC4Lii4Liy4Lii4Lie4Li34LmJ4LiZ4LiX4Li14LmI4LmB4Lib4Lil4LiH4LiX4Li14LmI4LiW4Li54LiB4LiX4Li14LmI4Liq4Li44LiU4LiX4Lix4LiZ4LiX4Li14LmA4Lih4Li34LmI4Lit4LmA4LiH4Li04LiZ4Lie4Lit"), -- Buy the cheapest available plot expansion
+    [602048425] = decodeText64("4LmA4LiB4Li04LiU4LmD4Lir4Lih4LmI4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0IChSZWJpcnRoKQ=="), -- Auto Rebirth
+    [440181375] = decodeText64("4LmA4LiB4Li04LiU4LmD4Lir4Lih4LmI4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4Lih4Li34LmI4Lit4LmA4LiH4Li04LiZ4LmB4Lil4Liw4LmC4LiZ4Lih4LiX4Li14LmI4LiE4LmJ4LiZ4Lie4Lia4LiE4Lij4Lia4LiV4Liy4Lih4LmA4LiH4Li34LmI4Lit4LiZ4LmE4LiC"), -- Rebirth when money and discovered gnomes meet requirements
+    [574315800] = decodeText64("4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ4LiB4Liy4Lij4Lir4Lil4Li44LiUIChBbnRpLUFGSyk="), -- Anti AFK
+    [69350190] = decodeText64("4LiI4Liz4Lil4Lit4LiH4LiB4Liy4Lij4LiC4Lii4Lix4Lia4LiV4Lix4Lin4LmA4Lih4Li34LmI4Lit4Lij4Liw4Lia4Lia4LiV4Lij4Lin4LiI4Lie4Lia4Lin4LmI4Liy4Lic4Li54LmJ4LmA4Lil4LmI4LiZ4Lit4Lii4Li54LmI4LiZ4Li04LmI4LiH"), -- Simulate input when Roblox reports the player idle
+    [1059741808] = decodeText64("4LmA4LiK4Li34LmI4Lit4Lih4LiV4LmI4Lit4LmD4Lir4Lih4LmI4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Rejoin
+    [2145984092] = decodeText64("4LiB4Lil4Lix4Lia4LmA4LiC4LmJ4Liy4LmA4LiL4Li04Lij4LmM4Lif4LmA4Lin4Lit4Lij4LmM4LmA4LiU4Li04Lih4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4Lih4Li34LmI4Lit4LmA4LiB4Lih4Lir4Lil4Li44LiU4Lir4Lij4Li34Lit4LiV4Lix4LiU4LiB4Liy4Lij4LmA4LiK4Li34LmI4Lit4Lih4LiV4LmI4Lit"), -- Rejoin this place after a disconnect/error prompt
+    [1974862954] = decodeText64("4LmC4Lir4Lih4LiU4Lil4LiU4LiE4Lin4Liy4Lih4Lir4LiZ4LmI4Lin4LiHIChMb3cgUGluZyk="), -- Low Ping Mode
+    [1618525399] = decodeText64("4LmA4LiB4Lil4Li14LmI4Lii4LiB4Liy4Lij4Liq4LmI4LiH4LiC4LmJ4Lit4Lih4Li54Lil4LmE4Lib4Lii4Lix4LiH4LmA4LiL4Li04Lij4LmM4Lif4LmA4Lin4Lit4Lij4LmM4LmD4Lir4LmJ4LmA4Liq4LiW4Li14Lii4Lij4LiC4Li24LmJ4LiZ"), -- Reduce remote bursts; server distance still determines real ping
+    [2034570322] = decodeText64("4LmC4Lir4Lih4LiU4Lig4Liy4Lie4LiB4Liy4LiBICjguKXguJTguYHguKXguYfguIEp"), -- Potato Graphics
+    [864013862] = decodeText64("4Lib4Li04LiU4LmA4Lit4Lif4LmA4Lif4LiB4LiV4LmM4Lig4Liy4Lie4LiX4Li14LmI4LmE4Lih4LmI4LiI4Liz4LmA4Lib4LmH4LiZ4LiX4Lix4LmJ4LiH4Lir4Lih4LiU4LmA4Lie4Li34LmI4Lit4LmA4Lie4Li04LmI4Lih4LiE4Lin4Liy4Lih4Lil4Li34LmI4LiZ4LmE4Lir4Lil"), -- Disable expensive local effects and use the lowest graphics quality
+    [822158911] = decodeText64("4LmC4Lir4Lil4LiU4LmC4Lib4Lij4LmE4Lif4Lil4LmM4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Auto Load Profile
+    [384180709] = decodeText64("4LmC4Lir4Lil4LiU4LiB4Liy4Lij4LiV4Lix4LmJ4LiH4LiE4LmI4Liy4LmC4Lib4Lij4LmE4Lif4Lil4LmM4LiZ4Li14LmJ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4Lih4Li34LmI4Lit4LmA4Lib4Li04LiU4Liq4LiE4Lij4Li04Lib4LiV4LmM4LiE4Lij4Lix4LmJ4LiH4LiW4Lix4LiU4LmE4Lib"), -- Load this profile automatically on the next execution
+    [1995119328] = decodeText64("4Lij4Liw4LiU4Lix4Lia4LmC4LiZ4Lih4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LiL4Li34LmJ4Lit"), -- Buy Rarity Targets
+    [632921855] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lij4Liw4LiU4Lix4Lia4LiE4Lin4Liy4Lih4Lir4Liy4Lii4Liy4LiB4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmD4Lir4LmJ4Lia4Lit4LiX4LiL4Li34LmJ4Lit4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Select rarity levels to buy automatically
+    [478680938] = decodeText64("4Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LiL4Li34LmJ4Lit"), -- Buy Mutation Targets
+    [122919227] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmD4Lir4LmJ4Lia4Lit4LiX4LiL4Li34LmJ4Lit4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Select mutations to buy automatically
+    [547907862] = decodeText64("4Lij4Liw4LiU4Lix4Lia4LmC4LiZ4Lih4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmA4LiB4LmH4LiaICjguYTguKHguYjguILguLLguKIp"), -- Keep Rarity Targets
+    [1466324090] = decodeText64("4LmC4LiZ4Lih4LiX4Li14LmI4Lih4Li14Lij4Liw4LiU4Lix4Lia4LmA4Lir4Lil4LmI4Liy4LiZ4Li14LmJ4LiI4Liw4LiW4Li54LiB4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ4LmB4Lil4Liw4LmA4LiB4LmH4Lia4LmE4Lin4LmJ4LmD4LiZ4LiV4Lix4Lin4LmA4Liq4Lih4LitIOC4q+C5ieC4suC4oeC4guC4suC4og=="), -- Gnomes with these rarities will always be protected and kept in inventory
+    [718391362] = decodeText64("4Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmA4LiB4LmH4LiaICjguYTguKHguYjguILguLLguKIp"), -- Keep Mutation Targets
+    [1712556532] = decodeText64("4LmC4LiZ4Lih4LiX4Li14LmI4Lih4Li14Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4LmA4Lir4Lil4LmI4Liy4LiZ4Li14LmJ4LiI4Liw4LiW4Li54LiB4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ4LmB4Lil4Liw4LmA4LiB4LmH4Lia4LmE4Lin4LmJ4LmD4LiZ4LiV4Lix4Lin4LmA4Liq4Lih4LitIOC4q+C5ieC4suC4oeC4guC4suC4og=="), -- Gnomes with these mutations will always be protected and kept in inventory
+    [390114212] = decodeText64("4Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4Lic4Lil4Lic4Lil4Li04LiV4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LiC4Liy4Lii"), -- Produce Mutation Targets
+    [1526727371] = decodeText64("4Lic4Lil4Lic4Lil4Li04LiV4LiX4Li14LmI4Lih4Li14Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4LiV4Liy4Lih4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LiI4Liw4LiW4Li54LiB4LiZ4Liz4LmE4Lib4LiC4Liy4LiiICjguJXguLTguYrguIEgTm9ybWFsIOC5gOC4nuC4t+C5iOC4reC4guC4suC4ouC4nOC4seC4geC4mOC4o+C4o+C4oeC4lOC4sik="), -- Ticked mutations will be sold; choose Normal for produce without a mutation
+    [68911190] = decodeText64("4LmE4Lit4LmA4LiX4Lih4Lif4Liy4Lij4LmM4Lih4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmD4LiK4LmJ"), -- Use Item Targets
+    [178505180] = decodeText64("4LmA4LiJ4Lie4Liy4Liw4LmE4Lit4LmA4LiX4Lih4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LmA4LiX4LmI4Liy4LiZ4Lix4LmJ4LiZ4LiX4Li14LmI4LiI4Liw4LiW4Li54LiB4LiZ4Liz4Lih4Liy4LmD4LiK4LmJ4LiH4Liy4LiZ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Only selected item types will be used automatically
+    [1510124033] = decodeText64("4LmE4Lit4LmA4LiX4Lih4Lij4LmJ4Liy4LiZ4LiE4LmJ4Liy4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LiL4Li34LmJ4Lit"), -- Shop Targets
+    [1699707406] = decodeText64("4LmE4Lit4LmA4LiX4Lih4LiX4Li14LmI4Lit4LiZ4Li44LiN4Liy4LiV4LmD4Lir4LmJ4Lij4Liw4Lia4Lia4LiL4Li34LmJ4Lit4LiI4Liy4LiB4Lij4LmJ4Liy4LiZ4LiE4LmJ4Liy4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Items allowed for Auto Buy Item Shop
+    [395775933] = decodeText64("4Lij4Liy4Lii4LiK4Li34LmI4Lit4LmA4Lie4Li34LmI4Lit4LiZ4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4Liq4LmI4LiH4LiC4Lit4LiH4LmD4Lir4LmJ"), -- Give To Players
+    [2048754197] = decodeText64("4LmA4Lil4Li34Lit4LiB4LmA4Lie4Li34LmI4Lit4LiZ4LmD4LiZ4LmA4LiL4Li04Lij4LmM4Lif4LmA4Lin4Lit4Lij4LmM4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4Liq4LmI4LiH4Lic4Lil4Lic4Lil4Li04LiV4Lir4Lij4Li34Lit4LmC4LiZ4Lih4LmD4Lir4LmJ"), -- Selected online recipient; the first available name is used
+    [1096463868] = decodeText64("4Lij4Liy4Lii4LiK4Li34LmI4Lit4LmA4Lie4Li34LmI4Lit4LiZ4LiX4Li14LmI4Lit4LiZ4Li44LiN4Liy4LiV4LmD4Lir4LmJ4Lij4Lix4Lia4LiC4Lit4LiH"), -- Accept From Players
+    [381601337] = decodeText64("4Lii4Lit4Lih4Lij4Lix4Lia4LiB4Liy4Lij4Liq4LmI4LiH4LiC4Lit4LiH4LiC4Lin4Lix4LiN4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4LiJ4Lie4Liy4Liw4LiI4Liy4LiB4LmA4Lie4Li34LmI4Lit4LiZ4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LmE4Lin4LmJ"), -- Only these senders are trusted for automatic acceptance
+    [1489178280] = decodeText64("4LmA4Lil4Li34Lit4LiB4LiX4Lix4LmJ4LiH4Lir4Lih4LiU"), -- Select All
+    [217603534] = decodeText64("4Lil4LmJ4Liy4LiH"), -- Clear
+    [794030545] = decodeText64("4LiE4LmJ4LiZ4Lir4LiyLi4u"), -- Search...
+    [1230004093] = decodeText64("4LmC4Lir4Lih4LiU4LiB4Lil4Lii4Li44LiX4LiY4LmM4LiB4Liy4Lij4LiX4Liz4LiH4Liy4LiZ"), -- Automation Strategy
+    [873990212] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lij4Li54Lib4LmB4Lia4Lia4LiB4Liy4Lij4LiX4Liz4LiH4Liy4LiZ4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmA4LiZ4LmJ4LiZ4LmA4Lib4LmH4LiZ4Lie4Li04LmA4Lio4Lip"), -- Choose how the automation prioritizes progression vs money vs hunting
+    [173500436] = decodeText64("4Liq4Lib4Li14LiU4Lij4Lix4LiZIFJlYmlydGg="), -- Rebirth Rush
+    [294679592] = decodeText64("4Lil4LmI4Liy4LmC4LiZ4Lih4LmA4LiX4Lie"), -- Gnome Hunter
+    [761187565] = decodeText64("4Lib4Lix4LmK4Lih4LmA4LiH4Li04LiZ4Lif4Liy4Lij4LmM4Lih"), -- Money Machine
+    [314142064] = decodeText64("4Liq4Lih4LiU4Li44Lil4Lit4Lix4LiI4LiJ4Lij4Li04Lii4Liw"), -- Balanced
+    [1092575591] = decodeText64("4Lil4Liz4LiU4Lix4Lia4LiE4Lin4Liy4Lih4Liq4Liz4LiE4Lix4LiNICjguKrguLjguYjguKEgdnMgUmViaXJ0aCk="), -- Roll vs Rebirth Priority
+    [2058004565] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lij4Liw4Lir4Lin4LmI4Liy4LiH4LiB4Liy4Lij4Lir4Lii4Li44LiU4LiL4Li34LmJ4Lit4LmC4LiZ4Lih4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4LijIOC4q+C4o+C4t+C4reC4geC4suC4o+C4geC4lOC5gOC4geC4tOC4lOC5g+C4q+C4oeC5iOC4geC5iOC4reC4mQ=="), -- Choose what wins when a wanted roll appears before rebirth
+    [211053657] = decodeText64("4LiL4Li34LmJ4Lit4LmC4LiZ4Lih4LiB4LmI4Lit4LiZ"), -- Target First
+    [1415884188] = decodeText64("4LmA4LiB4Li04LiU4LmD4Lir4Lih4LmI4LiB4LmI4Lit4LiZ"), -- Rebirth First
+    [564665951] = decodeText64("4LiI4Liz4LiZ4Lin4LiZ4LmC4LiZ4Lih4LiX4Li14LmI4LmA4LiB4LmI4LiH4LiX4Li14LmI4Liq4Li44LiU"), -- Best Gnome Amount
+    [1402248995] = decodeText64("4Lij4Liw4Lia4Li44LiI4Liz4LiZ4Lin4LiZ4LmC4LiZ4Lih4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4Lin4Liy4LiH4Lil4LiH4LmB4Lib4Lil4LiHICgxIOC4luC4tuC4hyAxMDAg4LiV4Lix4LinKQ=="), -- Enter an amount from 1 to 100
+    [790590637] = decodeText64("4LmC4Lir4Lih4LiU4Lie4Lix4LiB4Lir4LiZ4LmJ4Liy4LiI4LitICjguJvguKPguLDguKvguKLguLHguJTguJ7guKXguLHguIfguIfguLLguJkp"), -- Screen Sleep
+    [923391854] = decodeText64("4Lia4Lit4LiX4LiX4Liz4LiH4Liy4LiZ4LiV4LmI4Lit4LmA4LiZ4Li34LmI4Lit4LiH4LmC4LiU4Lii4Lib4Li04LiU4LiB4Liy4Lij4Lib4Lij4Liw4Lih4Lin4Lil4Lic4LilIDNEIOC5geC4peC4sOC4iOC4s+C4geC4seC4lCAxMCBGUFM="), -- Keep automation running with 3D rendering disabled and a 10 FPS cap
+    [226089592] = decodeText64("4Lie4Lix4LiB4Lir4LiZ4LmJ4Liy4LiI4Lit"), -- SLEEP SCREEN
+    [237978446] = decodeText64("4LiC4LiZ4Liy4LiU4LiV4Lix4Lin4Lir4LiZ4Lix4LiH4Liq4Li34Lit"), -- Text Size
+    [1123865154] = decodeText64("4Lib4Lij4Lix4Lia4LiC4LiZ4Liy4LiU4LiV4Lix4Lin4Lir4LiZ4Lix4LiH4Liq4Li34Lit4LmD4LiZ4LmA4Lih4LiZ4Li54LiV4Lix4LmJ4LiH4LmB4LiV4LmIIDcwJSDguJbguLbguIcgMTYwJQ=="), -- Adjust all interface text from 70% to 160%
+    [98108697] = decodeText64("4LiK4Li34LmI4Lit4LmC4Lib4Lij4LmE4Lif4Lil4LmM"), -- Profile Name
+    [1118359840] = decodeText64("4Lia4Lix4LiZ4LiX4Li24LiB4LmC4Lib4Lij4LmE4Lif4Lil4LmM"), -- Save Profile
+    [1685611255] = decodeText64("4LmC4Lir4Lil4LiU4LmC4Lib4Lij4LmE4Lif4Lil4LmM"), -- Load Profile
+    [193820477] = decodeText64("4LmA4LiC4LmJ4Liy4LmA4LiL4Li04Lij4LmM4Lif4LmD4Lir4Lih4LmI4LiX4Lix4LiZ4LiX4Li1"), -- Rejoin Now
+    [1625187216] = decodeText64("4Liq4Lib4Lij4Li04LiH4LmA4LiB4Lit4Lij4LmM4LmB4Lil4Liw4Lib4Li44LmL4Lii4LiI4Liw4Lin4Liy4LiH4LiE4Lil4Li44Lih4Lie4Li34LiK4Lij4Liy4LiE4Liy4LmB4Lie4LiHLCDguJrguLHguKfguKPguJTguJnguYnguLPguIjguLDguKPguJTguJ7guLfguIrguJfguLXguYjguIHguLPguKXguLHguIfguYLguJUsIOC5geC4peC4sOC4geC4suC5geC4n+C4iOC4sOC5g+C4iuC5ieC4geC4seC4muC5guC4meC4oeC4l+C4teC5iOC5gOC4geC5iOC4h+C4l+C4teC5iOC4quC4uOC4lOC5g+C4meC5geC4m+C4peC4hw=="), -- Area items cover valuable crops, watering cans target growing crops, and coffee targets the strongest unboosted gnome.
+    [895845879] = decodeText64("4Lil4Liz4LiU4Lix4Lia4LiB4Liy4Lij4Lit4Lix4Lib4LmA4LiB4Lij4LiUCjEuIOC4reC4seC4m+C5gOC4geC4o+C4lOC5geC4m+C4peC4h+C4l+C4teC5iOC5gOC4h+C4tOC4meC4nuC4reC4i+C4t+C5ieC4rQoyLiDguK3guLHguJvguYDguIHguKPguJTguKrguIHguLTguKXguJXguYnguJnguYTguKHguYnguJfguLXguYjguJvguKXguJTguKXguYfguK3guIHguYHguKXguYnguKcK4Lij4Liw4Lia4Lia4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ4LiB4Liy4Lij4LiL4Li34LmJ4Lit4LmA4LiB4Li04LiZ4Lir4Lij4Li34Lit4LiE4Liz4Liq4Lix4LmI4LiH4LmE4Lih4LmI4LiW4Li54LiB4LiV4LmJ4Lit4LiH4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"), -- Upgrade order 1. Affordable plot upgrades 2. Eligible Upgrade Tree nodes Server validation prevents invalid or maxed purchases.
+    [146757810] = decodeText64("Q3RybCArIEFsdCAgfCAg4LmA4Lib4Li04LiUIC8g4LiL4LmI4Lit4LiZ4Lir4LiZ4LmJ4Liy4LiV4LmI4Liy4LiHIFVJClBBVVNFIOC5gOC4nuC4t+C5iOC4reC4q+C4ouC4uOC4lOC4muC4reC4l+C4l+C4seC5ieC4h+C4q+C4oeC4lCwgUkVTVU1FIOC5gOC4nuC4t+C5iOC4reC5g+C4q+C5ieC4l+C4s+C4h+C4suC4meC4leC5iOC4reC4leC4suC4oeC5gOC4lOC4tOC4oQrguKPguLDguJrguJrguKLguLHguIfguITguIfguJfguLPguIfguLLguJnguJXguYjguK3guYDguJnguLfguYjguK3guIfguYDguKHguLfguYjguK3guKLguYjguK3guKvguJnguYnguLLguJXguYjguLLguIc="), -- Ctrl + Alt  |  Show / hide UI PAUSE stops all automation. RESUME restores the previous toggles. Settings stay active when the UI is minimized.
+    [754771019] = decodeText64("4LmB4LiV4Liw4Lir4LiZ4LmJ4Liy4LiI4Lit4LmA4Lie4Li34LmI4Lit4Lib4Lil4Li44LiBCuC4muC4reC4l+C4geC4s+C4peC4seC4h+C4l+C4s+C4h+C4suC4meC4leC5iOC4reC5gOC4meC4t+C5iOC4reC4h+C5g+C4meC5guC4q+C4oeC4lOC4m+C4o+C4sOC4q+C4ouC4seC4lOC4nuC4peC4seC4h+C4h+C4suC4mQ=="), -- TAP TO WAKE Automation continues in low-power mode
 }
 local LanguageBindings = {}
 local LanguageRefreshers = {}
@@ -986,8 +1329,11 @@ local function refreshLanguage()
     end
     for _, refresh in ipairs(LanguageRefreshers) do
         if type(refresh) == "function" then
-            if type(refresh) == "function" then pcall(refresh) end
+            pcall(refresh)
         end
+    end
+    if type(Runtime.RefreshVisibleLists) == "function" then
+        pcall(function() Runtime.RefreshVisibleLists(true) end)
     end
 end
 
@@ -1097,16 +1443,20 @@ Runtime.ScreenGui = ScreenGui
 end
 
 Runtime.Viewport = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1920, 1080)
+local isMobile = Runtime.Mobile or UserInputService.TouchEnabled
 local Window = {
-    D = Runtime.Mobile
-        and Vector2.new(math.min(620, Runtime.Viewport.X - 12), math.min(500, Runtime.Viewport.Y - 12))
+    D = isMobile
+        and Vector2.new(
+            math.clamp(math.floor(Runtime.Viewport.X * 0.84), 320, 580),
+            math.clamp(math.floor(Runtime.Viewport.Y * 0.80), 280, 440)
+        )
         or Vector2.new(720, 500),
-    N = Runtime.Mobile
-        and Vector2.new(math.max(240, math.min(320, Runtime.Viewport.X - 12)), math.max(250, math.min(280, Runtime.Viewport.Y - 12)))
-        or Vector2.new(560, 380),
-    C = Vector2.new(64, 64),
-    H = Runtime.Mobile and 56 or 64,
-    B = Runtime.Mobile and 112 or 156,
+    N = isMobile
+        and Vector2.new(math.min(280, Runtime.Viewport.X - 16), math.min(250, Runtime.Viewport.Y - 16))
+        or Vector2.new(520, 360),
+    C = isMobile and Vector2.new(54, 54) or Vector2.new(64, 64),
+    H = isMobile and 52 or 64,
+    B = isMobile and 110 or 156,
 }
 Window.S = Vector2.new(
     math.clamp(tonumber(State.UIWidth) or Window.D.X, Window.N.X, math.max(Window.N.X, Runtime.Viewport.X - 8)),
@@ -1628,7 +1978,7 @@ end
 local function addPage(name)
     local button = create("TextButton", {
         Name = name,
-        Size = UDim2.new(1, 0, 0, 38),
+        Size = UDim2.new(1, 0, 0, 42),
         BackgroundColor3 = Theme.Surface,
         BorderSizePixel = 0,
         Font = Enum.Font.GothamMedium,
@@ -1653,20 +2003,27 @@ local function addPage(name)
     create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = indicator })
     local page = create("ScrollingFrame", {
         Name = name,
-        Size = UDim2.new(1, -28, 1, -24),
-        Position = UDim2.fromOffset(14, 12),
+        Size = UDim2.new(1, -36, 1, -24),
+        Position = UDim2.fromOffset(18, 12),
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
-        ScrollBarThickness = 3,
+        ScrollBarThickness = Runtime.Mobile and 3 or 4,
         ScrollBarImageColor3 = Theme.Accent,
         CanvasSize = UDim2.new(),
         AutomaticCanvasSize = Enum.AutomaticSize.Y,
+        ElasticBehavior = (Enum and Enum.ElasticBehavior and Enum.ElasticBehavior.WhenScrollable) or nil,
+        ScrollingDirection = Enum.ScrollingDirection.Y,
         Visible = false,
         Parent = Content,
     })
     create("UIListLayout", {
-        Padding = UDim.new(0, 9),
+        Padding = UDim.new(0, 12),
         SortOrder = Enum.SortOrder.LayoutOrder,
+        Parent = page,
+    })
+    create("UIPadding", {
+        PaddingTop = UDim.new(0, 4),
+        PaddingBottom = UDim.new(0, 28),
         Parent = page,
     })
     navButtons[name] = button
@@ -1690,33 +2047,34 @@ end
 
 local GnomesPage = addPage("Gnomes")
 local FarmPage = addPage("Farm")
-local ShopPage = addPage("Shop")
 local UpgradePage = addPage("Upgrade")
 local SocialPage = addPage("Social")
 local SystemPage = addPage("System")
+local ShopPage = FarmPage
 local ConfigPage = SystemPage
 
 local function addGroupLabel(parent, title)
     local row = create("Frame", {
-        Size = UDim2.new(1, -4, 0, 30),
+        Size = UDim2.new(1, 0, 0, 36),
         BackgroundTransparency = 1,
         Parent = parent,
     })
     local label = create("TextLabel", {
-        Size = UDim2.new(0, 190, 1, 0),
+        Size = UDim2.new(0, 210, 1, 0),
+        Position = UDim2.fromOffset(2, 0),
         BackgroundTransparency = 1,
         Font = Enum.Font.GothamBold,
         Text = translated(title),
         TextColor3 = Theme.Accent,
-        TextSize = 10,
+        TextSize = 11,
         TextXAlignment = Enum.TextXAlignment.Left,
         Parent = row,
     })
     bindLanguage(label, "Text", title)
     local line = create("Frame", {
-        Size = UDim2.new(1, -200, 0, 1),
-        Position = UDim2.new(0, 200, 0.5, 0),
-        BackgroundColor3 = Color3.fromRGB(49, 55, 68),
+        Size = UDim2.new(1, -220, 0, 1),
+        Position = UDim2.new(0, 220, 0.5, 0),
+        BackgroundColor3 = Color3.fromRGB(45, 52, 65),
         BorderSizePixel = 0,
         Parent = row,
     })
@@ -1727,15 +2085,15 @@ local toggleRefreshers = {}
 Runtime.ToggleRefreshers = toggleRefreshers
 local function addToggle(parent, title, description, key)
     local row = create("Frame", {
-        Size = UDim2.new(1, -4, 0, 58),
+        Size = UDim2.new(1, 0, 0, 64),
         BackgroundColor3 = Theme.Surface,
         BorderSizePixel = 0,
         Parent = parent,
     })
-    create("UICorner", { CornerRadius = UDim.new(0, 9), Parent = row })
+    create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = row })
     local titleLabel = create("TextLabel", {
-        Size = UDim2.new(1, -76, 0, 22),
-        Position = UDim2.fromOffset(13, 8),
+        Size = UDim2.new(1, -84, 0, 22),
+        Position = UDim2.fromOffset(16, 11),
         BackgroundTransparency = 1,
         Font = Enum.Font.GothamMedium,
         Text = translated(title),
@@ -1746,21 +2104,21 @@ local function addToggle(parent, title, description, key)
     })
     bindLanguage(titleLabel, "Text", title)
     local descriptionLabel = create("TextLabel", {
-        Size = UDim2.new(1, -76, 0, 17),
-        Position = UDim2.fromOffset(13, 31),
+        Size = UDim2.new(1, -84, 0, 18),
+        Position = UDim2.fromOffset(16, 34),
         BackgroundTransparency = 1,
         Font = Enum.Font.Gotham,
         Text = translated(description),
         TextColor3 = Theme.Muted,
-        TextSize = 10,
+        TextSize = 11,
         TextXAlignment = Enum.TextXAlignment.Left,
         TextTruncate = Enum.TextTruncate.AtEnd,
         Parent = row,
     })
     bindLanguage(descriptionLabel, "Text", description)
     local switch = create("TextButton", {
-        Size = UDim2.fromOffset(45, 24),
-        Position = UDim2.new(1, -58, 0.5, -12),
+        Size = UDim2.fromOffset(48, 26),
+        Position = UDim2.new(1, -64, 0.5, -13),
         BorderSizePixel = 0,
         Text = "",
         AutoButtonColor = false,
@@ -1768,7 +2126,7 @@ local function addToggle(parent, title, description, key)
     })
     create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = switch })
     local knob = create("Frame", {
-        Size = UDim2.fromOffset(18, 18),
+        Size = UDim2.fromOffset(20, 20),
         BorderSizePixel = 0,
         BackgroundColor3 = Theme.Text,
         Parent = switch,
@@ -1777,7 +2135,7 @@ local function addToggle(parent, title, description, key)
     local function refresh()
         local enabled = State[key] == true
         switch.BackgroundColor3 = enabled and Theme.Accent or Theme.Negative
-        knob.Position = enabled and UDim2.fromOffset(24, 3) or UDim2.fromOffset(3, 3)
+        knob.Position = enabled and UDim2.fromOffset(25, 3) or UDim2.fromOffset(3, 3)
     end
     toggleRefreshers[key] = refresh
     connect(switch.Activated, function()
@@ -1792,6 +2150,12 @@ local function addToggle(parent, title, description, key)
             end
         end
         refresh()
+        if MasterAutomationKeySet[key] and State.AutomationStrategy ~= "Custom" then
+            State.AutomationStrategy = "Custom"
+            if type(Runtime.RefreshStrategyUI) == "function" then
+                pcall(Runtime.RefreshStrategyUI)
+            end
+        end
         Runtime.OnToggleChanged(key, State[key])
     end)
     refresh()
@@ -1800,15 +2164,15 @@ end
 
 local function addSection(parent, title, detail)
     local box = create("Frame", {
-        Size = UDim2.new(1, -4, 0, 214),
+        Size = UDim2.new(1, 0, 0, 248),
         BackgroundColor3 = Theme.Surface,
         BorderSizePixel = 0,
         Parent = parent,
     })
-    create("UICorner", { CornerRadius = UDim.new(0, 9), Parent = box })
+    create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = box })
     local sectionTitle = create("TextLabel", {
-        Size = UDim2.new(1, -20, 0, 22),
-        Position = UDim2.fromOffset(12, 8),
+        Size = UDim2.new(1, -160, 0, 22),
+        Position = UDim2.fromOffset(16, 12),
         BackgroundTransparency = 1,
         Font = Enum.Font.GothamMedium,
         Text = translated(title),
@@ -1819,8 +2183,8 @@ local function addSection(parent, title, detail)
     })
     bindLanguage(sectionTitle, "Text", title)
     local subtitle = create("TextLabel", {
-        Size = UDim2.new(1, -20, 0, 16),
-        Position = UDim2.fromOffset(12, 29),
+        Size = UDim2.new(1, -160, 0, 16),
+        Position = UDim2.fromOffset(16, 33),
         BackgroundTransparency = 1,
         Font = Enum.Font.Gotham,
         Text = translated(detail),
@@ -1836,9 +2200,49 @@ end
 local listRenderers = {}
 local function addMultiSelect(parent, title, detail, selection, optionProvider, preserveOrder)
     local box, subtitle = addSection(parent, title, detail)
+    local actionRow = create("Frame", {
+        Size = UDim2.fromOffset(150, 28),
+        Position = UDim2.new(1, -166, 0, 16),
+        BackgroundTransparency = 1,
+        Parent = box,
+    })
+    create("UIListLayout", {
+        FillDirection = Enum.FillDirection.Horizontal,
+        HorizontalAlignment = Enum.HorizontalAlignment.Right,
+        Padding = UDim.new(0, 6),
+        Parent = actionRow,
+    })
+    local selectAllBtn = create("TextButton", {
+        Size = UDim2.fromOffset(76, 26),
+        BackgroundColor3 = Theme.SurfaceHover,
+        BorderSizePixel = 0,
+        Font = Enum.Font.GothamMedium,
+        Text = translated("Select All"),
+        TextColor3 = Theme.Accent,
+        TextSize = 11,
+        AutoButtonColor = false,
+        Parent = actionRow,
+    })
+    create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = selectAllBtn })
+    bindLanguage(selectAllBtn, "Text", "Select All")
+
+    local clearAllBtn = create("TextButton", {
+        Size = UDim2.fromOffset(60, 26),
+        BackgroundColor3 = Theme.SurfaceHover,
+        BorderSizePixel = 0,
+        Font = Enum.Font.GothamMedium,
+        Text = translated("Clear"),
+        TextColor3 = Color3.fromRGB(255, 130, 140),
+        TextSize = 11,
+        AutoButtonColor = false,
+        Parent = actionRow,
+    })
+    create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = clearAllBtn })
+    bindLanguage(clearAllBtn, "Text", "Clear")
+
     local search = create("TextBox", {
-        Size = UDim2.new(1, -24, 0, 30),
-        Position = UDim2.fromOffset(12, 51),
+        Size = UDim2.new(1, -32, 0, 32),
+        Position = UDim2.fromOffset(16, 56),
         BackgroundColor3 = Theme.Background,
         BorderSizePixel = 0,
         ClearTextOnFocus = false,
@@ -1852,24 +2256,38 @@ local function addMultiSelect(parent, title, detail, selection, optionProvider, 
         Parent = box,
     })
     bindLanguage(search, "PlaceholderText", "Search...")
-    create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = search })
-    create("UIPadding", { PaddingLeft = UDim.new(0, 10), Parent = search })
+    create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = search })
+    create("UIPadding", { PaddingLeft = UDim.new(0, 12), Parent = search })
     local list = create("ScrollingFrame", {
-        Size = UDim2.new(1, -24, 0, 119),
-        Position = UDim2.fromOffset(12, 87),
+        Size = UDim2.new(1, -32, 0, 140),
+        Position = UDim2.fromOffset(16, 96),
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
-        ScrollBarThickness = 3,
+        ScrollBarThickness = 4,
         ScrollBarImageColor3 = Theme.Accent,
         CanvasSize = UDim2.new(),
         AutomaticCanvasSize = Enum.AutomaticSize.Y,
         Parent = box,
     })
     create("UIListLayout", {
-        Padding = UDim.new(0, 5),
+        Padding = UDim.new(0, 6),
         SortOrder = Enum.SortOrder.LayoutOrder,
         Parent = list,
     })
+
+    connect(selectAllBtn.Activated, function()
+        local options = optionProvider()
+        for _, opt in ipairs(options) do
+            selection[opt] = true
+        end
+        Runtime.SelectionVersion = Runtime.SelectionVersion + 1
+        render(true)
+    end)
+    connect(clearAllBtn.Activated, function()
+        table.clear(selection)
+        Runtime.SelectionVersion = Runtime.SelectionVersion + 1
+        render(true)
+    end)
 
     local previousSignature = ""
     local function render(force)
@@ -1901,12 +2319,12 @@ local function addMultiSelect(parent, title, detail, selection, optionProvider, 
                 local selected = isSelected(selection, option)
                 local choice = create("TextButton", {
                     Name = option,
-                    Size = UDim2.new(1, -5, 0, 27),
+                    Size = UDim2.new(1, -6, 0, 30),
                     LayoutOrder = visibleCount,
                     BackgroundColor3 = selected and Theme.AccentDark or Theme.Background,
                     BorderSizePixel = 0,
                     Font = Enum.Font.Gotham,
-                    Text = (selected and "  [x]  " or "  [ ]  ") .. option,
+                    Text = (selected and "  [✓]  " or "  [  ]  ") .. option,
                     TextColor3 = selected and Theme.Text or Theme.Muted,
                     TextSize = 11,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -1950,24 +2368,118 @@ Runtime.RefreshVisibleLists = function(force)
     end
 end
 
+
+addGroupLabel(GnomesPage, "Strategy & Modes")
+do
+local function addStrategyPresetsControl(parent)
+    local row = create("Frame", {
+        Size = UDim2.new(1, 0, 0, 96),
+        BackgroundColor3 = Theme.Surface,
+        BorderSizePixel = 0,
+        Parent = parent,
+    })
+    create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = row })
+    local title = create("TextLabel", {
+        Size = UDim2.new(1, -32, 0, 22),
+        Position = UDim2.fromOffset(16, 12),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.GothamMedium,
+        Text = translated("Automation Strategy"),
+        TextColor3 = Theme.Text,
+        TextSize = 13,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = row,
+    })
+    bindLanguage(title, "Text", "Automation Strategy")
+    local detail = create("TextLabel", {
+        Size = UDim2.new(1, -32, 0, 18),
+        Position = UDim2.fromOffset(16, 33),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.Gotham,
+        Text = translated("Choose how the automation prioritizes progression vs money vs hunting"),
+        TextColor3 = Theme.Muted,
+        TextSize = 11,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = row,
+    })
+    bindLanguage(detail, "Text", "Choose how the automation prioritizes progression vs money vs hunting")
+
+    local btnBar = create("Frame", {
+        Size = UDim2.new(1, -32, 0, 32),
+        Position = UDim2.fromOffset(16, 54),
+        BackgroundTransparency = 1,
+        Parent = row,
+    })
+    create("UIGridLayout", {
+        CellSize = UDim2.new(0.19, -2, 1, 0),
+        CellPadding = UDim2.new(0.012, 0, 0, 0),
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Parent = btnBar,
+    })
+
+    local strategyButtons = {}
+    local options = {
+        { Key = "Balanced", Label = "Balanced" },
+        { Key = "MaxProgression", Label = "Rebirth Rush" },
+        { Key = "GnomeHunter", Label = "Gnome Hunter" },
+        { Key = "MoneyMachine", Label = "Money Machine" },
+        { Key = "Custom", Label = "Custom" },
+    }
+    for idx, opt in ipairs(options) do
+        local btn = create("TextButton", {
+            Name = opt.Key,
+            LayoutOrder = idx,
+            BackgroundColor3 = Theme.Background,
+            BorderSizePixel = 0,
+            Font = Enum.Font.GothamMedium,
+            Text = translated(opt.Label),
+            TextColor3 = Theme.Muted,
+            TextSize = 10,
+            AutoButtonColor = false,
+            Parent = btnBar,
+        })
+        create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = btn })
+        bindLanguage(btn, "Text", opt.Label)
+        strategyButtons[opt.Key] = btn
+        connect(btn.Activated, function()
+            Runtime.ApplyStrategyPreset(opt.Key)
+            for k, b in pairs(strategyButtons) do
+                local sel = State.AutomationStrategy == k
+                b.BackgroundColor3 = sel and Theme.AccentDark or Theme.Background
+                b.TextColor3 = sel and Theme.Text or Theme.Muted
+            end
+        end)
+    end
+    local function refreshStrategyUI()
+        for k, b in pairs(strategyButtons) do
+            local sel = State.AutomationStrategy == k
+            b.BackgroundColor3 = sel and Theme.AccentDark or Theme.Background
+            b.TextColor3 = sel and Theme.Text or Theme.Muted
+        end
+    end
+    Runtime.RefreshStrategyUI = refreshStrategyUI
+    table.insert(LanguageRefreshers, refreshStrategyUI)
+    refreshStrategyUI()
+end
+addStrategyPresetsControl(GnomesPage)
+end
+
 addGroupLabel(GnomesPage, "Auto Roll")
 addToggle(GnomesPage, "Auto Roll", "Roll continuously and wait for every result", "AutoRoll")
-addToggle(GnomesPage, "Auto Buy by Rarity", "Buy rolled gnomes with a selected rarity", "AutoBuyTarget")
-addToggle(GnomesPage, "Auto Buy Rebirth Gnomes", "Buy missing gnomes required for the next rebirth", "AutoBuyRebirthGnomes")
+addToggle(GnomesPage, "Auto Buy Rolled Gnomes", "Buy rolled gnomes that match your selected rarity, mutation, or rebirth targets", "AutoBuyTarget")
 addToggle(GnomesPage, "Pause Roll Until Affordable", "Hold a wanted result until enough money is available to buy it", "PauseRollUntilAffordable")
-addToggle(GnomesPage, "Auto Buy Mutations", "Buy rolled gnomes with selected mutations", "AutoBuyMutation")
 do
 local function addRollPriorityControl(parent)
 local RollPriorityRow = create("Frame", {
-    Size = UDim2.new(1, -4, 0, 82),
+    Size = UDim2.new(1, 0, 0, 96),
     BackgroundColor3 = Theme.Surface,
     BorderSizePixel = 0,
     Parent = parent,
 })
-create("UICorner", { CornerRadius = UDim.new(0, 9), Parent = RollPriorityRow })
+create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = RollPriorityRow })
 local RollPriorityTitle = create("TextLabel", {
-    Size = UDim2.new(1, -24, 0, 20),
-    Position = UDim2.fromOffset(13, 7),
+    Size = UDim2.new(1, -32, 0, 22),
+    Position = UDim2.fromOffset(16, 12),
     BackgroundTransparency = 1,
     Font = Enum.Font.GothamMedium,
     Text = translated("Roll vs Rebirth Priority"),
@@ -1978,20 +2490,20 @@ local RollPriorityTitle = create("TextLabel", {
 })
 bindLanguage(RollPriorityTitle, "Text", "Roll vs Rebirth Priority")
 local RollPriorityDetail = create("TextLabel", {
-    Size = UDim2.new(1, -24, 0, 16),
-    Position = UDim2.fromOffset(13, 27),
+    Size = UDim2.new(1, -32, 0, 18),
+    Position = UDim2.fromOffset(16, 33),
     BackgroundTransparency = 1,
     Font = Enum.Font.Gotham,
     Text = translated("Choose what wins when a wanted roll appears before rebirth"),
     TextColor3 = Theme.Muted,
-    TextSize = 10,
+    TextSize = 11,
     TextXAlignment = Enum.TextXAlignment.Left,
     Parent = RollPriorityRow,
 })
 bindLanguage(RollPriorityDetail, "Text", "Choose what wins when a wanted roll appears before rebirth")
 local RollPriorityBar = create("Frame", {
-    Size = UDim2.new(1, -24, 0, 27),
-    Position = UDim2.fromOffset(12, 48),
+    Size = UDim2.new(1, -32, 0, 32),
+    Position = UDim2.fromOffset(16, 54),
     BackgroundTransparency = 1,
     Parent = RollPriorityRow,
 })
@@ -2041,47 +2553,49 @@ local function refreshRollPriorityUI()
         button.TextColor3 = selected and Theme.Text or Theme.Muted
     end
 end
+Runtime.RefreshRollPriorityUI = refreshRollPriorityUI
 table.insert(LanguageRefreshers, refreshRollPriorityUI)
 refreshRollPriorityUI()
 end
 addRollPriorityControl(GnomesPage)
 end
 addGroupLabel(GnomesPage, "Auto Best Gnomes")
-addToggle(GnomesPage, "Auto Manage Best Gnomes", "Protect and place the strongest gnomes using the selected sell policy", "AutoBest30")
-local BestLimitRow = create("Frame", {
-    Size = UDim2.new(1, -4, 0, 58),
+local BestGnomeCard = create("Frame", {
+    Size = UDim2.new(1, 0, 0, 64),
     BackgroundColor3 = Theme.Surface,
     BorderSizePixel = 0,
     Parent = GnomesPage,
 })
-create("UICorner", { CornerRadius = UDim.new(0, 9), Parent = BestLimitRow })
-local BestLimitTitle = create("TextLabel", {
-    Size = UDim2.new(1, -92, 0, 22),
-    Position = UDim2.fromOffset(13, 8),
+create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = BestGnomeCard })
+local bestTitle = create("TextLabel", {
+    Size = UDim2.new(1, -140, 0, 22),
+    Position = UDim2.fromOffset(16, 11),
     BackgroundTransparency = 1,
     Font = Enum.Font.GothamMedium,
-    Text = translated("Best Gnome Amount"),
+    Text = translated("Auto Manage Best Gnomes"),
     TextColor3 = Theme.Text,
     TextSize = 13,
     TextXAlignment = Enum.TextXAlignment.Left,
-    Parent = BestLimitRow,
+    Parent = BestGnomeCard,
 })
-bindLanguage(BestLimitTitle, "Text", "Best Gnome Amount")
-local BestLimitDetail = create("TextLabel", {
-    Size = UDim2.new(1, -92, 0, 17),
-    Position = UDim2.fromOffset(13, 31),
+bindLanguage(bestTitle, "Text", "Auto Manage Best Gnomes")
+local bestDesc = create("TextLabel", {
+    Size = UDim2.new(1, -140, 0, 18),
+    Position = UDim2.fromOffset(16, 34),
     BackgroundTransparency = 1,
     Font = Enum.Font.Gotham,
-    Text = translated("Enter an amount from 1 to 100"),
+    Text = translated("Protect and place the strongest gnomes using the selected limit"),
     TextColor3 = Theme.Muted,
-    TextSize = 10,
+    TextSize = 11,
     TextXAlignment = Enum.TextXAlignment.Left,
-    Parent = BestLimitRow,
+    TextTruncate = Enum.TextTruncate.AtEnd,
+    Parent = BestGnomeCard,
 })
-bindLanguage(BestLimitDetail, "Text", "Enter an amount from 1 to 100")
+bindLanguage(bestDesc, "Text", "Protect and place the strongest gnomes using the selected limit")
+
 local BestLimitInput = create("TextBox", {
-    Size = UDim2.fromOffset(62, 32),
-    Position = UDim2.new(1, -75, 0.5, -16),
+    Size = UDim2.fromOffset(50, 28),
+    Position = UDim2.new(1, -124, 0.5, -14),
     BackgroundColor3 = Theme.Background,
     BorderSizePixel = 0,
     ClearTextOnFocus = false,
@@ -2092,7 +2606,7 @@ local BestLimitInput = create("TextBox", {
     TextColor3 = Theme.Text,
     TextSize = 12,
     TextXAlignment = Enum.TextXAlignment.Center,
-    Parent = BestLimitRow,
+    Parent = BestGnomeCard,
 })
 create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = BestLimitInput })
 create("UIStroke", { Color = Color3.fromRGB(49, 55, 68), Thickness = 1, Parent = BestLimitInput })
@@ -2101,76 +2615,45 @@ connect(BestLimitInput.FocusLost, function()
     State.BestGnomeLimit = value
     BestLimitInput.Text = tostring(value)
 end)
-local PolicyRow = create("Frame", {
-    Size = UDim2.new(1, -4, 0, 88),
-    BackgroundColor3 = Theme.Surface,
+
+local bestSwitch = create("TextButton", {
+    Size = UDim2.fromOffset(48, 26),
+    Position = UDim2.new(1, -64, 0.5, -13),
     BorderSizePixel = 0,
-    Parent = GnomesPage,
+    Text = "",
+    AutoButtonColor = false,
+    Parent = BestGnomeCard,
 })
-create("UICorner", { CornerRadius = UDim.new(0, 9), Parent = PolicyRow })
-local PolicyTitle = create("TextLabel", {
-    Size = UDim2.new(1, -24, 0, 20),
-    Position = UDim2.fromOffset(13, 7),
-    BackgroundTransparency = 1,
-    Font = Enum.Font.GothamMedium,
-    Text = translated("Gnome Sell Policy"),
-    TextColor3 = Theme.Text,
-    TextSize = 13,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    Parent = PolicyRow,
+create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = bestSwitch })
+local bestKnob = create("Frame", {
+    Size = UDim2.fromOffset(20, 20),
+    BorderSizePixel = 0,
+    BackgroundColor3 = Theme.Text,
+    Parent = bestSwitch,
 })
-bindLanguage(PolicyTitle, "Text", "Gnome Sell Policy")
-local PolicyDetail = create("TextLabel", {
-    Size = UDim2.new(1, -24, 0, 16),
-    Position = UDim2.fromOffset(13, 27),
-    BackgroundTransparency = 1,
-    Font = Enum.Font.Gotham,
-    Text = translated("Protected best gnomes are never sold"),
-    TextColor3 = Theme.Muted,
-    TextSize = 10,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    Parent = PolicyRow,
-})
-bindLanguage(PolicyDetail, "Text", "Protected best gnomes are never sold")
-local PolicyBar = create("Frame", {
-    Size = UDim2.new(1, -24, 0, 29),
-    Position = UDim2.fromOffset(12, 50),
-    BackgroundTransparency = 1,
-    Parent = PolicyRow,
-})
-create("UIListLayout", {
-    FillDirection = Enum.FillDirection.Horizontal,
-    HorizontalAlignment = Enum.HorizontalAlignment.Center,
-    Padding = UDim.new(0, 5),
-    Parent = PolicyBar,
-})
-local PolicyButtons = {}
-for _, option in ipairs({
-    { Key = "BelowBest", Label = "Below Best" },
-    { Key = "SelectedRarities", Label = "Selected Rarities" },
-    { Key = "KeepExtras", Label = "Keep Extras" },
-}) do
-    local button = create("TextButton", {
-        Size = UDim2.new(1 / 3, -4, 1, 0),
-        BackgroundColor3 = Theme.Background,
-        BorderSizePixel = 0,
-        Font = Enum.Font.GothamMedium,
-        Text = translated(option.Label),
-        TextColor3 = Theme.Muted,
-        TextSize = 10,
-        AutoButtonColor = false,
-        Parent = PolicyBar,
-    })
-    create("UICorner", { CornerRadius = UDim.new(0, 7), Parent = button })
-    bindLanguage(button, "Text", option.Label)
-    PolicyButtons[option.Key] = button
-    connect(button.Activated, function()
-        State.GnomeSellPolicy = option.Key
-        if Runtime.RefreshGnomePolicyUI then
-            Runtime.RefreshGnomePolicyUI()
-        end
-    end)
+create("UICorner", { CornerRadius = UDim.new(1, 0), Parent = bestKnob })
+local function refreshBestToggle()
+    local enabled = State.AutoBest30 == true
+    bestSwitch.BackgroundColor3 = enabled and Theme.Accent or Theme.Negative
+    bestKnob.Position = enabled and UDim2.fromOffset(25, 3) or UDim2.fromOffset(3, 3)
 end
+toggleRefreshers["AutoBest30"] = refreshBestToggle
+refreshBestToggle()
+connect(bestSwitch.Activated, function()
+    if Runtime.Paused and MasterAutomationKeySet["AutoBest30"] then
+        return
+    end
+    State.AutoBest30 = not State.AutoBest30
+    Runtime.NormalizeAutomation("AutoBest30")
+    for otherKey, otherRefresh in pairs(toggleRefreshers) do
+        if otherKey ~= "AutoBest30" then
+            if type(otherRefresh) == "function" then pcall(otherRefresh) end
+        end
+    end
+    refreshBestToggle()
+    Runtime.OnToggleChanged("AutoBest30", State.AutoBest30)
+end)
+-- GnomeSellPolicy consolidated into 3-tier keep/sell rules
 addGroupLabel(FarmPage, "Auto Collect")
 addToggle(FarmPage, "Auto Collect", "Teleport to every ready crop, collect it, then return", "AutoCollect")
 addToggle(FarmPage, "Auto Sell Produce", "Sell only collected produce matching the selected mutations", "AutoSellProduce")
@@ -2332,56 +2815,20 @@ collectPlayerOptions = function()
     return result
 end
 
-addGroupLabel(GnomesPage, "Targets")
-addMultiSelect(GnomesPage, "Buy Rarity Targets", "Select rarity levels, ordered strongest to weakest", State.BuyRarityTargets, collectRarityOptions, true)
-addMultiSelect(GnomesPage, "Buy Mutation Targets", "Any matching mutation will trigger a purchase", State.MutationTargets, collectMutationOptions, true)
-addMultiSelect(GnomesPage, "Keep Rarity Targets", "Gnomes with these rarities will always be kept in inventory", State.KeepRarityTargets, collectRarityOptions, true)
-addMultiSelect(GnomesPage, "Keep Mutation Targets", "Gnomes with these mutations will always be kept in inventory (select Normal for no mutation)", State.KeepMutationTargets, collectMutationOptions, true)
-local SellRaritySection = addMultiSelect(GnomesPage, "Sell Rarity Targets", "Only unprotected gnomes with these rarity levels will be sold", State.SellRarityTargets, collectRarityOptions, true)
-Runtime.RefreshGnomePolicyUI = function()
-    for policy, button in pairs(PolicyButtons) do
-        local selected = State.GnomeSellPolicy == policy
-        button.BackgroundColor3 = selected and Theme.AccentDark or Theme.Background
-        button.TextColor3 = selected and Theme.Text or Theme.Muted
-    end
-    SellRaritySection.Visible = State.GnomeSellPolicy == "SelectedRarities"
-end
-table.insert(LanguageRefreshers, Runtime.RefreshGnomePolicyUI)
-Runtime.RefreshGnomePolicyUI()
+addGroupLabel(GnomesPage, "Targets & Protection")
+addMultiSelect(GnomesPage, "Buy Rarity Targets", "Select rarity levels to buy automatically", State.BuyRarityTargets, collectRarityOptions, true)
+addMultiSelect(GnomesPage, "Buy Mutation Targets", "Select mutations to buy automatically", State.MutationTargets, collectMutationOptions, true)
+addMultiSelect(GnomesPage, "Keep Rarity Targets", "Gnomes with these rarities will always be protected and kept in inventory", State.KeepRarityTargets, collectRarityOptions, true)
+addMultiSelect(GnomesPage, "Keep Mutation Targets", "Gnomes with these mutations will always be protected and kept in inventory", State.KeepMutationTargets, collectMutationOptions, true)
 addMultiSelect(FarmPage, "Produce Mutation Targets", "Ticked mutations will be sold; choose Normal for produce without a mutation", State.SellProduceMutationTargets, function()
     local options = table.clone(collectMutationOptions())
     table.insert(options, "Normal")
     return options
 end, true)
 
-addGroupLabel(ShopPage, "Shop")
-addToggle(ShopPage, "Auto Buy Item Shop", "Buy selected items whenever they are in stock", "AutoBuyShop")
-addMultiSelect(ShopPage, "Shop Targets", "Items allowed for Auto Buy Item Shop", State.ShopTargets, collectShopOptions, true)
-Runtime.ShopStatusLabel = create("TextLabel", {
-    Size = UDim2.new(1, -4, 0, 38),
-    BackgroundColor3 = Theme.Surface,
-    BorderSizePixel = 0,
-    Font = Enum.Font.GothamMedium,
-    Text = "SHOP | IDLE",
-    TextColor3 = Theme.Muted,
-    TextSize = 10,
-    TextWrapped = true,
-    Parent = ShopPage,
-})
-create("UICorner", { CornerRadius = UDim.new(0, 9), Parent = Runtime.ShopStatusLabel })
-Runtime.SetShopStatus = function(message, positive)
-    Runtime.LastShopResult = tostring(message or "IDLE")
-    if Runtime.ShopStatusLabel and Runtime.ShopStatusLabel.Parent then
-        Runtime.ShopStatusLabel.Text = "SHOP | " .. Runtime.LastShopResult
-        Runtime.ShopStatusLabel.TextColor3 = positive == true and Theme.Positive
-            or positive == false and Color3.fromRGB(255, 170, 95)
-            or Theme.Muted
-    end
-end
-
-addGroupLabel(ShopPage, "Auto Use Items")
-addToggle(ShopPage, "Auto Use Items", "Use selected sprinklers, fertilizers, watering cans, and gnome items", "AutoUseItems")
-addMultiSelect(ShopPage, "Use Item Targets", "Only selected item types will be used automatically", State.UseItemTargets, function()
+addGroupLabel(FarmPage, "Farm Care & Buffs")
+addToggle(FarmPage, "Auto Use Items", "Use selected sprinklers, fertilizers, watering cans, and gnome items", "AutoUseItems")
+addMultiSelect(FarmPage, "Use Item Targets", "Only selected item types will be used automatically", State.UseItemTargets, function()
     local options = {}
     for name, data in pairs(ItemShop.Items or {}) do
         if type(data) == "table"
@@ -2397,6 +2844,27 @@ addMultiSelect(ShopPage, "Use Item Targets", "Only selected item types will be u
     end)
     return options
 end, true)
+Runtime.UseItemStatusLabel = create("TextLabel", {
+    Size = UDim2.new(1, -4, 0, 38),
+    BackgroundColor3 = Theme.Surface,
+    BorderSizePixel = 0,
+    Font = Enum.Font.GothamMedium,
+    Text = "ITEM | IDLE",
+    TextColor3 = Theme.Muted,
+    TextSize = 10,
+    TextWrapped = true,
+    Parent = FarmPage,
+})
+create("UICorner", { CornerRadius = UDim.new(0, 9), Parent = Runtime.UseItemStatusLabel })
+Runtime.SetUseItemStatus = function(message, positive)
+    Runtime.LastUseItemResult = tostring(message or "IDLE")
+    if Runtime.UseItemStatusLabel and Runtime.UseItemStatusLabel.Parent then
+        Runtime.UseItemStatusLabel.Text = "ITEM | " .. Runtime.LastUseItemResult
+        Runtime.UseItemStatusLabel.TextColor3 = positive == true and Theme.Positive
+            or positive == false and Color3.fromRGB(255, 170, 95)
+            or Theme.Muted
+    end
+end
 local UseItemInfo = create("TextLabel", {
     Size = UDim2.new(1, -4, 0, 82),
     BackgroundColor3 = Theme.Surface,
@@ -2407,7 +2875,7 @@ local UseItemInfo = create("TextLabel", {
     TextSize = 11,
     TextWrapped = true,
     TextXAlignment = Enum.TextXAlignment.Left,
-    Parent = ShopPage,
+    Parent = FarmPage,
 })
 create("UICorner", { CornerRadius = UDim.new(0, 9), Parent = UseItemInfo })
 create("UIPadding", {
@@ -2416,23 +2884,27 @@ create("UIPadding", {
     Parent = UseItemInfo,
 })
 bindLanguage(UseItemInfo, "Text", "Area items cover valuable crops, watering cans target growing crops, and coffee targets the strongest unboosted gnome.")
-Runtime.UseItemStatusLabel = create("TextLabel", {
+
+addGroupLabel(FarmPage, "Item Shop Automation")
+addToggle(FarmPage, "Auto Buy Item Shop", "Buy selected items whenever they are in stock", "AutoBuyShop")
+addMultiSelect(FarmPage, "Shop Targets", "Items allowed for Auto Buy Item Shop", State.ShopTargets, collectShopOptions, true)
+Runtime.ShopStatusLabel = create("TextLabel", {
     Size = UDim2.new(1, -4, 0, 38),
     BackgroundColor3 = Theme.Surface,
     BorderSizePixel = 0,
     Font = Enum.Font.GothamMedium,
-    Text = "ITEM | IDLE",
+    Text = "SHOP | IDLE",
     TextColor3 = Theme.Muted,
     TextSize = 10,
     TextWrapped = true,
-    Parent = ShopPage,
+    Parent = FarmPage,
 })
-create("UICorner", { CornerRadius = UDim.new(0, 9), Parent = Runtime.UseItemStatusLabel })
-Runtime.SetUseItemStatus = function(message, positive)
-    Runtime.LastUseItemResult = tostring(message or "IDLE")
-    if Runtime.UseItemStatusLabel and Runtime.UseItemStatusLabel.Parent then
-        Runtime.UseItemStatusLabel.Text = "ITEM | " .. Runtime.LastUseItemResult
-        Runtime.UseItemStatusLabel.TextColor3 = positive == true and Theme.Positive
+create("UICorner", { CornerRadius = UDim.new(0, 9), Parent = Runtime.ShopStatusLabel })
+Runtime.SetShopStatus = function(message, positive)
+    Runtime.LastShopResult = tostring(message or "IDLE")
+    if Runtime.ShopStatusLabel and Runtime.ShopStatusLabel.Parent then
+        Runtime.ShopStatusLabel.Text = "SHOP | " .. Runtime.LastShopResult
+        Runtime.ShopStatusLabel.TextColor3 = positive == true and Theme.Positive
             or positive == false and Color3.fromRGB(255, 170, 95)
             or Theme.Muted
     end
@@ -2708,13 +3180,14 @@ local function refreshMasterControl()
     end
 end
 
-connect(LanguageControl.Activated, function()
+Runtime.ToggleLanguage = function()
     State.Language = State.Language == "TH" and "EN" or "TH"
     LanguageControl.Text = State.Language
     refreshLanguage()
-    refreshMasterControl()
-    refreshConfigUI()
-end)
+    if type(refreshMasterControl) == "function" then refreshMasterControl() end
+    if type(refreshConfigUI) == "function" then refreshConfigUI() end
+end
+connect(LanguageControl.Activated, Runtime.ToggleLanguage)
 connect(LanguageControl.MouseEnter, function()
     LanguageControl.BackgroundColor3 = Theme.SurfaceHover
 end)
@@ -2931,24 +3404,15 @@ connect(Header.InputBegan, beginDrag)
 -- When minimized, this button covers the whole compact window and must also
 -- act as its drag handle.
 connect(Minimize.InputBegan, beginDrag)
-connect(UserInputService.InputEnded, function(input)
-    local key = input.KeyCode
-    if key == Enum.KeyCode.LeftAlt or key == Enum.KeyCode.RightAlt
-        or key == Enum.KeyCode.LeftControl or key == Enum.KeyCode.RightControl then
-        Window.K = false
-    end
-    local finished = input.UserInputType == Enum.UserInputType.MouseButton1
-        or (input.UserInputType == Enum.UserInputType.Touch and input == dragInput)
-    if dragging and finished then
+local function endDragging(input)
+    if dragging and (not input or input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch or input == dragInput) then
         if dragMoved then
             suppressMinimizeUntil = os.clock() + 0.2
         end
         dragging = false
         dragInput = nil
     end
-    local resizeFinished = input.UserInputType == Enum.UserInputType.MouseButton1
-        or (input.UserInputType == Enum.UserInputType.Touch and input == Window.I)
-    if Window.A and resizeFinished then
+    if Window.A and (not input or input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch or input == Window.I) then
         Window.A = false
         Window.I = nil
         Window.L.Visible = Window.V and not minimized
@@ -2956,15 +3420,33 @@ connect(UserInputService.InputEnded, function(input)
     if not dragging and not Window.A and Runtime.StopPointerRender then
         Runtime.StopPointerRender()
     end
+end
+
+connect(UserInputService.InputEnded, function(input)
+    local key = input.KeyCode
+    if key == Enum.KeyCode.LeftAlt or key == Enum.KeyCode.RightAlt
+        or key == Enum.KeyCode.LeftControl or key == Enum.KeyCode.RightControl then
+        Window.K = false
+    end
+    endDragging(input)
+end)
+connect(UserInputService.TouchEnded, function(touch)
+    endDragging(touch)
 end)
 connect(UserInputService.InputChanged, function(input)
-    local movingTouch = dragInput and input == dragInput
-    if dragging and movingTouch then
-        updateDrag(pointerPosition(input))
+    if dragging and (input.UserInputType == Enum.UserInputType.Touch or input == dragInput) then
+        updateDrag(Vector2.new(input.Position.X, input.Position.Y))
     end
-    local resizingTouch = Window.A and Window.I and input == Window.I
-    if resizingTouch then
-        updateResize(pointerPosition(input))
+    if Window.A and (input.UserInputType == Enum.UserInputType.Touch or input == Window.I) then
+        updateResize(Vector2.new(input.Position.X, input.Position.Y))
+    end
+end)
+connect(UserInputService.TouchMoved, function(touch)
+    if dragging then
+        updateDrag(Vector2.new(touch.Position.X, touch.Position.Y))
+    end
+    if Window.A then
+        updateResize(Vector2.new(touch.Position.X, touch.Position.Y))
     end
 end)
 Runtime.StartPointerRender = function()
@@ -2973,11 +3455,11 @@ Runtime.StartPointerRender = function()
     end
     local ok, connection = pcall(function()
         return game:GetService("RunService").RenderStepped:Connect(function()
-            if dragging and not dragInput then
-                updateDrag(pointerPosition())
+            if dragging then
+                updateDrag(pointerPosition(dragInput))
             end
-            if Window.A and not Window.I then
-                updateResize(pointerPosition())
+            if Window.A then
+                updateResize(pointerPosition(Window.I))
             end
         end)
     end)
@@ -3264,7 +3746,9 @@ local function findGnomePlacement()
     return fallback.CFrame * CFrame.new(0, fallback.Size.Y / 2, 0), getFloorId(fallback, ground)
 end
 
-local Backpack = LocalPlayer:FindFirstChildOfClass("Backpack") or LocalPlayer:FindFirstChild("Backpack")
+local function getBackpack()
+    return LocalPlayer:FindFirstChildOfClass("Backpack") or LocalPlayer:FindFirstChild("Backpack")
+end
 Runtime.GetSellPointCFrame = function()
     local plot = getPlot()
     local points = plot and plot:FindFirstChild("Points")
@@ -3316,7 +3800,7 @@ end
 Runtime.ProduceSellRetry = setmetatable({}, { __mode = "k" })
 Runtime.FindSelectedProduceBatch = function(limit)
     local result = {}
-    for _, container in ipairs({ Backpack, LocalPlayer.Character }) do
+    for _, container in ipairs({ getBackpack(), LocalPlayer.Character }) do
         if container then
             for _, tool in ipairs(container:GetChildren()) do
                 if (Runtime.ProduceSellRetry[tool] or 0) <= os.clock()
@@ -3416,7 +3900,7 @@ local function tryAutoPlace(tool)
                                 humanoid:UnequipTools()
                             end)
                         end
-                        if previouslyEquipped and previouslyEquipped.Parent == Backpack then
+                        if previouslyEquipped and previouslyEquipped.Parent == getBackpack() then
                             pcall(function()
                                 humanoid:EquipTool(previouslyEquipped)
                             end)
@@ -3546,7 +4030,7 @@ local function getRankedGnomes()
             add(worker, "Worker")
         end
     end
-    for _, container in ipairs({ Backpack, LocalPlayer.Character }) do
+    for _, container in ipairs({ getBackpack(), LocalPlayer.Character }) do
         if container then
             for _, tool in ipairs(container:GetChildren()) do
                 if isGnomeTool(tool) then
@@ -3704,7 +4188,7 @@ local function sellInventoryGnomeBatch(tools)
             pcall(function()
                 humanoid:UnequipTools()
             end)
-            if previouslyEquipped and previouslyEquipped.Parent == Backpack then
+            if previouslyEquipped and previouslyEquipped.Parent == getBackpack() then
                 pcall(function()
                     humanoid:EquipTool(previouslyEquipped)
                 end)
@@ -3738,7 +4222,6 @@ local function sellInventoryGnome(tool)
 end
 
 local function policySellsGnome(record)
-    -- Unknown/event configs stay protected from destructive automation.
     if not record or not record.Instance or type(FarmersConfig[record.FarmerName]) ~= "table" then
         return false
     end
@@ -3751,16 +4234,93 @@ local function policySellsGnome(record)
     if hasKeepMutation(record.Instance) then
         return false
     end
-    if State.GnomeSellPolicy == "BelowBest" then
-        return true
-    elseif State.GnomeSellPolicy == "SelectedRarities" then
-        if Runtime.HasAnySelection(State.SellRarityTargets) then
-            return isSelected(State.SellRarityTargets, getFarmerRarity(record.Instance))
-        end
+    return true
+end
+
+Runtime.PurgeInventoryOverflow = function()
+    if not Runtime.Alive then
+        return false
+    end
+    local currentCount = Runtime.GetBackpackItemCount()
+    if currentCount < 35 then
         return true
     end
-    return false
+
+    local actionOk = Runtime.WithAction("EmergencyInventoryPurge", { "Movement", "Farm", "Equipment", "Gnome" }, function()
+        local character = LocalPlayer.Character
+        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+        local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+        local returnPivot = character and character:GetPivot()
+        local sellCFrame = Runtime.GetSellPointCFrame()
+
+        if character and rootPart and sellCFrame and (rootPart.Position - sellCFrame.Position).Magnitude > 8 then
+            pcall(function()
+                character:PivotTo(sellCFrame * CFrame.new(0, 3, 5))
+                rootPart.AssemblyLinearVelocity = Vector3.zero
+                rootPart.AssemblyAngularVelocity = Vector3.zero
+            end)
+            task.wait(0.2)
+        end
+
+        -- 1. Sell eligible produce in backpack (Try SellAll fast-path first)
+        local okAll = invoke("SellAll")
+        local produceBatch = Runtime.FindSelectedProduceBatch(20)
+        for _, produce in ipairs(produceBatch) do
+            if produce.Parent and Runtime.IsProduceTool(produce) and Runtime.IsSelectedProduceMutation(produce) then
+                if Runtime.EquipToolConfirmed(produce) then
+                    local ok, res = invoke("SellThis")
+                    if ok and type(res) == "number" then
+                        Runtime.Stats.Sold = Runtime.Stats.Sold + 1
+                    end
+                end
+            end
+        end
+
+        -- 2. If still high, sell junk inventory gnomes (never Top 30 placed or keep targets)
+        if Runtime.GetBackpackItemCount() >= 35 then
+            local ranked = getRankedGnomes()
+            local keepLimit = getBestGnomeLimit()
+            local protectedCount = math.min(keepLimit, #ranked)
+            local junkGnomes = {}
+            for index = #ranked, protectedCount + 1, -1 do
+                local record = ranked[index]
+                if record.Kind == "Tool" and record.Instance and record.Instance.Parent and policySellsGnome(record) then
+                    table.insert(junkGnomes, record.Instance)
+                    if #junkGnomes >= 12 then
+                        break
+                    end
+                end
+            end
+            for _, gnomeTool in ipairs(junkGnomes) do
+                if gnomeTool.Parent and not Runtime.IsGiftReserved(gnomeTool) then
+                    if Runtime.EquipToolConfirmed(gnomeTool) then
+                        local ok, res = invoke("SellGnome")
+                        if ok and type(res) == "number" then
+                            Runtime.Stats.Sold = Runtime.Stats.Sold + 1
+                        end
+                    end
+                end
+            end
+        end
+
+        if humanoid and humanoid.Parent then
+            pcall(function()
+                humanoid:UnequipTools()
+            end)
+        end
+
+        if returnPivot and character == LocalPlayer.Character and character.Parent and rootPart and rootPart.Parent then
+            pcall(function()
+                character:PivotTo(returnPivot)
+                rootPart.AssemblyLinearVelocity = Vector3.zero
+                rootPart.AssemblyAngularVelocity = Vector3.zero
+            end)
+        end
+        return true
+    end)
+    return actionOk == true
 end
+
 
 local function removePlacedGnome(record, sell)
     local instance = record and record.Instance
@@ -3800,7 +4360,7 @@ end
 -- the desired ceiling, so a missing/renamed capacity attribute cannot underfill.
 task.spawn(function()
     while Runtime.Alive do
-        if State.AutoBest30 then
+        if State.AutoBest30 or Runtime.IsBackpackNearFull() then
             local ranked = getRankedGnomes()
             local keepLimit = getBestGnomeLimit()
             local protectedCount = math.min(keepLimit, #ranked)
@@ -4205,10 +4765,16 @@ local function findCoffeeTarget()
     local protectedCount = State.AutoBest30 and math.min(getBestGnomeLimit(), #ranked) or #ranked
     for index, record in ipairs(ranked) do
         if index <= protectedCount and record.Kind == "Worker"
-            and (tonumber(record.Instance:GetAttribute("GnomeSpeed")) or 1) <= 1
             and (Runtime.ItemTargetRetry[record.Instance] or 0) <= os.clock()
         then
-            return record.Instance
+            local worker = record.Instance
+            local hasCoffee = worker:GetAttribute("HasCoffee") == true
+                or worker:FindFirstChild("CoffeeTrail") ~= nil
+            local gnomeSpeed = tonumber(worker:GetAttribute("GnomeSpeed"))
+            local isBoosted = hasCoffee or (gnomeSpeed and gnomeSpeed > 1)
+            if not isBoosted then
+                return worker
+            end
         end
     end
 end
@@ -4264,11 +4830,11 @@ local function tryUseItem(tool)
         placeCFrame, floorId = findSmartAreaPlacement(tool)
     end
     if (itemType == "WateringCan" or itemType == "GnomeItem") and not target then
-        itemRetryAt[tool] = os.clock() + 1.5
+        itemRetryAt[tool] = os.clock() + 0.5
         Runtime.SetUseItemStatus(itemName .. " | NO TARGET")
         return false
     elseif (itemType == "Sprinkler" or itemType == "Fertilizer") and not placeCFrame then
-        itemRetryAt[tool] = os.clock() + 2
+        itemRetryAt[tool] = os.clock() + 1
         Runtime.SetUseItemStatus(itemName .. " | NO VALID AREA")
         return false
     end
@@ -4283,6 +4849,7 @@ local function tryUseItem(tool)
     end
     itemPending[tool] = true
     Runtime.ItemActionActive = true
+    Runtime.ItemActionActiveAt = os.clock()
     task.spawn(function()
         local actionOk, confirmed, attempted = Runtime.WithAction("UseItem", groups, function()
             if not State.AutoUseItems or not tool.Parent or not isSelected(State.UseItemTargets, itemName) then
@@ -4353,6 +4920,7 @@ local function tryUseItem(tool)
                     addIdentifier(tool:GetAttribute("GnomeItemName"))
                     addIdentifier(itemName)
                     addIdentifier(tool.Name)
+                    addIdentifier(tool)
                     for _, identifier in ipairs(identifiers) do
                         local sent = fire("GiveFarmerItem", target, identifier)
                         didAttempt = sent or didAttempt
@@ -4398,7 +4966,7 @@ local function tryUseItem(tool)
                         humanoid:UnequipTools()
                     end)
                 end
-                if previouslyEquipped and previouslyEquipped ~= tool and previouslyEquipped.Parent == Backpack then
+                if previouslyEquipped and previouslyEquipped ~= tool and previouslyEquipped.Parent == getBackpack() then
                     pcall(function()
                         humanoid:EquipTool(previouslyEquipped)
                     end)
@@ -4408,6 +4976,7 @@ local function tryUseItem(tool)
         end)
         itemPending[tool] = nil
         Runtime.ItemActionActive = false
+        Runtime.ItemActionActiveAt = nil
         local waitingForTurn = not actionOk and confirmed == "busy"
         if not waitingForTurn then
             Runtime.ClearActionReservation("UseItem")
@@ -4433,7 +5002,7 @@ local function tryUseItem(tool)
                 end
                 Runtime.ItemPlacementRejected[tool] = rejected
             end
-            itemRetryAt[tool] = os.clock() + math.min(2 + failures * 1.5, 10)
+            itemRetryAt[tool] = os.clock() + math.min(1 + failures * 0.5, 4)
             Runtime.SetUseItemStatus(
                 itemName .. " | " .. (not actionOk and tostring(confirmed):upper()
                     or attempted and "SERVER REJECTED"
@@ -4453,10 +5022,16 @@ task.spawn(function()
             end
         elseif not Runtime.HasAnySelection(State.UseItemTargets) then
             Runtime.SetUseItemStatus("SELECT AN ITEM", false)
-        elseif not Runtime.ItemActionActive then
+        elseif not Runtime.ItemActionActive
+            or (Runtime.ItemActionActiveAt and os.clock() - Runtime.ItemActionActiveAt > 8)
+        then
+            if Runtime.ItemActionActiveAt and os.clock() - Runtime.ItemActionActiveAt > 8 then
+                Runtime.ItemActionActive = false
+                Runtime.ItemActionActiveAt = nil
+            end
             local candidates = {}
             local now = os.clock()
-            for _, container in ipairs({ Backpack, LocalPlayer.Character }) do
+            for _, container in ipairs({ getBackpack(), LocalPlayer.Character }) do
                 if container then
                     for _, tool in ipairs(container:GetChildren()) do
                         local itemName, itemType = getUseItemInfo(tool)
@@ -4482,7 +5057,7 @@ task.spawn(function()
                 end
             end
         end
-        task.wait(State.AutoUseItems and 0.75 or 1.5)
+        task.wait(State.AutoUseItems and 0.4 or 1.5)
     end
 end)
 
@@ -4733,16 +5308,7 @@ local function isWantedPreview(instance)
     return rarityMatch or mutationMatch or Runtime.NeedsRebirthGnome(instance)
 end
 
-local function getPlayerMoney()
-    local stats = type(Replication.Data) == "table" and Replication.Data.stats or nil
-    local money = type(stats) == "table" and tonumber(stats.money) or nil
-    if money then
-        return money
-    end
-    local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
-    local moneyValue = leaderstats and leaderstats:FindFirstChild("Money")
-    return moneyValue and tonumber(moneyValue.Value) or 0
-end
+-- getPlayerMoney moved to early helpers
 
 Runtime.GetRebirthCount = function()
     local stats = type(Replication.Data) == "table" and Replication.Data.stats or {}
@@ -4865,6 +5431,9 @@ local function tryBuyPreview(instance)
         return
     end
     boughtPreview[instance] = os.clock()
+    if Runtime.IsBackpackNearFull() then
+        Runtime.EnsureBackpackSpace(1)
+    end
     local ok = fire("BuyFarmer", instance)
     if ok then
         local deadline = os.clock() + 0.6
@@ -4953,14 +5522,19 @@ task.spawn(function()
     local collecting = setmetatable({}, { __mode = "k" })
     while Runtime.Alive do
         local yieldForSale = false
-        if State.AutoSellProduce and Runtime.HasAnySelection(State.SellProduceMutationTargets) then
-            yieldForSale = Runtime.FindSelectedProduceBatch(1)[1] ~= nil
+        if State.AutoSellProduce then
+            yieldForSale = Runtime.FindSelectedProduceBatch(1)[1] ~= nil or Runtime.IsBackpackNearFull()
             if yieldForSale then
                 Runtime.ProduceSellPending = true
                 Runtime.ReserveAction("SellSelectedProduce", { "Movement", "Farm", "Equipment" }, 2)
             end
         end
-        if State.AutoCollect and not yieldForSale then
+        local lease = Runtime.MovementLease
+        local leaseActive = lease and lease.Owner ~= "Collect" and os.clock() < lease.Until
+        if Runtime.IsBackpackNearFull() then
+            Runtime.PurgeInventoryOverflow()
+        end
+        if State.AutoCollect and not yieldForSale and not leaseActive then
             Runtime.WithAction("Collect", { "Movement", "Farm" }, function()
                 local plot = getPlot()
                 local plants = plot and plot:FindFirstChild("Plants")
@@ -5032,9 +5606,7 @@ task.spawn(function()
                             collecting[plant] = nil
                         end)
                         task.wait(0.08)
-                        if State.AutoSellProduce and Runtime.HasAnySelection(State.SellProduceMutationTargets)
-                            and Runtime.FindSelectedProduceBatch(1)[1]
-                        then
+                        if State.AutoSellProduce and (Runtime.FindSelectedProduceBatch(1)[1] ~= nil or Runtime.IsBackpackNearFull()) then
                             Runtime.ProduceSellPending = true
                             Runtime.ReserveAction("SellSelectedProduce", { "Movement", "Farm", "Equipment" }, 2)
                             break
@@ -5062,12 +5634,12 @@ end)
 task.spawn(function()
     while Runtime.Alive do
         local batch = {}
-        if State.AutoSellProduce and Runtime.HasAnySelection(State.SellProduceMutationTargets) then
-            batch = Runtime.FindSelectedProduceBatch(8)
+        if State.AutoSellProduce or Runtime.IsBackpackNearFull() then
+            batch = Runtime.FindSelectedProduceBatch(15)
         end
         if batch[1] then
             Runtime.ProduceSellPending = true
-            Runtime.ReserveAction("SellSelectedProduce", { "Movement", "Farm", "Equipment" }, 5)
+            Runtime.ReserveAction("SellSelectedProduce", { "Movement", "Farm", "Equipment" }, 5, 50)
             local actionOk, soldCount, result = Runtime.WithAction("SellSelectedProduce", { "Movement", "Farm", "Equipment" }, function()
                 local character = LocalPlayer.Character
                 local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -5079,56 +5651,64 @@ task.spawn(function()
                 local count = 0
                 local lastResponse = "no match"
                 if character and rootPart and sellCFrame
-                    and (rootPart.Position - sellCFrame.Position).Magnitude > 10
+                    and (rootPart.Position - sellCFrame.Position).Magnitude > 8
                 then
                     moved = pcall(function()
                         character:PivotTo(sellCFrame * CFrame.new(0, 3, 5))
                         rootPart.AssemblyLinearVelocity = Vector3.zero
                         rootPart.AssemblyAngularVelocity = Vector3.zero
                     end)
-                    task.wait(0.05)
+                    task.wait(0.1)
                 end
-                for _, produce in ipairs(batch) do
-                    if not Runtime.Alive or not State.AutoSellProduce then
-                        break
-                    end
-                    if produce.Parent and Runtime.IsProduceTool(produce)
-                        and Runtime.IsSelectedProduceMutation(produce)
-                    then
-                        Runtime.SellingProduceTool = produce
-                        local ok, response
-                        local success = false
-                        for attempt = 1, 6 do
-                            local equipped = Runtime.EquipToolConfirmed(produce, attempt > 1)
-                            if equipped and Runtime.IsSelectedProduceMutation(produce) then
-                                ok, response = invoke("SellThis")
-                                success = ok and type(response) == "number"
-                            else
-                                response = equipped and "selection changed" or "equip failed"
-                            end
-                            if success or not produce.Parent then
-                                break
-                            end
-                            task.wait(math.min(0.025 * attempt, 0.1))
+
+                -- Fast Path: Try SellAll first for instant 1-tick sale
+                local okAll, resAll = invoke("SellAll")
+                if okAll and type(resAll) == "number" and resAll > 0 then
+                    count = #batch
+                    Runtime.Stats.Sold = Runtime.Stats.Sold + count
+                    lastResponse = "SellAll " .. tostring(resAll) .. "$"
+                else
+                    -- Fallback: Equip and sell individually via SellThis
+                    for _, produce in ipairs(batch) do
+                        if not Runtime.Alive or not (State.AutoSellProduce or Runtime.IsBackpackNearFull()) then
+                            break
                         end
-                        if success then
-                            count = count + 1
-                            Runtime.Stats.Sold = Runtime.Stats.Sold + 1
-                            if produce.Parent then
-                                Runtime.ProduceSellRetry[produce] = os.clock() + 0.25
+                        if produce.Parent and Runtime.IsProduceTool(produce)
+                            and Runtime.IsSelectedProduceMutation(produce)
+                        then
+                            Runtime.SellingProduceTool = produce
+                            local ok, response
+                            local success = false
+                            for attempt = 1, 4 do
+                                local equipped = Runtime.EquipToolConfirmed(produce, attempt > 1)
+                                if equipped then
+                                    ok, response = invoke("SellThis")
+                                    success = ok and type(response) == "number"
+                                else
+                                    response = "equip failed"
+                                end
+                                if success or not produce.Parent then
+                                    break
+                                end
+                                task.wait(0.04)
                             end
-                        elseif produce.Parent then
-                            Runtime.ProduceSellRetry[produce] = os.clock() + 0.1
+                            if success then
+                                count = count + 1
+                                Runtime.Stats.Sold = Runtime.Stats.Sold + 1
+                            elseif produce.Parent then
+                                Runtime.ProduceSellRetry[produce] = os.clock() + 0.5
+                            end
+                            lastResponse = response
+                            Runtime.SellingProduceTool = nil
                         end
-                        lastResponse = response
-                        Runtime.SellingProduceTool = nil
                     end
                 end
+
                 if humanoid and humanoid.Parent then
                     pcall(function()
                         humanoid:UnequipTools()
                     end)
-                    if previous and previous.Parent == Backpack then
+                    if previous and previous.Parent == getBackpack() then
                         pcall(function()
                             humanoid:EquipTool(previous)
                         end)
@@ -5148,17 +5728,15 @@ task.spawn(function()
             end)
             Runtime.SellingProduceTool = nil
             Runtime.LastProduceSellResult = actionOk
-                and string.format("batch %d/8 | %s", soldCount, tostring(result))
+                and string.format("batch %d | %s", soldCount or 0, tostring(result))
                 or tostring(soldCount)
             if actionOk then
-                if soldCount <= 0 then
-                    Runtime.ProduceSellPending = false
-                    Runtime.ClearActionReservation("SellSelectedProduce")
-                end
+                Runtime.ProduceSellPending = false
+                Runtime.ClearActionReservation("SellSelectedProduce")
             elseif soldCount ~= "busy" then
                 for _, produce in ipairs(batch) do
                     if produce.Parent then
-                        Runtime.ProduceSellRetry[produce] = os.clock() + 1.5
+                        Runtime.ProduceSellRetry[produce] = os.clock() + 1
                     end
                 end
                 Runtime.ProduceSellPending = false
@@ -5239,7 +5817,7 @@ end
 Runtime.CountOwnedShopItem = function(itemName)
     local count = 0
     local wanted = string.lower(tostring(itemName))
-    for _, container in ipairs({ Backpack, LocalPlayer.Character }) do
+    for _, container in ipairs({ getBackpack(), LocalPlayer.Character }) do
         if container then
             for _, tool in ipairs(container:GetChildren()) do
                 if tool:IsA("Tool") then
@@ -5335,8 +5913,10 @@ Runtime.CanBuyShopItem = function(price)
     if money < price then
         return false, string.format("NEED $%d | HAVE $%d", math.floor(price), math.floor(money))
     end
-    -- A selected shop target is an explicit purchase request. Future rebirth
-    -- money is not reserved here; a rebirth that is actually ready still wins.
+    local dynamicAllowed, dynamicReason = Runtime.CanSpendDynamic(price, "Shop")
+    if not dynamicAllowed then
+        return false, dynamicReason
+    end
     return true
 end
 
@@ -5371,8 +5951,7 @@ task.spawn(function()
                         end
                     end
                     if candidates[1] then
-                        -- Give the shop a turn when collect/use-item loops keep
-                        -- reacquiring Movement. Existing work is allowed to end.
+                        Runtime.AcquireMovementLease("BuyShopItems", 2.5)
                         Runtime.ReserveAction("BuyShopItems", { "Movement", "Economy" }, 3, 30)
                         local actionOk, boughtCount, lastResult = Runtime.WithAction(
                             "BuyShopItems",
