@@ -1,0 +1,27 @@
+--[[
+  Type:     ModuleScript
+  Method:   decompile
+  Name:     Ghost
+  Path:     game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Ghost
+  Service:  ReplicatedStorage
+  Success:  true
+  Executor: Potassium v2.4.2
+  Game:     Roll_A_Gnome (117539213094671)
+  Time:     Mon Aug 17 02:37:04 2026
+]]
+
+-- Decompiled with Potassium's decompiler.
+
+return function() -- Line: 1
+    local UIGradient = Instance.new("UIGradient");
+    UIGradient.Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)), ColorSequenceKeypoint.new(0.5, Color3.new(0.7098039388656616, 0.7215686440467834, 0.7372549176216125)), ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1)) });
+    UIGradient.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0),
+        NumberSequenceKeypoint.new(0.09894459694623947, 0),
+        NumberSequenceKeypoint.new(0.5, 1),
+        NumberSequenceKeypoint.new(0.8997361660003662, 0),
+        NumberSequenceKeypoint.new(1, 0)
+    });
+
+    return UIGradient;
+end;

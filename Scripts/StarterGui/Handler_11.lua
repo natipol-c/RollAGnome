@@ -1,0 +1,37 @@
+--[[
+  Type:     LocalScript
+  Method:   decompile
+  Name:     Handler
+  Path:     game.StarterGui.Notifications.Frame.InstabilityEvent.Handler
+  Service:  StarterGui
+  Success:  true
+  Executor: Potassium v2.4.2
+  Game:     Roll_A_Gnome (117539213094671)
+  Time:     Mon Aug 17 02:37:08 2026
+]]
+
+-- Decompiled with Potassium's decompiler.
+
+local Players = game:GetService("Players");
+local ReplicatedStorage = game:GetService("ReplicatedStorage");
+game:GetService("RunService");
+local _ = Players.LocalPlayer;
+local Timer = script.Parent.Timer;
+
+local function update() -- Line: 24
+    -- upvalues: ReplicatedStorage (copy), Timer (copy)
+    local v1 = ReplicatedStorage:GetAttribute("Instability");
+    local v2 = ReplicatedStorage:GetAttribute("Instability_Timer");
+
+    if not v1 then
+        script.Parent.Visible = false;
+
+        return;
+    end;
+
+    Timer.Text = `BACKROOMS COLLAPSE IN: {v2}s`;
+    script.Parent.Visible = true;
+end;
+
+ReplicatedStorage:GetAttributeChangedSignal("Instability"):Connect(update);
+ReplicatedStorage:GetAttributeChangedSignal("Instability_Timer"):Connect(update);

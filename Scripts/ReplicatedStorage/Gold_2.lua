@@ -1,0 +1,29 @@
+--[[
+  Type:     ModuleScript
+  Method:   decompile
+  Name:     Gold
+  Path:     game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Gold
+  Service:  ReplicatedStorage
+  Success:  true
+  Executor: Potassium v2.4.2
+  Game:     Roll_A_Gnome (117539213094671)
+  Time:     Mon Aug 17 02:37:04 2026
+]]
+
+-- Decompiled with Potassium's decompiler.
+
+return function() -- Line: 1
+    local UIGradient = Instance.new("UIGradient");
+    UIGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.new(0.8352941274642944, 0.6823529601097107, 0.21960784494876862)),
+        ColorSequenceKeypoint.new(0.220486119389534, Color3.new(0.8352941274642944, 0.6823529601097107, 0.21960784494876862)),
+        ColorSequenceKeypoint.new(0.3680555522441864, Color3.new(0.7803921699523926, 0.5960784554481506, 0.0470588244497776)),
+        ColorSequenceKeypoint.new(0.4982638955116272, Color3.new(0.8509804010391235, 0.6980392336845398, 0.0117647061124444)),
+        ColorSequenceKeypoint.new(0.5034722089767456, Color3.new(1, 0.9254902005195618, 0.5058823823928833)),
+        ColorSequenceKeypoint.new(0.6927083134651184, Color3.new(0.8352941274642944, 0.6823529601097107, 0.21960784494876862)),
+        ColorSequenceKeypoint.new(0.7916666865348816, Color3.new(0.8352941274642944, 0.6823529601097107, 0.21960784494876862)),
+        ColorSequenceKeypoint.new(1, Color3.new(0.8352941274642944, 0.6823529601097107, 0.21960784494876862))
+    });
+
+    return UIGradient;
+end;

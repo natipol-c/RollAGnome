@@ -1,0 +1,25 @@
+SIZE BREAKDOWN — DUMPER v7.0
+
+── By Service ──
+  StarterPlayer           123 scripts     878.2 KB
+  Workspace                 6 scripts     154.1 KB
+  StarterGui               22 scripts      18.8 KB
+  PlayerGui                21 scripts      16.2 KB
+  ReplicatedStorage       241 scripts    1163.5 KB
+
+── By Type ──
+  LocalScript              59 scripts     236.9 KB
+  Script[Client]            1 scripts       0.1 KB
+  ModuleScript            353 scripts    1993.8 KB
+
+── Top 10 Largest Scripts ──
+   1.     83.2 KB  [ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.src.optional_ast
+   2.     74.7 KB  [ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages.satchel
+   3.     65.5 KB  [ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ast.0.2.1-rc.2.conch_ast.src.lib
+   4.     52.5 KB  [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Gnome Handler
+   5.     47.8 KB  [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.ClickToMoveController
+   6.     45.2 KB  [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Upgrade Tree
+   7.     44.7 KB  [ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Upgrade Tree
+   8.     41.2 KB  [ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Promise
+   9.     34.8 KB  [ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus
+  10.     30.7 KB  [ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Farmers

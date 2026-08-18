@@ -1,0 +1,6 @@
+GAME INFO  — DUMPER v7.0
+
+  Creator             : 8 Digit Bros
+  PlaceId             : 117539213094671
+  Name                : Roll_A_Gnome
+  CreatorType         : Group

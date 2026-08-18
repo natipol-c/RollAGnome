@@ -1,0 +1,1182 @@
+DEPENDENCY GRAPH — DUMPER v7.0
+Shows require() calls found in decompiled scripts
+
+[ReplicatedStorage] game.ReplicatedStorage.Library
+    → require(v4)
+    → require(v)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Numbers
+    → require(script.Data)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Products
+    → require(game.ReplicatedStorage.Replication)
+    → require(game.ReplicatedStorage.Library)
+    → require(game.ServerStorage.ServerLibrary)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Settings
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Commands
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Sounds
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Fling
+    → require(script.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.OpenUtil
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Refresh
+    → require(ReplicatedStorage.Library)
+    → require(game.ServerStorage.ServerLibrary)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Crops
+    → require(script.Parent.Plants)
+    → require(script.Parent.Mutations)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.GnomeUtil
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.Utility
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.Brainrot
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.Mutation
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.Zone
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.LuckyBlock
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.WheelType
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.EventCurrency
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Network
+    → require(script.Callback)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.CameraShaker
+    → require(game.ReplicatedStorage.Library)
+    → require(script.CameraShakeInstance)
+    → require(script.CameraShakePresets)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.CameraShaker.CameraShakePresets
+    → require(script.Parent.CameraShakeInstance)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Observers
+    → require(script.observeTag)
+    → require(script.observeTagNoAncestry)
+    → require(script.observeAttribute)
+    → require(script.observeProperty)
+    → require(script.observePlayer)
+    → require(script.observeCharacter)
+    → require(script.observeCharacters)
+    → require(script.observeChildren)
+    → require(script.observeDescendants)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Observers.observeCharacters
+    → require(script.Parent.observePlayer)
+    → require(script.Parent.observeCharacter)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals
+    → require(script.Gradient)
+    → require(script.Stroke)
+    → require(script.Dropshadow)
+    → require(script.GradientTemplates)
+    → require(Presets:FindFirstChild(p5)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets
+    → require(descendant)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Bubblegum
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.ChromeStroke
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.GhostStroke
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Gold
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.GoldStroke
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Lava
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.LavaStroke
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.OceanicStroke
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Rainbow
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.RainbowStroke
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Silver
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.SilverStroke
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Zebra
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Ghost
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.RainbowOutline
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.DeathStroke
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.IceStroke
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.FireStroke
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Matrix
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.GreenOutline
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Shine
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.WaveStroke
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.ShineOutline
+    → require(script.Parent.Parent)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates
+    → require(descendant)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch
+    → require(script.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.lib
+    → require("./roblox_packages/conch")
+    → require("./roblox_packages/ui")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages.conch
+    → require(script.Parent[".pesde"]["alicesaidhi+conch"]["0.2.5-rc.2"].conch.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages.ui
+    → require(script.Parent[".pesde"]["alicesaidhi+conch_ui"]["0.2.5-rc.1"].conch_ui.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_vm.0.2.1.conch_vm.src.lib
+    → require("../roblox_packages/types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_vm.0.2.1.conch_vm.roblox_packages.types
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.ast
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_ast"]["0.2.1-rc.2"].conch_ast.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.compiler
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_compiler"]["0.2.2"].conch_compiler.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.intel
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_analysis"]["0.2.2-rc.2"].conch_analysis.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.types
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.vm
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_vm"]["0.2.1"].conch_vm.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.arguments
+    → require("./console")
+    → require("./context")
+    → require("./types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.bootstrap
+    → require("./arguments")
+    → require("./console")
+    → require("./state")
+    → require("./types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.client
+    → require("./console")
+    → require("./net")
+    → require("./state")
+    → require("./types")
+    → require("./user")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.console
+    → require("../roblox_packages/ast")
+    → require("../roblox_packages/compiler")
+    → require("../roblox_packages/vm")
+    → require("../roblox_packages/types")
+    → require("../roblox_packages/intel")
+    → require("./net")
+    → require("./signal")
+    → require("./state")
+    → require("./types")
+    → require("./user")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.context
+    → require("./state")
+    → require("./types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.lib
+    → require("./arguments")
+    → require("../roblox_packages/ast")
+    → require("./bootstrap")
+    → require("./client")
+    → require("./console")
+    → require("./context")
+    → require("./net")
+    → require("./state")
+    → require("./types")
+    → require("./user")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.signal
+    → require("./types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.state
+    → require("./types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.types
+    → require("../roblox_packages/types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.user
+    → require("./constants")
+    → require("./net")
+    → require("./state")
+    → require("./types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.roblox_packages.types
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.src.lib
+    → require("./optional_ast")
+    → require("../roblox_packages/types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ast.0.2.1-rc.2.conch_ast.roblox_packages.types
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ast.0.2.1-rc.2.conch_ast.src.lib
+    → require("../roblox_packages/types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_compiler.0.2.2.conch_compiler.roblox_packages.types
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_compiler.0.2.2.conch_compiler.src.lib
+    → require("../roblox_packages/types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide
+    → require("test/relative-string")
+    → require(script.root)
+    → require(script.mount)
+    → require(script.create)
+    → require(script.apply)
+    → require(script.source)
+    → require(script.effect)
+    → require(script.derive)
+    → require(script.cleanup)
+    → require(script.untrack)
+    → require(script.read)
+    → require(script.batch)
+    → require(script.context)
+    → require(script.switch)
+    → require(script.show)
+    → require(script.maps)
+    → require(script.spring)
+    → require(script.action)
+    → require(script.changed)
+    → require(script.throw)
+    → require(script.flags)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.apply
+    → require("test/relative-string")
+    → require("test/mock")
+    → require("test/mock")
+    → require("test/mock")
+    → require(script.Parent.flags)
+    → require(script.Parent.throw)
+    → require(script.Parent.bind)
+    → require(script.Parent.action)
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.batch
+    → require("test/relative-string")
+    → require(script.Parent.flags)
+    → require(script.Parent.throw)
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.bind
+    → require("test/relative-string")
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.changed
+    → require("test/relative-string")
+    → require(script.Parent.action)
+    → require(script.Parent.cleanup)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.cleanup
+    → require("test/relative-string")
+    → require("test/mock")
+    → require(script.Parent.throw)
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.context
+    → require("test/relative-string")
+    → require(script.Parent.throw)
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.create
+    → require("test/relative-string")
+    → require("test/mock")
+    → require("test/mock")
+    → require(script.Parent.throw)
+    → require(script.Parent.defaults)
+    → require(script.Parent.apply)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.defaults
+    → require("test/mock")
+    → require("test/mock")
+    → require("test/mock")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.derive
+    → require("test/relative-string")
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.effect
+    → require("test/relative-string")
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.graph
+    → require("test/relative-string")
+    → require(script.Parent.throw)
+    → require(script.Parent.flags)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.maps
+    → require("test/relative-string")
+    → require(script.Parent.throw)
+    → require(script.Parent.flags)
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.mount
+    → require("test/relative-string")
+    → require(script.Parent.root)
+    → require(script.Parent.apply)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.read
+    → require("test/relative-string")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.root
+    → require("test/relative-string")
+    → require(script.Parent.throw)
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.show
+    → require("test/relative-string")
+    → require(script.Parent.switch)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.source
+    → require("test/relative-string")
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.spring
+    → require("test/relative-string")
+    → require("test/mock")
+    → require(script.Parent.throw)
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.switch
+    → require("test/relative-string")
+    → require(script.Parent.throw)
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.throw
+    → require("test/relative-string")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.untrack
+    → require("test/relative-string")
+    → require(script.Parent.graph)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.ast
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_ast"]["0.2.1-rc.2"].conch_ast.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.conch
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch"]["0.2.5-rc.2"].conch.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.vide
+    → require(script.Parent.Parent.Parent.Parent.Parent["centau_vide@0.3.1"].vide)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.app
+    → require("./components/background")
+    → require("../roblox_packages/conch")
+    → require("./components/corner")
+    → require("./components/flex")
+    → require("./components/gap")
+    → require("./components/loading")
+    → require("./components/padding")
+    → require("./components/screen")
+    → require("./state")
+    → require("./components/suggestion")
+    → require("./components/text")
+    → require("./components/textbox")
+    → require("./theme")
+    → require("../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.lib
+    → require("./app")
+    → require("../roblox_packages/conch")
+    → require("./state")
+    → require("../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.state
+    → require("../roblox_packages/conch")
+    → require("../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.theme
+    → require("../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.stories.app.story
+    → require("../../roblox_packages/conch")
+    → require("../../roblox_packages/vide")
+    → require("../app")
+    → require("../state")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.stories.suggestion.story
+    → require("../../roblox_packages/conch")
+    → require("../../roblox_packages/vide")
+    → require("../state")
+    → require("../components/suggestion")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.background
+    → require("../theme")
+    → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.container
+    → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.corner
+    → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.flex
+    → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.gap
+    → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.loading
+    → require("../theme")
+    → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.padding
+    → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.screen
+    → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.stroke
+    → require("../theme")
+    → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.suggestion
+    → require("./background")
+    → require("./container")
+    → require("./flex")
+    → require("./padding")
+    → require("./text")
+    → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.text
+    → require("../theme")
+    → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.textbox
+    → require("../theme")
+    → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus
+    → require(u1.Reference)
+    → require(v3)
+    → require(u1.Packages.GoodSignal)
+    → require(u1.Packages.Janitor)
+    → require(u1.Utility)
+    → require(u1.Attribute)
+    → require(u1.Features.Themes)
+    → require(u1.Features.Gamepad)
+    → require(u1.Features.Overflow)
+    → require(Themes2.Default)
+    → require(Elements.Container)
+    → require(Themes2.Classic)
+    → require(Elements.Widget)
+    → require(Elements.Notice)
+    → require(Elements.Caption)
+    → require(Elements.Dropdown)
+    → require(Elements.Indicator)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Utility
+    → require(script.Parent.Packages.Janitor)
+    → require(u29.iconModule)
+    → require(u63.iconModule)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Packages.Janitor
+    → require(game:GetService("ReplicatedStorage")
+    → require(game:GetService("ReplicatedStorage")
+    → require(game:GetService("ReplicatedStorage")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Gamepad
+    → require(script.Parent.Parent.Utility)
+    → require(script.Parent.Parent.Elements.Selection)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Overflow
+    → require(script.Parent.Parent.Utility)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Themes
+    → require(script.Parent.Parent.Utility)
+    → require(script.Default)
+    → require(p68)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Caption
+    → require(u1.iconModule)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Dropdown
+    → require(u1.iconModule)
+    → require(script.Parent.Parent.Utility)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Menu
+    → require(u1.iconModule)
+    → require(script.Parent.Parent.Features.Themes)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Widget
+    → require(script.Parent.Menu)
+    → require(script.Parent.Parent.Features.Gamepad)
+    → require(script.Parent.Parent.Utility)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Notice
+    → require(Packages.Janitor)
+    → require(Packages.GoodSignal)
+    → require(Parent.Utility)
+
+[ReplicatedStorage] game.ReplicatedStorage.Replication
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader
+    → require(script.Satchel)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel
+    → require(script.Packages.satchel)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages.satchel
+    → require(game.ReplicatedStorage.Library)
+    → require(script.Parent.topbarplus)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages.topbarplus
+    → require(script.Parent._Index["1foreverhd_topbarplus@3.3.1"].topbarplus)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus
+    → require(script.Types)
+    → require(u1.Reference)
+    → require(v3)
+    → require(u1.Packages.GoodSignal)
+    → require(u1.Packages.Janitor)
+    → require(u1.Utility)
+    → require(u1.Features.Themes)
+    → require(u1.Features.Gamepad)
+    → require(u1.Features.Overflow)
+    → require(Themes2.Default)
+    → require(Elements.Container)
+    → require(u1.Attribute)
+    → require(Elements.Widget)
+    → require(Elements.Notice)
+    → require(Elements.Caption)
+    → require(Elements.Dropdown)
+    → require(Elements.Indicator)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Attribute
+    → require(script.Parent.VERSION)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Utility
+    → require(script.Parent.Packages.Janitor)
+    → require(u29.iconModule)
+    → require(u63.iconModule)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Gamepad
+    → require(script.Parent.Parent.Elements.Selection)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Overflow
+    → require(script.Parent.Parent.Utility)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Themes
+    → require(script.Parent.Parent.Utility)
+    → require(script.Default)
+    → require(p68)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Caption
+    → require(u2.iconModule)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Container
+    → require(script.Parent.Parent.Packages.GoodSignal)
+    → require(script.Parent.Parent.Features.Themes.Classic)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Dropdown
+    → require(script.Parent.Parent.Features.Themes)
+    → require(u1.iconModule)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Menu
+    → require(u1.iconModule)
+    → require(script.Parent.Parent.Features.Themes)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Notice
+    → require(Packages.Janitor)
+    → require(Packages.GoodSignal)
+    → require(Parent.Utility)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Widget
+    → require(script.Parent.Menu)
+    → require(script.Parent.Parent.Features.Gamepad)
+    → require(script.Parent.Parent.Utility)
+
+[StarterGui] game.StarterGui.Display.LocalScript
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.Display.Right.Frame.Upgrade.Frame.OUTLINE.Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.Display.Boosts.Frame.ServerLuck.Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.Display.Boosts.Frame.VIP.Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.Display.Boosts.Frame.2x Money.Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.Display.Boosts.Frame.2x Luck.Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.Display.Boosts.Frame.4x Luck.Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.Display.Boosts.Frame.2x Grow Speed.Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.Display.Boosts.Friends.Friends.Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.Notifications.Frame.OnboardingMessage.Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.Notifications.Frame.OnboardingBridgeMessage.Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.UpgradeTree.Close.ClosePointer.LocalScript
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.UpgradeTree.Indicators.Money.Label.Handler
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui.TutorialMessages.Messages.Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterGui] game.StarterGui._loading_.Handler
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Camera
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client
+    → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage:WaitForChild("Replication", 5)
+    → require(p4)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+    → require(v)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Received
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Main
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Upgrade Tree
+    → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage.Replication)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Upgrade Tree.TutorialPointer.LocalScript
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Upgrade Tree.TutorialPointer2.LocalScript
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.TopButtons
+    → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage.Replication)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Notifications
+    → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage.Replication)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Place
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Currency
+    → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage.Replication)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Backpack
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs
+    → require(ReplicatedStorage.Library)
+    → require(u38)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Settings
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Index
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Are You Sure
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.ItemShop
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.ActiveGnomes
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Shop
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Gift
+    → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage.Replication)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.AutoRoll
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Rebirth
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.WeeklyDeal
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Loading
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Clock
+    → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage.Replication)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Auto Sell
+    → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage.Replication)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Products
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Mutation Images
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Plant Handler
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+    → require(script.Parent.CollectionEffect)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Upgrades Handler
+    → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage.Replication)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Sell
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Sell.ClosePointer.LocalScript
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Expand Plot
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Opening Effect
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.RNG Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GrowPlants
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Gnome Handler
+    → require(script.Animations)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Placement
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Effects Controller
+    → require(script.Spin)
+    → require(script.Bounce)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Effects Controller.Bounce
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Effects Controller.Spin
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Chat
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Buttons
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Tutorial
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Plot Sign
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Products Client
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.ItemShop
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Sprinkler Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Fertilizer Handler
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Plot Products
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.ChatTags
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Free Gnome
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Active Luck
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Night Gnomes
+    → require(script.Parent["Gnome Handler"].Animations)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.LightingController
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Event Noti
+    → require(ReplicatedStorage.Replication)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.SystemMessages
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents
+    → require(ReplicatedStorage.Library)
+    → require(script.WeatherIcon)
+    → require(child)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.Toxic
+    → require(script.Parent.Parent.Parent.LightingController)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.LightningStorm
+    → require(script.Parent.Parent.Parent.LightingController)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.Blizzard
+    → require(script.Parent.Parent.Parent.LightingController)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.Cursed
+    → require(script.Parent.Parent.Parent.LightingController)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Lightning Strike
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Glitch
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Weather Board
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Give Item
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Debug
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Device Detector
+    → require(script.StartMode)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule
+    → require(script:WaitForChild("CameraModule")
+    → require(script:WaitForChild("ControlModule")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule
+    → require(CommonUtils:WaitForChild("ConnectionUtil")
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script:WaitForChild("CameraUtils")
+    → require(script:WaitForChild("CameraInput")
+    → require(script:WaitForChild("ClassicCamera")
+    → require(script:WaitForChild("OrbitalCamera")
+    → require(script:WaitForChild("LegacyCamera")
+    → require(script:WaitForChild("VehicleCamera")
+    → require(script:WaitForChild("VRCamera")
+    → require(script:WaitForChild("VRVehicleCamera")
+    → require(script:WaitForChild("Invisicam")
+    → require(script:WaitForChild("Poppercam")
+    → require(script:WaitForChild("TransparencyController")
+    → require(script:WaitForChild("MouseLockController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.ClassicCamera
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("CameraUtils")
+    → require(script.Parent:WaitForChild("BaseCamera")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRBaseCamera
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("ZoomController")
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("BaseCamera")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.Invisicam
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("BaseOcclusion")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCamera
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("CameraUtils")
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("VRBaseCamera")
+    → require(Players.LocalPlayer:WaitForChild("PlayerScripts")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.Poppercam
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("ZoomController")
+    → require(script.Parent:WaitForChild("BaseOcclusion")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VehicleCamera
+    → require(script.Parent:WaitForChild("BaseCamera")
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("CameraUtils")
+    → require(script.Parent:WaitForChild("ZoomController")
+    → require(script:WaitForChild("VehicleCameraCore")
+    → require(script:WaitForChild("VehicleCameraConfig")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VehicleCamera.VehicleCameraCore
+    → require(script.Parent.Parent.CameraUtils)
+    → require(script.Parent.VehicleCameraConfig)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.TransparencyController
+    → require(script.Parent:WaitForChild("CameraUtils")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.ZoomController
+    → require(script:WaitForChild("Popper")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.ZoomController.Popper
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(CommonUtils:WaitForChild("CameraWrapper")
+    → require(CommonUtils:WaitForChild("ConnectionUtil")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRVehicleCamera
+    → require(script.Parent:WaitForChild("VRBaseCamera")
+    → require(script.Parent:WaitForChild("CameraUtils")
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("VehicleCamera")
+    → require(script.Parent:WaitForChild("VRVehicleCameraDeprecated")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.OrbitalCamera
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("CameraUtils")
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("BaseCamera")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraToggleStateController
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("CameraUI")
+    → require(script.Parent:WaitForChild("CameraUtils")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRVehicleCameraDeprecated
+    → require(script.Parent:WaitForChild("VRBaseCamera")
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("CameraUtils")
+    → require(script.Parent:WaitForChild("VehicleCamera")
+    → require(script.Parent.VehicleCamera:FindFirstChild("VehicleCameraCore")
+    → require(script.Parent.VehicleCamera:FindFirstChild("VehicleCameraConfig")
+    → require(LocalPlayer:WaitForChild("PlayerScripts")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.LegacyCamera
+    → require(script.Parent:WaitForChild("CameraUtils")
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("BaseCamera")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.MouseLockController
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("CameraUtils")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.BaseCamera
+    → require(CommonUtils:WaitForChild("ConnectionUtil")
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("CameraUtils")
+    → require(script.Parent:WaitForChild("ZoomController")
+    → require(script.Parent:WaitForChild("CameraToggleStateController")
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("CameraUI")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraInput
+    → require(CommonUtils:WaitForChild("FlagUtil")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule
+    → require(script:WaitForChild("Keyboard")
+    → require(script:WaitForChild("Gamepad")
+    → require(script:WaitForChild("DynamicThumbstick")
+    → require(script:WaitForChild("TouchThumbstick")
+    → require(script:WaitForChild("ClickToMoveController")
+    → require(script:WaitForChild("TouchJump")
+    → require(script:WaitForChild("VehicleController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.TouchJump
+    → require(CommonUtils:WaitForChild("ConnectionUtil")
+    → require(CommonUtils:WaitForChild("CharacterUtil")
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("AvatarAbilitiesInterface")
+    → require(script.Parent:WaitForChild("BaseCharacterController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.Keyboard
+    → require(script.Parent:WaitForChild("BaseCharacterController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.AvatarAbilitiesInterface
+    → require(CommonUtils:WaitForChild("FlagUtil")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.TouchThumbstick
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("AvatarAbilitiesInterface")
+    → require(script.Parent:WaitForChild("BaseCharacterController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.ClickToMoveDisplay
+    → require(CommonUtils:WaitForChild("FlagUtil")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.ClickToMoveController
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("ClickToMoveDisplay")
+    → require(script.Parent:WaitForChild("Keyboard")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.PathDisplay
+    → require(CommonUtils:WaitForChild("FlagUtil")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.BaseCharacterController
+    → require(CommonUtils:WaitForChild("ConnectionUtil")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.Gamepad
+    → require(script.Parent:WaitForChild("BaseCharacterController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.VRNavigation
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(PathDisplay)
+    → require(script.Parent:WaitForChild("BaseCharacterController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.DynamicThumbstick
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("AvatarAbilitiesInterface")
+    → require(script.Parent:WaitForChild("BaseCharacterController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CameraWrapper.spec
+    → require(CorePackages.Packages.Dev.JestGlobals)
+    → require(CorePackages.Workspace.Packages.TestUtils)
+    → require(script.Parent.CameraWrapper)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CharacterUtil
+    → require(script.Parent:WaitForChild("ConnectionUtil")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.ConnectionUtil.spec
+    → require(CorePackages.Packages.Dev.JestGlobals)
+    → require(CorePackages.Workspace.Packages.AppCommonLib)
+    → require(script.Parent.ConnectionUtil)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CameraWrapper
+    → require(script.Parent.ConnectionUtil)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.RbxCharacterSounds
+    → require(script:WaitForChild("AtomicBinding")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerScriptsLoader
+    → require(script.Parent:WaitForChild("PlayerModule")
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.Display.LocalScript
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.Display.Right.Frame.Upgrade.Frame.OUTLINE.Handler
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.ServerLuck.Handler
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.VIP.Handler
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.2x Money.Handler
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.2x Luck.Handler
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.4x Luck.Handler
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.2x Grow Speed.Handler
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Friends.Friends.Handler
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.Notifications.Frame.OnboardingMessage.Handler
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.Notifications.Frame.OnboardingBridgeMessage.Handler
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.UpgradeTree.Close.ClosePointer.LocalScript
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.UpgradeTree.Indicators.Money.Label.Handler
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+
+[PlayerGui] game.Players.Palukalima37806.PlayerGui.TutorialMessages.Messages.Handler
+    → require(ReplicatedStorage.Library)

@@ -1,0 +1,26 @@
+--[[
+  Type:     ModuleScript
+  Method:   decompile
+  Name:     Mutation
+  Path:     game.ReplicatedStorage.Library.Configs.ConchTypes.Mutation
+  Service:  ReplicatedStorage
+  Success:  true
+  Executor: Potassium v2.4.2
+  Game:     Roll_A_Gnome (117539213094671)
+  Time:     Mon Aug 17 02:37:04 2026
+]]
+
+-- Decompiled with Potassium's decompiler.
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage");
+local Library = require(ReplicatedStorage.Library);
+local v1 = Library.get("Conch");
+local v2 = {
+    All = "All"
+};
+
+for _, v in Library.get("Index").MUTATIONS do
+    v2[v] = v;
+end;
+
+return v1.register_type("Mutation", v1.args.enum_map(v2));
