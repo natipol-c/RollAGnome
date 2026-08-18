@@ -640,6 +640,15 @@ local function ensurePresetTargets(preset)
     end
 end
 
+Runtime.MarkCustomStrategy = function()
+    if State and State.AutomationStrategy ~= "Custom" then
+        State.AutomationStrategy = "Custom"
+        if type(Runtime.RefreshStrategyUI) == "function" then
+            pcall(Runtime.RefreshStrategyUI)
+        end
+    end
+end
+
 Runtime.ApplyStrategyPreset = function(preset)
     if not State then return end
     State.AutomationStrategy = preset
@@ -1036,6 +1045,9 @@ Runtime.SetSelection = function(selection, name, enabled)
     if changed then
         Runtime.SelectionVersion = Runtime.SelectionVersion + 1
         Runtime.GiftRecipientCache = nil
+        if type(Runtime.MarkCustomStrategy) == "function" then
+            Runtime.MarkCustomStrategy()
+        end
     end
     return enabled == true
 end
