@@ -3955,11 +3955,9 @@ for _, tool in ipairs(eligible) do
 best30Selling[tool] = true
 end
 local soldCount = 0
-local actionOk = Runtime.WithAction("SellInventoryGnome", { "Movement", "Equipment", "Gnome" }, function()
+local actionOk = Runtime.WithAction("SellInventoryGnome", { "Equipment", "Gnome" }, function()
 local character = LocalPlayer.Character
 local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-local returnPivot = character and character:GetPivot()
 local previouslyEquipped
 if character then
 for _, child in ipairs(character:GetChildren()) do
@@ -3969,16 +3967,6 @@ break
 end
 end
 end
-local sellCFrame = Runtime.GetSellPointCFrame()
-local moved = false
-if character and rootPart and sellCFrame and (rootPart.Position - sellCFrame.Position).Magnitude > 8 then
-moved = pcall(function()
-character:PivotTo(sellCFrame * CFrame.new(0, 3, 5))
-rootPart.AssemblyLinearVelocity = Vector3.zero
-rootPart.AssemblyAngularVelocity = Vector3.zero
-end)
-task.wait(UserInputService.TouchEnabled and 0.45 or 0.25)
-end
 for _, tool in ipairs(eligible) do
 if not Runtime.Alive or not State.AutoBest30 or not tool.Parent then
 break
@@ -3986,6 +3974,9 @@ end
 if not Runtime.IsGiftReserved(tool) then
 if Runtime.EquipToolConfirmed(tool) and State.AutoBest30 then
 local ok, result = invoke("SellGnome")
+if not ok or result == "Not Holding" then
+ok, result = invoke("SellThis")
+end
 local deadline = os.clock() + 0.85
 repeat
 task.wait(0.04)
@@ -4010,15 +4001,6 @@ pcall(function()
 humanoid:EquipTool(previouslyEquipped)
 end)
 end
-end
-if moved and returnPivot and character == LocalPlayer.Character and character.Parent then
-pcall(function()
-character:PivotTo(returnPivot)
-if rootPart and rootPart.Parent then
-rootPart.AssemblyLinearVelocity = Vector3.zero
-rootPart.AssemblyAngularVelocity = Vector3.zero
-end
-end)
 end
 return soldCount > 0
 end)
@@ -4056,20 +4038,9 @@ local currentCount = Runtime.GetBackpackItemCount()
 if currentCount < 35 then
 return true
 end
-local actionOk = Runtime.WithAction("EmergencyInventoryPurge", { "Movement", "Farm", "Equipment", "Gnome" }, function()
+local actionOk = Runtime.WithAction("EmergencyInventoryPurge", { "Farm", "Equipment", "Gnome" }, function()
 local character = LocalPlayer.Character
 local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-local returnPivot = character and character:GetPivot()
-local sellCFrame = Runtime.GetSellPointCFrame()
-if character and rootPart and sellCFrame and (rootPart.Position - sellCFrame.Position).Magnitude > 8 then
-pcall(function()
-character:PivotTo(sellCFrame * CFrame.new(0, 3, 5))
-rootPart.AssemblyLinearVelocity = Vector3.zero
-rootPart.AssemblyAngularVelocity = Vector3.zero
-end)
-task.wait(0.2)
-end
 local okAll = invoke("SellAll")
 local produceBatch = Runtime.FindSelectedProduceBatch(20)
 for _, produce in ipairs(produceBatch) do
@@ -4100,6 +4071,9 @@ for _, gnomeTool in ipairs(junkGnomes) do
 if gnomeTool.Parent and not Runtime.IsGiftReserved(gnomeTool) then
 if Runtime.EquipToolConfirmed(gnomeTool) then
 local ok, res = invoke("SellGnome")
+if not ok or res == "Not Holding" then
+ok, res = invoke("SellThis")
+end
 if ok and type(res) == "number" then
 Runtime.Stats.Sold = Runtime.Stats.Sold + 1
 end
@@ -4110,13 +4084,6 @@ end
 if humanoid and humanoid.Parent then
 pcall(function()
 humanoid:UnequipTools()
-end)
-end
-if returnPivot and character == LocalPlayer.Character and character.Parent and rootPart and rootPart.Parent then
-pcall(function()
-character:PivotTo(returnPivot)
-rootPart.AssemblyLinearVelocity = Vector3.zero
-rootPart.AssemblyAngularVelocity = Vector3.zero
 end)
 end
 return true
@@ -4609,9 +4576,9 @@ itemRetryAt[tool] = os.clock() + 1
 Runtime.SetUseItemStatus(itemName .. " | NO VALID AREA")
 return false
 end
-local groups = itemType == "WateringCan" and { "Equipment", "Movement", "Farm" }
-or itemType == "GnomeItem" and { "Equipment", "Movement", "Gnome" }
-or { "Equipment", "Movement", "Farm" }
+local groups = itemType == "WateringCan" and { "Equipment", "Farm" }
+or itemType == "GnomeItem" and { "Equipment", "Gnome" }
+or { "Equipment", "Farm" }
 if not Runtime.ReserveAction("UseItem", groups, 3, 20) then
 return false
 end
@@ -4651,16 +4618,6 @@ and Runtime.GetUseTargetSignature(target) ~= targetSignature)
 or Runtime.CountPlacedUseItems(itemType) > placedBefore
 end
 local moved = false
-if actionCFrame and character and rootPart
-and (rootPart.Position - actionCFrame.Position).Magnitude > 4
-then
-moved = pcall(function()
-character:PivotTo(actionCFrame * CFrame.new(0, 2, 1))
-rootPart.AssemblyLinearVelocity = Vector3.zero
-rootPart.AssemblyAngularVelocity = Vector3.zero
-end)
-task.wait(Runtime.Mobile and 0.25 or 0.12)
-end
 local didAttempt = false
 local wasConfirmed = false
 if equipped and character and tool.Parent == character and State.AutoUseItems then
@@ -4715,13 +4672,6 @@ Runtime.ItemTargetRetry[target] = os.clock() + (wasConfirmed and 5 or 2)
 end
 if wasConfirmed and (itemType == "Sprinkler" or itemType == "Fertilizer") then
 Runtime.Stats.Placed = Runtime.Stats.Placed + 1
-end
-end
-if returnPivot and moved and character == LocalPlayer.Character and character.Parent then
-character:PivotTo(returnPivot)
-if rootPart and rootPart.Parent then
-rootPart.AssemblyLinearVelocity = Vector3.zero
-rootPart.AssemblyAngularVelocity = Vector3.zero
 end
 end
 if humanoid and humanoid.Parent then
@@ -4962,36 +4912,18 @@ and not (State.AutoBest30 and isProtectedGnome(heldTool))
 then
 local lastAttempt = lastGiftAttempt[heldTool] or 0
 if os.clock() - lastAttempt >= 2 then
-local actionToken = Runtime.BeginAction("Give", { "Movement", "Equipment" })
+local actionToken = Runtime.BeginAction("Give", { "Equipment" })
 if actionToken then
 lastGiftAttempt[heldTool] = os.clock()
 Runtime.Gifting = true
 task.spawn(function()
 pcall(function()
-local giverCharacter = LocalPlayer.Character
-local giverRoot = giverCharacter and giverCharacter:FindFirstChild("HumanoidRootPart")
-local recipientCharacter = recipient.Character
-local recipientRoot = recipientCharacter and recipientCharacter:FindFirstChild("HumanoidRootPart")
-local returnPivot = giverCharacter and giverCharacter:GetPivot()
-if giverCharacter and giverRoot and recipientRoot then
-giverCharacter:PivotTo(recipientRoot.CFrame * CFrame.new(0, 0, 3))
-giverRoot.AssemblyLinearVelocity = Vector3.zero
-giverRoot.AssemblyAngularVelocity = Vector3.zero
-task.wait(0.2)
-end
 if heldTool.Parent and State.AutoGive then
 fire("RequestGiftItem", recipient, heldTool:GetAttribute("Id"))
 local deadline = os.clock() + 1.5
 repeat
 task.wait(0.1)
 until not heldTool.Parent or os.clock() >= deadline or not Runtime.Alive
-end
-if returnPivot and giverCharacter == LocalPlayer.Character and giverCharacter.Parent then
-giverCharacter:PivotTo(returnPivot)
-if giverRoot and giverRoot.Parent then
-giverRoot.AssemblyLinearVelocity = Vector3.zero
-giverRoot.AssemblyAngularVelocity = Vector3.zero
-end
 end
 end)
 Runtime.EndAction(actionToken)
@@ -5274,31 +5206,12 @@ end)
 task.spawn(function()
 local collecting = setmetatable({}, { __mode = "k" })
 while Runtime.Alive do
-local yieldForSale = false
-if State.AutoSellProduce then
-yieldForSale = Runtime.FindSelectedProduceBatch(1)[1] ~= nil or Runtime.IsBackpackNearFull()
-if yieldForSale then
-Runtime.ProduceSellPending = true
-Runtime.ReserveAction("SellSelectedProduce", { "Movement", "Farm", "Equipment" }, 2)
-end
-end
-local lease = Runtime.MovementLease
-local leaseActive = lease and lease.Owner ~= "Collect" and os.clock() < lease.Until
-if Runtime.IsBackpackNearFull() then
-Runtime.PurgeInventoryOverflow()
-end
-if State.AutoCollect and not yieldForSale and not leaseActive then
-Runtime.WithAction("Collect", { "Movement", "Farm" }, function()
+if State.AutoCollect then
+Runtime.WithAction("Collect", { "Farm" }, function()
 local plot = getPlot()
 local plants = plot and plot:FindFirstChild("Plants")
 local readyToCollect = plot and plot:FindFirstChild("ReadyToCollect")
 if plants or readyToCollect then
-local character = LocalPlayer.Character
-local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-local returnPivot = character and character:GetPivot() or nil
-local didTeleport = false
-local collectedThisPass = 0
 local readyPlants = {}
 local seenPlants = {}
 for _, container in pairs({ plants, readyToCollect }) do
@@ -5311,104 +5224,45 @@ end
 end
 end
 end
+local collectedThisPass = 0
 for _, plant in ipairs(readyPlants) do
-local reserved = Runtime.PriorityAction
-if not Runtime.Alive or not State.AutoCollect or collectedThisPass >= 4
-or (reserved and reserved.Owner == "SellSelectedProduce")
-then
+if not Runtime.Alive or not State.AutoCollect or collectedThisPass >= 12 then
 break
 end
 local fruitReady = plant:GetAttribute("FruitReady") ~= false
 if plant:GetAttribute("READY") == true and fruitReady and not collecting[plant] then
 collecting[plant] = true
-if character and rootPart and rootPart.Parent then
-local center = plant:FindFirstChild("CenterPart", true)
-local targetCFrame
-if center and center:IsA("BasePart") then
-targetCFrame = center.CFrame
-else
-local pivotOk, pivot = pcall(getInstancePivot, plant)
-targetCFrame = pivotOk and pivot or nil
-end
-if targetCFrame then
-if humanoid then
-humanoid.Sit = false
-end
-character:PivotTo(targetCFrame * CFrame.new(0, 3, 0))
-rootPart.AssemblyLinearVelocity = Vector3.zero
-rootPart.AssemblyAngularVelocity = Vector3.zero
-didTeleport = true
-task.wait(0.1)
-local deadline = os.clock() + 0.4
-repeat
-task.wait()
-until LocalPlayer:GetAttribute("CanCollect") == true
-or os.clock() >= deadline
-or not Runtime.Alive
-end
-end
 local ok, result = invoke("CollectPlant", plant)
 collectedThisPass = collectedThisPass + 1
 if ok and result ~= false then
 Runtime.Stats.Collected = Runtime.Stats.Collected + 1
 end
-task.delay(0.6, function()
+task.delay(0.4, function()
 collecting[plant] = nil
 end)
-task.wait(0.08)
-if State.AutoSellProduce and (Runtime.FindSelectedProduceBatch(1)[1] ~= nil or Runtime.IsBackpackNearFull()) then
-Runtime.ProduceSellPending = true
-Runtime.ReserveAction("SellSelectedProduce", { "Movement", "Farm", "Equipment" }, 2)
-break
+task.wait(0.03)
 end
-end
-end
-if didTeleport
-and returnPivot
-and character == LocalPlayer.Character
-and character.Parent
-and rootPart
-and rootPart.Parent
-then
-character:PivotTo(returnPivot)
-rootPart.AssemblyLinearVelocity = Vector3.zero
-rootPart.AssemblyAngularVelocity = Vector3.zero
 end
 end
 end)
 end
-task.wait(yieldForSale and 0.1 or State.AutoCollect and 0.25 or 1)
+task.wait(State.AutoCollect and 0.15 or 1)
 end
 end)
 task.spawn(function()
 while Runtime.Alive do
 local batch = {}
 if State.AutoSellProduce or Runtime.IsBackpackNearFull() then
-batch = Runtime.FindSelectedProduceBatch(15)
+batch = Runtime.FindSelectedProduceBatch(20)
 end
 if batch[1] then
 Runtime.ProduceSellPending = true
-Runtime.ReserveAction("SellSelectedProduce", { "Movement", "Farm", "Equipment" }, 5, 50)
-local actionOk, soldCount, result = Runtime.WithAction("SellSelectedProduce", { "Movement", "Farm", "Equipment" }, function()
+local actionOk, soldCount, result = Runtime.WithAction("SellSelectedProduce", { "Farm", "Equipment" }, function()
 local character = LocalPlayer.Character
 local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-local rootPart = character and character:FindFirstChild("HumanoidRootPart")
 local previous = character and character:FindFirstChildWhichIsA("Tool")
-local returnPivot = character and character:GetPivot()
-local sellCFrame = Runtime.GetSellPointCFrame()
-local moved = false
 local count = 0
 local lastResponse = "no match"
-if character and rootPart and sellCFrame
-and (rootPart.Position - sellCFrame.Position).Magnitude > 8
-then
-moved = pcall(function()
-character:PivotTo(sellCFrame * CFrame.new(0, 3, 5))
-rootPart.AssemblyLinearVelocity = Vector3.zero
-rootPart.AssemblyAngularVelocity = Vector3.zero
-end)
-task.wait(0.1)
-end
 local okAll, resAll = invoke("SellAll")
 if okAll and type(resAll) == "number" and resAll > 0 then
 count = #batch
@@ -5425,7 +5279,7 @@ then
 Runtime.SellingProduceTool = produce
 local ok, response
 local success = false
-for attempt = 1, 4 do
+for attempt = 1, 3 do
 local equipped = Runtime.EquipToolConfirmed(produce, attempt > 1)
 if equipped then
 ok, response = invoke("SellThis")
@@ -5436,7 +5290,7 @@ end
 if success or not produce.Parent then
 break
 end
-task.wait(0.04)
+task.wait(0.03)
 end
 if success then
 count = count + 1
@@ -5459,15 +5313,6 @@ humanoid:EquipTool(previous)
 end)
 end
 end
-if moved and returnPivot and character == LocalPlayer.Character and character.Parent then
-pcall(function()
-character:PivotTo(returnPivot)
-if rootPart and rootPart.Parent then
-rootPart.AssemblyLinearVelocity = Vector3.zero
-rootPart.AssemblyAngularVelocity = Vector3.zero
-end
-end)
-end
 Runtime.SellingProduceTool = nil
 return count, lastResponse
 end)
@@ -5475,25 +5320,13 @@ Runtime.SellingProduceTool = nil
 Runtime.LastProduceSellResult = actionOk
 and string.format("batch %d | %s", soldCount or 0, tostring(result))
 or tostring(soldCount)
-if actionOk then
 Runtime.ProduceSellPending = false
-Runtime.ClearActionReservation("SellSelectedProduce")
-elseif soldCount ~= "busy" then
-for _, produce in ipairs(batch) do
-if produce.Parent then
-Runtime.ProduceSellRetry[produce] = os.clock() + 1
-end
-end
-Runtime.ProduceSellPending = false
-Runtime.ClearActionReservation("SellSelectedProduce")
-end
 else
 Runtime.ProduceSellPending = false
-Runtime.ClearActionReservation("SellSelectedProduce")
 end
 task.wait(Runtime.ProduceSellPending and 0.1
-or State.AutoSellProduce and 0.25
-or 1.5)
+or State.AutoSellProduce and 0.2
+or 1)
 end
 end)
 Runtime.TriggerGuiButton = function(button)
@@ -5686,51 +5519,16 @@ end
 end
 end
 if candidates[1] then
-Runtime.AcquireMovementLease("BuyShopItems", 2.5)
-Runtime.ReserveAction("BuyShopItems", { "Movement", "Economy" }, 3, 30)
+Runtime.ReserveAction("BuyShopItems", { "Economy" }, 3, 30)
 local actionOk, boughtCount, lastResult = Runtime.WithAction(
 "BuyShopItems",
-{ "Movement", "Economy" },
+{ "Economy" },
 function()
 if not State.AutoBuyShop or (Runtime.RebirthReady and Runtime.RebirthReady()) then
 return 0, "STOPPED"
 end
-local character = LocalPlayer.Character
-local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-local returnPivot = character and character:GetPivot()
-local plot = getPlot()
-local points = plot and plot:FindFirstChild("Points")
-local shopFolder = points and points:FindFirstChild("ItemShop")
-local shopPoint = shopFolder and (shopFolder:FindFirstChild("ItemShop")
-or shopFolder:FindFirstChildWhichIsA("BasePart", true))
-local shopCFrame = shopPoint and getInstancePivot(shopPoint)
-local moved = false
-if character and rootPart and shopCFrame
-and (rootPart.Position - shopCFrame.Position).Magnitude > 4
-then
-moved = pcall(function()
-character:PivotTo(shopCFrame * CFrame.new(0, 2, 0))
-rootPart.AssemblyLinearVelocity = Vector3.zero
-rootPart.AssemblyAngularVelocity = Vector3.zero
-end)
-task.wait(Runtime.Mobile and 0.5 or 0.35)
-if not moved or not rootPart.Parent
-or (rootPart.Position - shopCFrame.Position).Magnitude > 4
-then
-moved = false
-end
-end
-local nearShop = rootPart and shopCFrame
-and (rootPart.Position - shopCFrame.Position).Magnitude < 15
-local shopGui = nearShop and Runtime.OpenItemShopUI(shopFolder) or nil
-if shopGui then
-task.wait(Runtime.Mobile and 0.3 or 0.15)
-end
 local count = 0
-local response = not character and "WAITING FOR CHARACTER"
-or not shopCFrame and "SHOP POINT NOT FOUND | DIRECT"
-or not nearShop and "MOVE TO SHOP FAILED | DIRECT"
-or "SERVER REJECTED"
+local response = "SERVER REJECTED"
 for _, itemName in ipairs(candidates) do
 if not Runtime.Alive or not State.AutoBuyShop
 or (Runtime.RebirthReady and Runtime.RebirthReady())
@@ -5750,24 +5548,6 @@ itemName,
 moneyBefore,
 ownedBefore
 )
-if not purchased and nearShop then
-task.wait(0.25)
-purchased, directDetail = Runtime.TryDirectShopPurchase(
-itemName,
-moneyBefore,
-ownedBefore
-)
-end
-if not purchased and shopGui then
-local uiBought, uiResult = Runtime.TryShopUIPurchase(
-shopGui,
-itemName,
-moneyBefore,
-ownedBefore
-)
-purchased = uiBought
-response = directDetail .. " | " .. tostring(uiResult)
-end
 if purchased then
 count = count + 1
 Runtime.Stats.Shop = Runtime.Stats.Shop + 1
@@ -5775,19 +5555,7 @@ response = "BOUGHT " .. itemName
 elseif response == "SERVER REJECTED" then
 response = directDetail
 end
-task.wait(0.2)
-end
-if Runtime.ClientSignal and type(Runtime.ClientSignal.Fire) == "function" then
-pcall(function() if Runtime.ClientSignal and type(Runtime.ClientSignal.Fire) == "function" then Runtime.ClientSignal:Fire("CloseTab", "ItemShop") end end)
-end
-if moved and returnPivot and character == LocalPlayer.Character and character.Parent then
-pcall(function()
-character:PivotTo(returnPivot)
-if rootPart.Parent then
-rootPart.AssemblyLinearVelocity = Vector3.zero
-rootPart.AssemblyAngularVelocity = Vector3.zero
-end
-end)
+task.wait(0.12)
 end
 return count, response
 end
@@ -5819,7 +5587,7 @@ if Runtime.LastShopResult ~= "IDLE" then
 Runtime.SetShopStatus("IDLE")
 end
 end
-task.wait(State.AutoBuyShop and 1 or 1.75)
+task.wait(State.AutoBuyShop and 0.75 or 1.5)
 end
 end)
 do
