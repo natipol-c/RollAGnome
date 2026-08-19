@@ -3130,7 +3130,7 @@ table.insert(LanguageRefreshers, function()
 ConfigStatus.Text = translated(type(writefile) == "function" and "Ready to save profiles" or "Executor file API unavailable")
 end)
 Runtime.Logs = {}
-Runtime.LogAutoScroll = true
+Runtime.LogAutoScroll = false
 Runtime.LogFilter = "ALL"
 local logItemFrames = {}
 local logsContainer = nil
@@ -3307,7 +3307,7 @@ end
 if Runtime.LogAutoScroll and logsContainer.Parent and logsContainer.Parent:IsA("ScrollingFrame") then
 task.defer(function()
 if logsContainer and logsContainer.Parent then
-logsContainer.Parent.CanvasPosition = Vector2.new(0, math.max(0, logsContainer.AbsoluteSize.Y))
+logsContainer.Parent.CanvasPosition = Vector2.new(0, 0)
 end
 end)
 end

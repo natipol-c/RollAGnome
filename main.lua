@@ -3334,7 +3334,7 @@ end)
 -- =========================================================================
 
 Runtime.Logs = {}
-Runtime.LogAutoScroll = true
+Runtime.LogAutoScroll = false
 Runtime.LogFilter = "ALL"
 local logItemFrames = {}
 local logsContainer = nil
@@ -3535,7 +3535,8 @@ local function refreshLogsUI()
     if Runtime.LogAutoScroll and logsContainer.Parent and logsContainer.Parent:IsA("ScrollingFrame") then
         task.defer(function()
             if logsContainer and logsContainer.Parent then
-                logsContainer.Parent.CanvasPosition = Vector2.new(0, math.max(0, logsContainer.AbsoluteSize.Y))
+                -- Snap to the TOP where newest logs reside!
+                logsContainer.Parent.CanvasPosition = Vector2.new(0, 0)
             end
         end)
     end
