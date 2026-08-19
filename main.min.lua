@@ -511,30 +511,26 @@ State.SellProduceMutationTargets[mut] = true
 end
 end
 if preset == "MoneyMachine" then
-if not Runtime.HasAnySelection(State.BuyRarityTargets) then
-State.BuyRarityTargets["IMPOSSIBLE"] = true
-State.BuyRarityTargets["Godly"] = true
-State.BuyRarityTargets["Mythic"] = true
-end
-if not Runtime.HasAnySelection(State.MutationTargets) then
-State.MutationTargets["Night"] = true
-State.MutationTargets["Cursed"] = true
-State.MutationTargets["Shiny"] = true
-end
 elseif preset == "GnomeHunter" then
 if not Runtime.HasAnySelection(State.BuyRarityTargets) then
 State.BuyRarityTargets["IMPOSSIBLE"] = true
 State.BuyRarityTargets["Godly"] = true
 end
 if not Runtime.HasAnySelection(State.MutationTargets) then
-State.MutationTargets["Night"] = true
-State.MutationTargets["Cursed"] = true
 State.MutationTargets["Shiny"] = true
+State.MutationTargets["Diamond"] = true
+State.MutationTargets["Cursed"] = true
+State.MutationTargets["Toxic"] = true
+State.MutationTargets["Golden"] = true
+State.MutationTargets["Night"] = true
 end
 if not Runtime.HasAnySelection(State.KeepMutationTargets) then
-State.KeepMutationTargets["Night"] = true
-State.KeepMutationTargets["Cursed"] = true
 State.KeepMutationTargets["Shiny"] = true
+State.KeepMutationTargets["Diamond"] = true
+State.KeepMutationTargets["Cursed"] = true
+State.KeepMutationTargets["Toxic"] = true
+State.KeepMutationTargets["Golden"] = true
+State.KeepMutationTargets["Night"] = true
 end
 if not Runtime.HasAnySelection(State.KeepRarityTargets) then
 State.KeepRarityTargets["IMPOSSIBLE"] = true
@@ -547,14 +543,20 @@ State.BuyRarityTargets["Godly"] = true
 State.BuyRarityTargets["Mythic"] = true
 end
 if not Runtime.HasAnySelection(State.MutationTargets) then
-State.MutationTargets["Night"] = true
-State.MutationTargets["Cursed"] = true
 State.MutationTargets["Shiny"] = true
+State.MutationTargets["Diamond"] = true
+State.MutationTargets["Cursed"] = true
+State.MutationTargets["Toxic"] = true
+State.MutationTargets["Golden"] = true
+State.MutationTargets["Night"] = true
 end
 if not Runtime.HasAnySelection(State.KeepMutationTargets) then
-State.KeepMutationTargets["Night"] = true
-State.KeepMutationTargets["Cursed"] = true
 State.KeepMutationTargets["Shiny"] = true
+State.KeepMutationTargets["Diamond"] = true
+State.KeepMutationTargets["Cursed"] = true
+State.KeepMutationTargets["Toxic"] = true
+State.KeepMutationTargets["Golden"] = true
+State.KeepMutationTargets["Night"] = true
 end
 if not Runtime.HasAnySelection(State.KeepRarityTargets) then
 State.KeepRarityTargets["IMPOSSIBLE"] = true

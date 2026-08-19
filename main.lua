@@ -567,65 +567,62 @@ local function ensurePresetTargets(preset)
 
     -- 4. Mode-specific Target configurations:
     if preset == "MoneyMachine" then
-        -- Buy Rarity: impossible, godly, mythic
-        if not Runtime.HasAnySelection(State.BuyRarityTargets) then
-            State.BuyRarityTargets["IMPOSSIBLE"] = true
-            State.BuyRarityTargets["Godly"] = true
-            State.BuyRarityTargets["Mythic"] = true
-        end
-        -- Buy Mutation: Night, Cursed, Shiny
-        if not Runtime.HasAnySelection(State.MutationTargets) then
-            State.MutationTargets["Night"] = true
-            State.MutationTargets["Cursed"] = true
-            State.MutationTargets["Shiny"] = true
-        end
+        -- Money Machine: ปิด Auto Roll และไม่เลือกเป้าหมายซื้อ/เก็บโนม เพื่อเซฟเงิน 100%
+        -- Buy Rarity: ไม่เลือก
+        -- Buy Mutation: ไม่เลือก
         -- Keep Mutation: ไม่เลือก
         -- Keep Rarity: ไม่เลือก
 
     elseif preset == "GnomeHunter" then
-        -- Buy Rarity: impossible, godly
+        -- Gnome Hunter: ล่าตัวท็อป IMPOSSIBLE / Godly + 6 มิวเตชั่นที่ดีที่สุด
         if not Runtime.HasAnySelection(State.BuyRarityTargets) then
             State.BuyRarityTargets["IMPOSSIBLE"] = true
             State.BuyRarityTargets["Godly"] = true
         end
-        -- Buy Mutation: Night, Cursed, Shiny
         if not Runtime.HasAnySelection(State.MutationTargets) then
-            State.MutationTargets["Night"] = true
-            State.MutationTargets["Cursed"] = true
             State.MutationTargets["Shiny"] = true
+            State.MutationTargets["Diamond"] = true
+            State.MutationTargets["Cursed"] = true
+            State.MutationTargets["Toxic"] = true
+            State.MutationTargets["Golden"] = true
+            State.MutationTargets["Night"] = true
         end
-        -- Keep Mutation: Night, Cursed, Shiny
         if not Runtime.HasAnySelection(State.KeepMutationTargets) then
-            State.KeepMutationTargets["Night"] = true
-            State.KeepMutationTargets["Cursed"] = true
             State.KeepMutationTargets["Shiny"] = true
+            State.KeepMutationTargets["Diamond"] = true
+            State.KeepMutationTargets["Cursed"] = true
+            State.KeepMutationTargets["Toxic"] = true
+            State.KeepMutationTargets["Golden"] = true
+            State.KeepMutationTargets["Night"] = true
         end
-        -- Keep Rarity: impossible, godly
         if not Runtime.HasAnySelection(State.KeepRarityTargets) then
             State.KeepRarityTargets["IMPOSSIBLE"] = true
             State.KeepRarityTargets["Godly"] = true
         end
 
     elseif preset == "Balanced" then
-        -- Buy Rarity: impossible, godly, mythic
+        -- Balanced: สมดุลครบวงจร IMPOSSIBLE / Godly / Mythic + 6 มิวเตชั่นที่ดีที่สุด
         if not Runtime.HasAnySelection(State.BuyRarityTargets) then
             State.BuyRarityTargets["IMPOSSIBLE"] = true
             State.BuyRarityTargets["Godly"] = true
             State.BuyRarityTargets["Mythic"] = true
         end
-        -- Buy Mutation: Night, Cursed, Shiny
         if not Runtime.HasAnySelection(State.MutationTargets) then
-            State.MutationTargets["Night"] = true
-            State.MutationTargets["Cursed"] = true
             State.MutationTargets["Shiny"] = true
+            State.MutationTargets["Diamond"] = true
+            State.MutationTargets["Cursed"] = true
+            State.MutationTargets["Toxic"] = true
+            State.MutationTargets["Golden"] = true
+            State.MutationTargets["Night"] = true
         end
-        -- Keep Mutation: Night, Cursed, Shiny
         if not Runtime.HasAnySelection(State.KeepMutationTargets) then
-            State.KeepMutationTargets["Night"] = true
-            State.KeepMutationTargets["Cursed"] = true
             State.KeepMutationTargets["Shiny"] = true
+            State.KeepMutationTargets["Diamond"] = true
+            State.KeepMutationTargets["Cursed"] = true
+            State.KeepMutationTargets["Toxic"] = true
+            State.KeepMutationTargets["Golden"] = true
+            State.KeepMutationTargets["Night"] = true
         end
-        -- Keep Rarity: impossible, godly, mythic
         if not Runtime.HasAnySelection(State.KeepRarityTargets) then
             State.KeepRarityTargets["IMPOSSIBLE"] = true
             State.KeepRarityTargets["Godly"] = true
@@ -633,6 +630,7 @@ local function ensurePresetTargets(preset)
         end
 
     elseif preset == "MaxProgression" then
+        -- Max Progression (Rebirth Rush): ไม่เลือกเป้าหมายซื้อโนมทั่วไป ให้ AutoBuyRebirthGnomes จัดการตัวเควสต์
         -- Buy Rarity: ไม่เลือก
         -- Buy Mutation: ไม่เลือก
         -- Keep Mutation: ไม่เลือก
