@@ -1,13 +1,13 @@
 --[[
   Type:     ModuleScript
-  Method:   cached
+  Method:   decompile
   Name:     ast
   Path:     game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.ast
   Service:  ReplicatedStorage
   Success:  true
   Executor: Potassium v2.4.2
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Mon Aug 17 02:37:05 2026
+  Time:     Thu Aug 20 00:11:25 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.

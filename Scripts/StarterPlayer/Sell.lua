@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.2
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Mon Aug 17 02:37:08 2026
+  Time:     Thu Aug 20 00:11:29 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -241,127 +241,316 @@ local function getBillboard() -- Line: 219
     return v44;
 end;
 
-local function setupBillboard() -- Line: 230
-    -- upvalues: LocalPlayer (copy), u1 (copy), SellBillboard (copy), u6 (copy), u11 (ref), setupDailyDeal (copy), createFrame (copy), u2 (copy), close (copy), u14 (ref), u3 (copy)
-    local v45 = u1(LocalPlayer.Character, "HumanoidRootPart");
-    local v46 = SellBillboard:Clone();
-    v46.Parent = u6;
-    v46.Adornee = v45;
-    u11 = v46;
-    setupDailyDeal(v46);
-    createFrame(v46, "1. Sell Inventory!", function() -- Line: 235
+local function getHeldType() -- Line: 230
+    -- upvalues: LocalPlayer (copy)
+    local Character = LocalPlayer.Character;
+
+    if Character then
+        Character = Character:FindFirstChildWhichIsA("Tool");
+    end;
+
+    if Character then
+        Character = Character:GetAttribute("type");
+    end;
+
+    return Character;
+end;
+
+local function setDailyDealVisible(p45, p46) -- Line: 236
+    if p45 then
+        p45 = p45:FindFirstChild("Frame");
+    end;
+
+    if p45 then
+        p45 = p45:FindFirstChild("DailyDeal");
+    end;
+
+    if p45 then
+        p45.Visible = p46;
+    end;
+end;
+
+local function showSellResponse(p47, p48) -- Line: 244
+    -- upvalues: close (copy), u14 (ref), u3 (copy)
+    task.wait();
+    close();
+
+    if p47 == "Not Holding" then
+        u14(p48 or "You are not holding anything.");
+
+        return;
+    end;
+
+    if not p47 then
+        return;
+    end;
+
+    u14((`Here is <font color="#FFC800">{u3.Comma(p47)}$</font>`));
+end;
+
+local function showWorthResponse(p49, p50) -- Line: 255
+    -- upvalues: close (copy), u14 (ref), u3 (copy)
+    task.wait();
+    close();
+
+    if p49 == "Not Holding" then
+        u14(p50 or "You are not holding anything.");
+
+        return;
+    end;
+
+    if not p49 then
+        return;
+    end;
+
+    u14((`I'd give you <font color="#FFC800">{u3.Comma(p49)}$</font>`));
+end;
+
+local function setupBillboard() -- Line: 266
+    -- upvalues: LocalPlayer (copy), u1 (copy), SellBillboard (copy), u6 (copy), u11 (ref), createFrame (copy), u2 (copy), close (copy), u14 (ref), u3 (copy), setupDailyDeal (copy)
+    local v51 = u1(LocalPlayer.Character, "HumanoidRootPart");
+    local v52 = SellBillboard:Clone();
+    v52.Parent = u6;
+    v52.Adornee = v51;
+    u11 = v52;
+    local Character = LocalPlayer.Character;
+
+    if Character then
+        Character = Character:FindFirstChildWhichIsA("Tool");
+    end;
+
+    if Character then
+        Character = Character:GetAttribute("type");
+    end;
+
+    if Character == "Pet" then
+        local v53;
+
+        if v52 then
+            v53 = v52:FindFirstChild("Frame");
+        else
+            v53 = v52;
+        end;
+
+        if v53 then
+            v53 = v53:FindFirstChild("DailyDeal");
+        end;
+
+        if v53 then
+            v53.Visible = false;
+        end;
+
+        createFrame(v52, "1. Sell Pet", function() -- Line: 273
+            -- upvalues: u2 (ref), close (ref), u14 (ref), u3 (ref)
+            local v54 = u2:InvokeServer("SellPet");
+            task.wait();
+            close();
+
+            if v54 == "Not Holding" then
+                u14("You are not holding a pet.");
+
+                return;
+            end;
+
+            if not v54 then
+                return;
+            end;
+
+            u14((`Here is <font color="#FFC800">{u3.Comma(v54)}$</font>`));
+        end);
+        createFrame(v52, "2. How much for this pet?", function() -- Line: 276
+            -- upvalues: u2 (ref), close (ref), u14 (ref), u3 (ref)
+            local v55 = u2:InvokeServer("HowMuchPet");
+            task.wait();
+            close();
+
+            if v55 == "Not Holding" then
+                u14("You are not holding a pet.");
+
+                return;
+            end;
+
+            if not v55 then
+                return;
+            end;
+
+            u14((`I'd give you <font color="#FFC800">{u3.Comma(v55)}$</font>`));
+        end);
+        createFrame(v52, "3. Nevermind.", close);
+
+        return;
+    end;
+
+    if Character == "Farmer" then
+        local v56;
+
+        if v52 then
+            v56 = v52:FindFirstChild("Frame");
+        else
+            v56 = v52;
+        end;
+
+        if v56 then
+            v56 = v56:FindFirstChild("DailyDeal");
+        end;
+
+        if v56 then
+            v56.Visible = false;
+        end;
+
+        createFrame(v52, "1. Sell Gnome", function() -- Line: 285
+            -- upvalues: u2 (ref), close (ref), u14 (ref), u3 (ref)
+            local v57 = u2:InvokeServer("SellGnome");
+            task.wait();
+            close();
+
+            if v57 == "Not Holding" then
+                u14("You are not holding a gnome.");
+
+                return;
+            end;
+
+            if not v57 then
+                return;
+            end;
+
+            u14((`Here is <font color="#FFC800">{u3.Comma(v57)}$</font>`));
+        end);
+        createFrame(v52, "2. How much for this?", function() -- Line: 288
+            -- upvalues: u2 (ref), close (ref), u14 (ref), u3 (ref)
+            local v58 = u2:InvokeServer("HowMuch");
+            task.wait();
+            close();
+
+            if v58 == "Not Holding" then
+                u14("You are not holding a gnome.");
+
+                return;
+            end;
+
+            if not v58 then
+                return;
+            end;
+
+            u14((`I'd give you <font color="#FFC800">{u3.Comma(v58)}$</font>`));
+        end);
+        createFrame(v52, "3. Sell All Gnomes", function() -- Line: 291
+            -- upvalues: u2 (ref), close (ref), u14 (ref), u3 (ref)
+            local v59 = u2:InvokeServer("SellAllGnomes");
+            task.wait();
+            close();
+
+            if v59 == "Not Holding" then
+                u14("You have no gnomes to sell.");
+
+                return;
+            end;
+
+            if not v59 then
+                return;
+            end;
+
+            u14((`Here is <font color="#FFC800">{u3.Comma(v59)}$</font>`));
+        end);
+        createFrame(v52, "4. Nevermind.", close);
+
+        return;
+    end;
+
+    local v60;
+
+    if v52 then
+        v60 = v52:FindFirstChild("Frame");
+    else
+        v60 = v52;
+    end;
+
+    if v60 then
+        v60 = v60:FindFirstChild("DailyDeal");
+    end;
+
+    if v60 then
+        v60.Visible = true;
+    end;
+
+    setupDailyDeal(v52);
+    createFrame(v52, "1. Sell Inventory!", function() -- Line: 301
         -- upvalues: u2 (ref), close (ref), u14 (ref), u3 (ref)
-        local v47 = u2:InvokeServer("SellAll");
+        local v61 = u2:InvokeServer("SellAll");
         task.wait();
         close();
 
-        if v47 == "No Plants" then
+        if v61 == "No Plants" then
             u14("You have no plants to sell.");
 
             return;
         end;
 
-        if not v47 then
+        if not v61 then
             return;
         end;
 
-        u14((`Sweet! Here is <font color="#FFC800">{u3.Comma(v47)}$</font>`));
+        u14((`Sweet! Here is <font color="#FFC800">{u3.Comma(v61)}$</font>`));
     end);
-    createFrame(v46, "2. Sell Just This!", function() -- Line: 246
+    createFrame(v52, "2. Sell Just This!", function() -- Line: 312
         -- upvalues: u2 (ref), close (ref), u14 (ref), u3 (ref)
-        local v48 = u2:InvokeServer("SellThis");
+        local v62 = u2:InvokeServer("SellThis");
         task.wait();
         close();
 
-        if v48 == "Not Holding" then
+        if v62 == "Not Holding" then
             u14("You are not holding anything.");
 
             return;
         end;
 
-        if not v48 then
+        if not v62 then
             return;
         end;
 
-        u14((`Here is <font color="#FFC800">{u3.Comma(v48)}$</font>`));
+        u14((`Here is <font color="#FFC800">{u3.Comma(v62)}$</font>`));
     end);
-    createFrame(v46, "3. How much for this?", function() -- Line: 257
+    createFrame(v52, "3. How much for this?", function() -- Line: 323
         -- upvalues: u2 (ref), close (ref), u14 (ref), u3 (ref)
-        local v49 = u2:InvokeServer("HowMuch");
+        local v63 = u2:InvokeServer("HowMuch");
         task.wait();
         close();
 
-        if v49 == "Not Holding" then
+        if v63 == "Not Holding" then
             u14("You are not holding anything.");
 
             return;
         end;
 
-        if not v49 then
+        if not v63 then
             return;
         end;
 
-        u14((`I'd give you <font color="#FFC800">{u3.Comma(v49)}$</font>`));
+        u14((`I'd give you <font color="#FFC800">{u3.Comma(v63)}$</font>`));
     end);
-    createFrame(v46, "4. Sell Gnome", function() -- Line: 268
-        -- upvalues: u2 (ref), close (ref), u14 (ref), u3 (ref)
-        local v50 = u2:InvokeServer("SellGnome");
-        task.wait();
-        close();
-
-        if v50 == "Not Holding" then
-            u14("You are not holding anything.");
-
-            return;
-        end;
-
-        if not v50 then
-            return;
-        end;
-
-        u14((`Here is <font color="#FFC800">{u3.Comma(v50)}$</font>`));
-    end);
-    createFrame(v46, "5. Sell All Gnomes", function() -- Line: 279
-        -- upvalues: u2 (ref), close (ref), u14 (ref), u3 (ref)
-        local v51 = u2:InvokeServer("SellAllGnomes");
-        task.wait();
-        close();
-
-        if v51 == "Not Holding" then
-            u14("You are not holding anything.");
-
-            return;
-        end;
-
-        if not v51 then
-            return;
-        end;
-
-        u14((`Here is <font color="#FFC800">{u3.Comma(v51)}$</font>`));
-    end);
-    createFrame(v46, "6. Nevermind.", function() -- Line: 290
+    createFrame(v52, "4. Nevermind.", function() -- Line: 334
         -- upvalues: close (ref)
         close();
     end);
 end;
 
-local function setupSell() -- Line: 295
+local function setupSell() -- Line: 339
     -- upvalues: u7 (copy), getSellPart (copy), u12 (ref), LocalPlayer (copy), GamepadService (copy), setupBillboard (copy), u13 (ref), RunService (copy), close (copy), u1 (copy), u14 (ref), u15 (ref), cancelTextMessageTweens (copy), u16 (copy), u4 (copy)
     if not u7.Value then
         u7.Changed:Wait();
     end;
 
     local Sell = u7.Value:WaitForChild("Points"):WaitForChild("Sell");
-    local u52 = getSellPart(Sell);
+    local u64 = getSellPart(Sell);
 
-    if not u52 then
+    if not u64 then
         return;
     end;
 
     local ProximityPrompt = script.ProximityPrompt;
-    ProximityPrompt.Parent = u52;
-    ProximityPrompt.Triggered:Connect(function() -- Line: 308
-        -- upvalues: ProximityPrompt (copy), u12 (ref), LocalPlayer (ref), GamepadService (ref), setupBillboard (ref), u13 (ref), RunService (ref), u52 (copy), close (ref)
+    ProximityPrompt.Parent = u64;
+    ProximityPrompt.Triggered:Connect(function() -- Line: 352
+        -- upvalues: ProximityPrompt (copy), u12 (ref), LocalPlayer (ref), GamepadService (ref), setupBillboard (ref), u13 (ref), RunService (ref), u64 (copy), close (ref)
         ProximityPrompt.Enabled = false;
         u12 = ProximityPrompt;
 
@@ -370,134 +559,134 @@ local function setupSell() -- Line: 295
         end;
 
         setupBillboard();
-        u13 = RunService.Heartbeat:Connect(function() -- Line: 317
-            -- upvalues: LocalPlayer (ref), u52 (ref), close (ref)
+        u13 = RunService.Heartbeat:Connect(function() -- Line: 361
+            -- upvalues: LocalPlayer (ref), u64 (ref), close (ref)
             local Character = LocalPlayer.Character;
 
             if Character then
                 Character = Character:FindFirstChild("HumanoidRootPart");
             end;
 
-            if Character and (Character.Position - u52.Position).Magnitude >= 15 then
+            if Character and (Character.Position - u64.Position).Magnitude >= 15 then
                 close();
             end;
         end);
     end);
-    local u53 = u1(u1(Sell, "SellCharacter"), "TextBubble");
-    local u54 = u1(u53, "Frame");
-    local u55 = u1(u53, "TextLabel");
-    local u56 = u55:FindFirstChildWhichIsA("UIStroke");
-    local BackgroundTransparency = u54.BackgroundTransparency;
+    local u65 = u1(u1(Sell, "SellCharacter"), "TextBubble");
+    local u66 = u1(u65, "Frame");
+    local u67 = u1(u65, "TextLabel");
+    local u68 = u67:FindFirstChildWhichIsA("UIStroke");
+    local BackgroundTransparency = u66.BackgroundTransparency;
 
-    u14 = function(p57) -- Line: 333
-        -- upvalues: u15 (ref), u53 (copy), u55 (copy), cancelTextMessageTweens (ref), u54 (copy), BackgroundTransparency (copy), u56 (copy), u16 (ref), u4 (ref)
+    u14 = function(p69) -- Line: 377
+        -- upvalues: u15 (ref), u65 (copy), u67 (copy), cancelTextMessageTweens (ref), u66 (copy), BackgroundTransparency (copy), u68 (copy), u16 (ref), u4 (ref)
         u15 = u15 + 1;
-        local u58 = u15;
-        local u59 = tostring(p57 or "");
+        local u70 = u15;
+        local u71 = tostring(p69 or "");
 
-        local function isCurrent() -- Line: 337
-            -- upvalues: u58 (copy), u15 (ref), u53 (ref), u55 (ref)
-            local v60;
+        local function isCurrent() -- Line: 381
+            -- upvalues: u70 (copy), u15 (ref), u65 (ref), u67 (ref)
+            local v72;
 
-            if u58 == u15 then
-                v60 = u53.Parent and u55.Parent;
+            if u70 == u15 then
+                v72 = u65.Parent and u67.Parent;
             else
-                v60 = false;
+                v72 = false;
             end;
 
-            return v60;
+            return v72;
         end;
 
         cancelTextMessageTweens();
-        u53.Enabled = true;
-        u54.BackgroundTransparency = BackgroundTransparency;
-        u55.TextTransparency = 0;
+        u65.Enabled = true;
+        u66.BackgroundTransparency = BackgroundTransparency;
+        u67.TextTransparency = 0;
 
-        if u56 then
-            u56.Transparency = 0;
+        if u68 then
+            u68.Transparency = 0;
         end;
 
-        local u61 = u55;
+        local u73 = u67;
 
-        local function u64() -- Line: 349
-            -- upvalues: u58 (copy), u15 (ref), u53 (ref), u55 (ref), u16 (ref), u4 (ref), u54 (ref), u56 (ref), BackgroundTransparency (ref), cancelTextMessageTweens (ref)
+        local function u76() -- Line: 393
+            -- upvalues: u70 (copy), u15 (ref), u65 (ref), u67 (ref), u16 (ref), u4 (ref), u66 (ref), u68 (ref), BackgroundTransparency (ref), cancelTextMessageTweens (ref)
             task.wait(3);
-            local v62;
+            local v74;
 
-            if u58 == u15 then
-                v62 = u53.Parent and u55.Parent;
+            if u70 == u15 then
+                v74 = u65.Parent and u67.Parent;
             else
-                v62 = false;
+                v74 = false;
             end;
 
-            if not v62 then
+            if not v74 then
                 return;
             end;
 
-            table.insert(u16, u4:Tween(u55, 0.5, "Sine", "InOut", {
+            table.insert(u16, u4:Tween(u67, 0.5, "Sine", "InOut", {
                 TextTransparency = 1
             }));
-            table.insert(u16, u4:Tween(u54, 0.5, "Sine", "InOut", {
+            table.insert(u16, u4:Tween(u66, 0.5, "Sine", "InOut", {
                 BackgroundTransparency = 1
             }));
 
-            if u56 then
-                table.insert(u16, u4:Tween(u56, 0.5, "Sine", "InOut", {
+            if u68 then
+                table.insert(u16, u4:Tween(u68, 0.5, "Sine", "InOut", {
                     Transparency = 1
                 }));
             end;
 
             task.wait(0.5);
-            local v63;
+            local v75;
 
-            if u58 == u15 then
-                v63 = u53.Parent and u55.Parent;
+            if u70 == u15 then
+                v75 = u65.Parent and u67.Parent;
             else
-                v63 = false;
+                v75 = false;
             end;
 
-            if not v63 then
+            if not v75 then
                 return;
             end;
 
-            u53.Enabled = false;
-            u55.MaxVisibleGraphemes = -1;
-            u54.BackgroundTransparency = BackgroundTransparency;
-            u55.TextTransparency = 0;
+            u65.Enabled = false;
+            u67.MaxVisibleGraphemes = -1;
+            u66.BackgroundTransparency = BackgroundTransparency;
+            u67.TextTransparency = 0;
 
-            if u56 then
-                u56.Transparency = 0;
+            if u68 then
+                u68.Transparency = 0;
             end;
 
             cancelTextMessageTweens();
         end;
 
-        u61.Text = u59;
-        u61.MaxVisibleGraphemes = 0;
+        u73.Text = u71;
+        u73.MaxVisibleGraphemes = 0;
         task.spawn(function() -- Line: 122
-            -- upvalues: u59 (copy), isCurrent (copy), u61 (copy), u64 (copy)
-            local u65 = string.gsub(u59, "<[^<>]->", "");
-            local u66 = 0;
+            -- upvalues: u71 (copy), isCurrent (copy), u73 (copy), u76 (copy)
+            local u77 = string.gsub(u71, "<[^<>]->", "");
+            local u78 = 0;
 
             for i = 1, pcall(function() -- Line: 109
-                -- upvalues: u65 (copy), u66 (ref)
-                for _ in utf8.graphemes(u65) do
-                    u66 = u66 + 1;
+                -- upvalues: u77 (copy), u78 (ref)
+                for _ in utf8.graphemes(u77) do
+                    u78 = u78 + 1;
                 end;
-            end) and u66 or #u65 do
-                if not (isCurrent() and u61.Parent) then
+            end) and u78 or #u77 do
+                if not (isCurrent() and u73.Parent) then
                     return;
                 end;
 
-                u61.MaxVisibleGraphemes = i;
+                u73.MaxVisibleGraphemes = i;
                 task.wait(0.025);
             end;
 
-            if not (isCurrent() and u64) then
+            if not (isCurrent() and u76) then
                 return;
             end;
 
-            local success, result = pcall(u64);
+            local success, result = pcall(u76);
 
             if not success then
                 warn("Sell typewriter callback failed:", result);
@@ -506,7 +695,7 @@ local function setupSell() -- Line: 295
     end;
 end;
 
-function v8.Initialize(p67) -- Line: 380
+function v8.Initialize(p79) -- Line: 424
     -- upvalues: setupSell (copy)
     setupSell();
 end;

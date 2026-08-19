@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.2
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Mon Aug 17 02:37:04 2026
+  Time:     Thu Aug 20 00:11:23 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -20,76 +20,69 @@ local v3 = {};
 
 local function ApplyLuckToWeights(p4, p5) -- Line: 10
     -- upvalues: u2 (copy)
-    local v6 = 1 / math.max(p5 or 1, 1);
+    local v6 = math.max(p5 or 1, 1);
+    local _ = 1 / v6;
     local v7 = {};
     local v8 = 0;
 
     for i, v in pairs(p4) do
-        local v9 = u2[i];
-        local v10;
-
-        if v9 and v9.real_rarity == "IMPOSSIBLE" then
-            v10 = math.max(0.6, v6);
-        else
-            v10 = v6;
-        end;
-
-        local v11 = v ^ v10;
-        v7[i] = v11;
-        v8 = v8 + v11;
+        local _ = u2[i];
+        local v9 = v ^ (1 / v6);
+        v7[i] = v9;
+        v8 = v8 + v9;
     end;
 
     return v7, v8;
 end;
 
-local function ApplyLuckToSizeWeights(p12, p13) -- Line: 36
-    local v14 = 1 / math.max(p13 or 1, 1);
-    local v15 = 0;
-    local v16 = {};
+local function ApplyLuckToSizeWeights(p10, p11) -- Line: 33
+    local v12 = 1 / math.max(p11 or 1, 1);
+    local v13 = 0;
+    local v14 = {};
 
-    for _, v in ipairs(p12) do
-        local v17 = v.Weight ^ v14;
-        v15 = v15 + v17;
-        table.insert(v16, {
+    for _, v in ipairs(p10) do
+        local v15 = v.Weight ^ v12;
+        v13 = v13 + v15;
+        table.insert(v14, {
             Name = v.Name,
-            Weight = v17,
+            Weight = v15,
             ScaleRange = v.ScaleRange,
             MultRange = v.MultRange
         });
     end;
 
-    return v16, v15;
+    return v14, v13;
 end;
 
-function v3.Roll(p18, p19, p20, p21) -- Line: 59
+function v3.Roll(p16, p17, p18, p19) -- Line: 56
     -- upvalues: u1 (copy), ApplyLuckToWeights (copy)
-    local v22 = p20 or 1;
-    local v23 = u1[p19];
+    local v20 = p18 or 1;
+    local v21 = u1[p17];
 
-    if not v23 then
+    if not v21 then
         return nil, nil;
     end;
 
-    if p21 then
-        local v24 = {};
+    if p19 then
+        local v22 = {};
 
-        for i, _ in pairs(v23.contents) do
-            table.insert(v24, i);
+        for i, _ in pairs(v21.contents) do
+            table.insert(v22, i);
         end;
 
-        if #v24 > 0 then
-            return v24[math.random(1, #v24)];
+        if #v22 > 0 then
+            return v22[math.random(1, #v22)];
         end;
     else
-        local v25, v26 = ApplyLuckToWeights(v23.contents, v22);
-        local v27 = math.random() * v26;
+        local v23, v24 = ApplyLuckToWeights(v21.contents, v20);
+        local v25 = math.random() * v24;
 
-        for i, v in pairs(v25) do
-            if v27 <= v then
+        for i, v in pairs(v23) do
+            if v25 <= v then
                 return i;
             end;
 
-            v27 = v27 - v;
+            v25 = v25 - v;
         end;
     end;
 

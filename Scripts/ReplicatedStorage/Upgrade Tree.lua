@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.2
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Mon Aug 17 02:37:04 2026
+  Time:     Thu Aug 20 00:11:23 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -21,7 +21,7 @@ return {
             Type = "DiamondGnomes",
             Set = "true",
             Price = 155000,
-            Position = Vector2.new(-2, 0),
+            Position = Vector2.new(-3, -0),
             Requires = { "GoldenGnomes" }
         },
         GnomeSpeed1 = {
@@ -128,7 +128,7 @@ return {
             Icon = "\"\"",
             OpensPage = "Main",
             BackButton = true,
-            Position = Vector2.new(0, 0),
+            Position = Vector2.new(0, -0),
             Requires = {}
         },
         GoldenGnomes = {
@@ -138,7 +138,7 @@ return {
             Type = "GoldenGnomes",
             Set = "true",
             Price = 85000,
-            Position = Vector2.new(-1, 0),
+            Position = Vector2.new(-2, 0),
             Requires = { "MutatedGnomes" }
         },
         HugeGnomes = {
@@ -148,31 +148,31 @@ return {
             Type = "HugeGnomes",
             Set = "true",
             Price = 549000,
-            Position = Vector2.new(-3, 1),
+            Position = Vector2.new(-4, 1),
             Requires = { "DiamondGnomes" }
         },
         LRebirth_Node1 = {
             Name = "Rebirth 3 Required",
             RequiredRebirth = 3,
-            Position = Vector2.new(4, -5),
+            Position = Vector2.new(2, -4),
             Requires = { "MutationLuck3" }
         },
         LRebirth_Node2 = {
             Name = "Rebirth 4 Required",
             RequiredRebirth = 4,
-            Position = Vector2.new(6, -6),
+            Position = Vector2.new(4, -5),
             Requires = { "MutationLuck4" }
         },
         LRebirth_Node3 = {
             Name = "Rebirth 5 Required",
             RequiredRebirth = 5,
-            Position = Vector2.new(8, -5),
+            Position = Vector2.new(6, -4),
             Requires = { "MutationLuck6" }
         },
         LRebirth_Node4 = {
             Name = "Rebirth 6 Required",
             RequiredRebirth = 6,
-            Position = Vector2.new(6, -2),
+            Position = Vector2.new(4, -1),
             Requires = { "MutationLuck8" }
         },
         MutatedGnomes = {
@@ -181,7 +181,7 @@ return {
             Icon = "rbxassetid://100521396059781",
             Type = "MutatedGnomes",
             Price = 45000,
-            Position = Vector2.new(1, -1),
+            Position = Vector2.new(-1, 0),
             Requires = { "LuckIII" }
         },
         MutationLuck1 = {
@@ -189,7 +189,7 @@ return {
             Icon = "rbxassetid://94949780075192",
             Type = "MutationLuck",
             Price = 92500,
-            Position = Vector2.new(2, -2),
+            Position = Vector2.new(0, -1),
             Requires = { "MutatedGnomes" }
         },
         MutationLuck12 = {
@@ -197,7 +197,7 @@ return {
             Icon = "rbxassetid://138363228547583",
             Type = "MutationLuck",
             Price = 519000,
-            Position = Vector2.new(-4, 2),
+            Position = Vector2.new(-5, 2),
             Requires = { "HugeGnomes" }
         },
         MutationLuck122 = {
@@ -205,7 +205,7 @@ return {
             Icon = "rbxassetid://138363228547583",
             Type = "MutationLuck",
             Price = 275000,
-            Position = Vector2.new(-2, -1),
+            Position = Vector2.new(-3, -1),
             Requires = { "DiamondGnomes" }
         },
         MutationLuck2 = {
@@ -213,7 +213,7 @@ return {
             Icon = "rbxassetid://94949780075192",
             Type = "MutationLuck",
             Price = 495000,
-            Position = Vector2.new(2, -3),
+            Position = Vector2.new(1, -2),
             Requires = { "MutationLuck1" }
         },
         MutationLuck22 = {
@@ -221,7 +221,7 @@ return {
             Icon = "rbxassetid://138363228547583",
             Type = "MutationLuck",
             Price = 1149000,
-            Position = Vector2.new(-5, 2),
+            Position = Vector2.new(-6, 2),
             Requires = { "MutationLuck12" }
         },
         MutationLuck222 = {
@@ -229,7 +229,7 @@ return {
             Icon = "rbxassetid://138363228547583",
             Type = "MutationLuck",
             Price = 695000,
-            Position = Vector2.new(-1, -2),
+            Position = Vector2.new(-2, -2),
             Requires = { "MutationLuck122" }
         },
         MutationLuck3 = {
@@ -237,7 +237,7 @@ return {
             Icon = "rbxassetid://94949780075192",
             Type = "MutationLuck",
             Price = 895000,
-            Position = Vector2.new(3, -4),
+            Position = Vector2.new(1, -3),
             Requires = { "MutationLuck2" }
         },
         MutationLuck4 = {
@@ -245,7 +245,7 @@ return {
             Icon = "rbxassetid://94949780075192",
             Type = "MutationLuck",
             Price = 3495000,
-            Position = Vector2.new(5, -6),
+            Position = Vector2.new(3, -5),
             Requires = { "LRebirth_Node1" }
         },
         MutationLuck5 = {
@@ -253,7 +253,7 @@ return {
             Icon = "rbxassetid://94949780075192",
             Type = "MutationLuck",
             Price = 14650000,
-            Position = Vector2.new(7, -6),
+            Position = Vector2.new(5, -5),
             Requires = { "LRebirth_Node2" }
         },
         MutationLuck6 = {
@@ -261,7 +261,7 @@ return {
             Icon = "rbxassetid://94949780075192",
             Type = "MutationLuck",
             Price = 32850000,
-            Position = Vector2.new(8, -6),
+            Position = Vector2.new(6, -5),
             Requires = { "MutationLuck5" }
         },
         MutationLuck7 = {
@@ -269,7 +269,7 @@ return {
             Icon = "rbxassetid://94949780075192",
             Type = "MutationLuck",
             Price = 97850000,
-            Position = Vector2.new(7, -4),
+            Position = Vector2.new(5, -3),
             Requires = { "LRebirth_Node3" }
         },
         MutationLuck8 = {
@@ -277,7 +277,7 @@ return {
             Icon = "rbxassetid://94949780075192",
             Type = "MutationLuck",
             Price = 299850000,
-            Position = Vector2.new(6, -3),
+            Position = Vector2.new(4, -2),
             Requires = { "MutationLuck7" }
         },
         MutationLuck9 = {
@@ -285,7 +285,7 @@ return {
             Icon = "rbxassetid://94949780075192",
             Type = "MutationLuck",
             Price = 625850000,
-            Position = Vector2.new(7, -2),
+            Position = Vector2.new(5, -1),
             Requires = { "LRebirth_Node4" }
         },
         OfflinePerks = {
@@ -543,6 +543,13 @@ return {
             OpensPage = "Player",
             Position = Vector2.new(-1, 2),
             Requires = { "GrowthSpeed1" }
+        },
+        PlayerPage2 = {
+            Name = "Pets",
+            Icon = "rbxassetid://80647671940278",
+            OpensPage = "Pets",
+            Position = Vector2.new(-2, -1),
+            Requires = { "PlotExpansion2" }
         },
         PlotExpansion1 = {
             Name = "Expansion 1",
@@ -944,6 +951,40 @@ return {
         }
     },
     ["Offline Upgrades"] = {},
+    Pets = {
+        Equip1Pet1 = {
+            Name = "+1 Equip",
+            Icon = "rbxassetid://83889201963668",
+            Type = "MaxPetEquip",
+            Set = 4,
+            Price = 1000000,
+            Position = Vector2.new(0, 0),
+            Requires = { "PlotExpansion2" }
+        },
+        Equip1Pet2 = {
+            Name = "+1 Equip",
+            Icon = "rbxassetid://103952235880547",
+            Type = "MaxPetEquip",
+            Set = 5,
+            Price = 5000000,
+            Position = Vector2.new(2, -2),
+            Requires = { "Rebirth3_1" }
+        },
+        PetsBack2 = {
+            Name = "Pets",
+            Icon = "\"\"",
+            OpensPage = "Main",
+            BackButton = true,
+            Position = Vector2.new(-0, 1),
+            Requires = {}
+        },
+        Rebirth3_1 = {
+            Name = "Rebirth 3 Required",
+            RequiredRebirth = 3,
+            Position = Vector2.new(1, -1),
+            Requires = { "Equip1Pet1" }
+        }
+    },
     Plants = {
         BetterDirt1 = {
             Name = "Good Dirt",
@@ -1044,13 +1085,20 @@ return {
             Position = Vector2.new(-2, 4),
             Requires = { "GrowthSpeed1" }
         },
+        OfflinePerksPlants = {
+            Name = "Offline Perks",
+            Icon = "rbxassetid://71222959543971",
+            Price = 1000000,
+            Position = Vector2.new(-2, 2),
+            Requires = { "GrowthSpeed1" }
+        },
         PlantGrowthSpeed1 = {
             Name = "Fast Plant Growth I",
             Icon = "rbxassetid://70640268514060",
             Type = "OfflineGrowthSpeed",
             Set = 1.1,
             Price = 5850000,
-            Position = Vector2.new(-2, 1),
+            Position = Vector2.new(-2, 0),
             Requires = { "Rebirth3_2" }
         },
         PlantGrowthSpeed2 = {
@@ -1059,7 +1107,7 @@ return {
             Type = "OfflineGrowthSpeed",
             Set = 1.2,
             Price = 19850000,
-            Position = Vector2.new(-0, -1),
+            Position = Vector2.new(0, -2),
             Requires = { "Rebirth4_1" }
         },
         PlantGrowthSpeed3 = {
@@ -1068,7 +1116,7 @@ return {
             Type = "OfflineGrowthSpeed",
             Set = 1.3,
             Price = 64850000,
-            Position = Vector2.new(-0, -2),
+            Position = Vector2.new(0, -3),
             Requires = { "PlantGrowthSpeed2" }
         },
         PlantGrowthSpeed4 = {
@@ -1077,7 +1125,7 @@ return {
             Type = "OfflineGrowthSpeed",
             Set = 1.35,
             Price = 179875000,
-            Position = Vector2.new(-2, -2),
+            Position = Vector2.new(-2, -3),
             Requires = { "PlantGrowthSpeed3" }
         },
         PlantGrowthSpeed5 = {
@@ -1086,7 +1134,7 @@ return {
             Type = "OfflineGrowthSpeed",
             Set = 1.375,
             Price = 349850000,
-            Position = Vector2.new(-3, -1),
+            Position = Vector2.new(-3, -2),
             Requires = { "PlantGrowthSpeed4" }
         },
         PlantGrowthSpeed6 = {
@@ -1095,7 +1143,7 @@ return {
             Type = "OfflineGrowthSpeed",
             Set = 1.4,
             Price = 895000000,
-            Position = Vector2.new(-4, 1),
+            Position = Vector2.new(-4, 0),
             Requires = { "Rebirth6_1" }
         },
         PlantsBack = {
@@ -1109,25 +1157,25 @@ return {
         Rebirth3_2 = {
             Name = "Rebirth 3 Required",
             RequiredRebirth = 3,
-            Position = Vector2.new(-2, 2),
-            Requires = { "GrowthSpeed1" }
+            Position = Vector2.new(-2, 1),
+            Requires = { "OfflinePerksPlants" }
         },
         Rebirth4_1 = {
             Name = "Rebirth 4 Required",
             RequiredRebirth = 4,
-            Position = Vector2.new(-1, -0),
+            Position = Vector2.new(-1, -1),
             Requires = { "PlantGrowthSpeed1" }
         },
         Rebirth5_1 = {
             Name = "Rebirth 5 Required",
             RequiredRebirth = 5,
-            Position = Vector2.new(-1, -2),
+            Position = Vector2.new(-1, -3),
             Requires = { "PlantGrowthSpeed3" }
         },
         Rebirth6_1 = {
             Name = "Rebirth 6 Required",
             RequiredRebirth = 6,
-            Position = Vector2.new(-4, 0),
+            Position = Vector2.new(-4, -1),
             Requires = { "PlantGrowthSpeed5" }
         },
         ReduceTime1 = {

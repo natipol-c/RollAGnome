@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.2
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Mon Aug 17 02:37:09 2026
+  Time:     Thu Aug 20 00:11:29 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -23,7 +23,7 @@ local function prompt() -- Line: 26
     -- upvalues: SocialService (copy)
     local success, result = pcall(function() -- Line: 29
         -- upvalues: SocialService (ref)
-        return SocialService:GetEventRsvpStatusAsync("4979711253774729848");
+        return SocialService:GetEventRsvpStatusAsync("6904936723306906172");
     end);
 
     if not success then
@@ -33,7 +33,7 @@ local function prompt() -- Line: 26
     if result ~= Enum.RsvpStatus.Going then
         pcall(function() -- Line: 38
             -- upvalues: SocialService (ref)
-            SocialService:PromptRsvpToEventAsync("4979711253774729848");
+            SocialService:PromptRsvpToEventAsync("6904936723306906172");
         end);
     end;
 end;

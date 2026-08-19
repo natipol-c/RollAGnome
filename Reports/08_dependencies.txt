@@ -61,6 +61,104 @@ Shows require() calls found in decompiled scripts
 [ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.EventCurrency
     → require(ReplicatedStorage.Library)
 
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets
+    → require(script.Assets)
+    → require(Definitions.Dog)
+    → require(Definitions.Cat)
+    → require(Definitions.Bunny)
+    → require(Definitions.Cow)
+    → require(Definitions.Frog)
+    → require(Definitions.Bee)
+    → require(Definitions.Turtle)
+    → require(Definitions.Owl)
+    → require(Definitions.Pig)
+    → require(Definitions.Raccoon)
+    → require(Definitions.Hornet)
+    → require(Definitions.Ant)
+    → require(Definitions["Mutant Ant"])
+    → require(Definitions["Mutant Bee"])
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Behavior
+    → require(script.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Ant
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Bee
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Bunny
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Cat
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Chicken
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Cow
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Dog
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Frog
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Hornet
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Mutant Ant
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Owl
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Pig
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Raccoon
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Turtle
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Mutant Bee
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.PetsUtil
+    → require(ReplicatedStorage.Library.Configs.Mutations)
+
 [ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Network
     → require(script.Callback)
 
@@ -181,107 +279,6 @@ Shows require() calls found in decompiled scripts
 
 [ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages.ui
     → require(script.Parent[".pesde"]["alicesaidhi+conch_ui"]["0.2.5-rc.1"].conch_ui.src.lib)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_vm.0.2.1.conch_vm.src.lib
-    → require("../roblox_packages/types")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_vm.0.2.1.conch_vm.roblox_packages.types
-    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.ast
-    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_ast"]["0.2.1-rc.2"].conch_ast.src.lib)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.compiler
-    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_compiler"]["0.2.2"].conch_compiler.src.lib)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.intel
-    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_analysis"]["0.2.2-rc.2"].conch_analysis.src.lib)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.types
-    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.vm
-    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_vm"]["0.2.1"].conch_vm.src.lib)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.arguments
-    → require("./console")
-    → require("./context")
-    → require("./types")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.bootstrap
-    → require("./arguments")
-    → require("./console")
-    → require("./state")
-    → require("./types")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.client
-    → require("./console")
-    → require("./net")
-    → require("./state")
-    → require("./types")
-    → require("./user")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.console
-    → require("../roblox_packages/ast")
-    → require("../roblox_packages/compiler")
-    → require("../roblox_packages/vm")
-    → require("../roblox_packages/types")
-    → require("../roblox_packages/intel")
-    → require("./net")
-    → require("./signal")
-    → require("./state")
-    → require("./types")
-    → require("./user")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.context
-    → require("./state")
-    → require("./types")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.lib
-    → require("./arguments")
-    → require("../roblox_packages/ast")
-    → require("./bootstrap")
-    → require("./client")
-    → require("./console")
-    → require("./context")
-    → require("./net")
-    → require("./state")
-    → require("./types")
-    → require("./user")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.signal
-    → require("./types")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.state
-    → require("./types")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.types
-    → require("../roblox_packages/types")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.user
-    → require("./constants")
-    → require("./net")
-    → require("./state")
-    → require("./types")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.roblox_packages.types
-    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.src.lib
-    → require("./optional_ast")
-    → require("../roblox_packages/types")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ast.0.2.1-rc.2.conch_ast.roblox_packages.types
-    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ast.0.2.1-rc.2.conch_ast.src.lib
-    → require("../roblox_packages/types")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_compiler.0.2.2.conch_compiler.roblox_packages.types
-    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_compiler.0.2.2.conch_compiler.src.lib
-    → require("../roblox_packages/types")
 
 [ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide
     → require("test/relative-string")
@@ -414,14 +411,11 @@ Shows require() calls found in decompiled scripts
     → require("test/relative-string")
     → require(script.Parent.graph)
 
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.ast
-    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_ast"]["0.2.1-rc.2"].conch_ast.src.lib)
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_vm.0.2.1.conch_vm.src.lib
+    → require("../roblox_packages/types")
 
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.conch
-    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch"]["0.2.5-rc.2"].conch.src.lib)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.vide
-    → require(script.Parent.Parent.Parent.Parent.Parent["centau_vide@0.3.1"].vide)
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_vm.0.2.1.conch_vm.roblox_packages.types
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
 
 [ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.app
     → require("./components/background")
@@ -509,6 +503,110 @@ Shows require() calls found in decompiled scripts
 [ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.textbox
     → require("../theme")
     → require("../../roblox_packages/vide")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.ast
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_ast"]["0.2.1-rc.2"].conch_ast.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.conch
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch"]["0.2.5-rc.2"].conch.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.vide
+    → require(script.Parent.Parent.Parent.Parent.Parent["centau_vide@0.3.1"].vide)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_compiler.0.2.2.conch_compiler.src.lib
+    → require("../roblox_packages/types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_compiler.0.2.2.conch_compiler.roblox_packages.types
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ast.0.2.1-rc.2.conch_ast.src.lib
+    → require("../roblox_packages/types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ast.0.2.1-rc.2.conch_ast.roblox_packages.types
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.src.lib
+    → require("./optional_ast")
+    → require("../roblox_packages/types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.roblox_packages.types
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.arguments
+    → require("./console")
+    → require("./context")
+    → require("./types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.bootstrap
+    → require("./arguments")
+    → require("./console")
+    → require("./state")
+    → require("./types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.client
+    → require("./console")
+    → require("./net")
+    → require("./state")
+    → require("./types")
+    → require("./user")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.console
+    → require("../roblox_packages/ast")
+    → require("../roblox_packages/compiler")
+    → require("../roblox_packages/vm")
+    → require("../roblox_packages/types")
+    → require("../roblox_packages/intel")
+    → require("./net")
+    → require("./signal")
+    → require("./state")
+    → require("./types")
+    → require("./user")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.context
+    → require("./state")
+    → require("./types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.lib
+    → require("./arguments")
+    → require("../roblox_packages/ast")
+    → require("./bootstrap")
+    → require("./client")
+    → require("./console")
+    → require("./context")
+    → require("./net")
+    → require("./state")
+    → require("./types")
+    → require("./user")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.signal
+    → require("./types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.state
+    → require("./types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.types
+    → require("../roblox_packages/types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.user
+    → require("./constants")
+    → require("./net")
+    → require("./state")
+    → require("./types")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.ast
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_ast"]["0.2.1-rc.2"].conch_ast.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.compiler
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_compiler"]["0.2.2"].conch_compiler.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.intel
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_analysis"]["0.2.2-rc.2"].conch_analysis.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.types
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_types"]["0.2.1"].conch_types.src.lib)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.vm
+    → require(script.Parent.Parent.Parent.Parent.Parent["alicesaidhi+conch_vm"]["0.2.1"].conch_vm.src.lib)
 
 [ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus
     → require(u1.Reference)
@@ -759,6 +857,7 @@ Shows require() calls found in decompiled scripts
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Index
     → require(ReplicatedStorage.Replication)
     → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage.Library.Configs.Pets)
 
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Are You Sure
     → require(ReplicatedStorage.Replication)
@@ -791,6 +890,11 @@ Shows require() calls found in decompiled scripts
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.WeeklyDeal
     → require(ReplicatedStorage.Replication)
     → require(ReplicatedStorage.Library)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.ActivePets
+    → require(ReplicatedStorage.Replication)
+    → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage.Library.Configs.Pets)
 
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Loading
     → require(ReplicatedStorage.Library)
@@ -935,6 +1039,22 @@ Shows require() calls found in decompiled scripts
 
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Give Item
     → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage.Library.Configs.Pets)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets
+    → require(ReplicatedStorage.Library.Imported.Network)
+    → require(script.Actions.CarryFruit)
+    → require(script.Actions.Dig)
+    → require(script.Actions.Pollinate)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets.Actions.CarryFruit
+    → require(ReplicatedStorage.Library.Imported.Trove)
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets Handler
+    → require(ReplicatedStorage.Library)
+    → require(ReplicatedStorage.Library.Configs.PetsUtil)
+    → require(script.Animations)
+    → require(ReplicatedStorage.Library.Configs.Pets)
 
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Debug
     → require(ReplicatedStorage.Replication)
@@ -979,9 +1099,24 @@ Shows require() calls found in decompiled scripts
     → require(CommonUtils:WaitForChild("FlagUtil")
     → require(script.Parent:WaitForChild("BaseOcclusion")
 
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRVehicleCameraDeprecated
+    → require(script.Parent:WaitForChild("VRBaseCamera")
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("CameraUtils")
+    → require(script.Parent:WaitForChild("VehicleCamera")
+    → require(script.Parent.VehicleCamera:FindFirstChild("VehicleCameraCore")
+    → require(script.Parent.VehicleCamera:FindFirstChild("VehicleCameraConfig")
+    → require(LocalPlayer:WaitForChild("PlayerScripts")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraToggleStateController
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("CameraUI")
+    → require(script.Parent:WaitForChild("CameraUtils")
+
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCamera
     → require(script.Parent:WaitForChild("CameraInput")
     → require(script.Parent:WaitForChild("CameraUtils")
+    → require(script.Parent:WaitForChild("VRCameraTeleportDetector")
     → require(CommonUtils:WaitForChild("FlagUtil")
     → require(script.Parent:WaitForChild("VRBaseCamera")
     → require(Players.LocalPlayer:WaitForChild("PlayerScripts")
@@ -1027,20 +1162,6 @@ Shows require() calls found in decompiled scripts
     → require(script.Parent:WaitForChild("CameraInput")
     → require(script.Parent:WaitForChild("BaseCamera")
 
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraToggleStateController
-    → require(script.Parent:WaitForChild("CameraInput")
-    → require(script.Parent:WaitForChild("CameraUI")
-    → require(script.Parent:WaitForChild("CameraUtils")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRVehicleCameraDeprecated
-    → require(script.Parent:WaitForChild("VRBaseCamera")
-    → require(script.Parent:WaitForChild("CameraInput")
-    → require(script.Parent:WaitForChild("CameraUtils")
-    → require(script.Parent:WaitForChild("VehicleCamera")
-    → require(script.Parent.VehicleCamera:FindFirstChild("VehicleCameraCore")
-    → require(script.Parent.VehicleCamera:FindFirstChild("VehicleCameraConfig")
-    → require(LocalPlayer:WaitForChild("PlayerScripts")
-
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.LegacyCamera
     → require(script.Parent:WaitForChild("CameraUtils")
     → require(script.Parent:WaitForChild("CameraInput")
@@ -1049,6 +1170,10 @@ Shows require() calls found in decompiled scripts
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.MouseLockController
     → require(CommonUtils:WaitForChild("FlagUtil")
     → require(script.Parent:WaitForChild("CameraUtils")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCameraTeleportDetector.spec
+    → require(CorePackages.Packages.Dev.JestGlobals)
+    → require(script.Parent.VRCameraTeleportDetector)
 
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.BaseCamera
     → require(CommonUtils:WaitForChild("ConnectionUtil")

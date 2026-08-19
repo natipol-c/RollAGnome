@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.2
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Mon Aug 17 02:37:09 2026
+  Time:     Thu Aug 20 00:11:29 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -45,8 +45,6 @@ function u1.new(p5, p6) -- Line: 33
 
         return v8;
     end;
-
-    warn("Could not find animations module");
 end;
 
 function u1.LoadAnimations(u10) -- Line: 55

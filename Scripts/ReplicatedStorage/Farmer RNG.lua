@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.2
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Mon Aug 17 02:37:04 2026
+  Time:     Thu Aug 20 00:11:23 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -96,12 +96,12 @@ return {
             ["Rainbow Mango Gnome"] = 0.00002,
             ["Shadow Gnome"] = 0.00001,
             ["Eclipse Gnome"] = 5e-6,
-            ["Sun Gnome"] = 1e-7,
+            ["Sun Gnome"] = 1e-8,
             ["Celestial Peach Gnome"] = 5e-8,
-            ["Nebula Gnome"] = 5e-8,
             ["Lightning Gnome"] = 5e-8,
+            ["Nebula Gnome"] = 5e-8,
             ["Galaxy Gnome"] = 2.5e-8,
-            ["X Gnome"] = 1.5e-9
+            ["X Gnome"] = 1.5e-8
         }
     }
 };

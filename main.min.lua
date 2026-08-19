@@ -327,6 +327,176 @@ for _, key in ipairs(MasterAutomationKeys) do
 MasterAutomationKeySet[key] = true
 end
 local State = Environment.RollAGnomeSettings
+local ThaiText = {
+["Gnomes"] = "โนม",
+["Farm"] = "ฟาร์ม",
+["Logs"] = "บันทึก",
+["Upgrade"] = "อัปเกรด",
+["Social"] = "เพื่อน/ส่งของ",
+["System"] = "ระบบ",
+["Config"] = "ตั้งค่า",
+["Strategy & Modes"] = "กลยุทธ์ & โหมดการทำงาน",
+["Automation Strategy"] = "โหมดการทำงาน",
+["Choose how the automation prioritizes progression vs money vs hunting"] = "เลือกรูปแบบการฟาร์มที่ต้องการ",
+["Balanced"] = "สมดุล",
+["Rebirth Rush"] = "เกิดใหม่ไว",
+["Max Progression"] = "เกิดใหม่ไว",
+["Gnome Hunter"] = "ล่าโนมเทพ",
+["Money Machine"] = "ปั๊มเงิน",
+["Custom"] = "กำหนดเอง",
+["Auto Roll"] = "สุ่มโนมอัตโนมัติ",
+["Roll continuously and wait for every result"] = "หมุนตู้สุ่มโนมต่อเนื่องและรอผลลัพธ์ทุกรอบ",
+["Auto Buy Rolled Gnomes"] = "ซื้อโนมตามเป้าหมาย",
+["Buy rolled gnomes that match your selected rarity, mutation, or rebirth targets"] = "ซื้อโนมที่สุ่มได้ทันทีหากตรงกับระดับหรือมิวเตชั่นที่เลือก",
+["Pause Roll Until Affordable"] = "หยุดรอเงินซื้อโนม",
+["Hold a wanted result until enough money is available to buy it"] = "หากสุ่มเจอโนมเป้าหมายแต่เงินไม่พอ จะหยุดรอจนกว่าเงินจะพอซื้อ",
+["Roll vs Rebirth Priority"] = "ลำดับความสำคัญ (สุ่ม vs เกิดใหม่)",
+["Choose what wins when a wanted roll appears before rebirth"] = "เลือกว่าจะเน้นซื้อโนมที่ต้องการก่อน หรือจะกดเกิดใหม่ก่อน",
+["Target First"] = "ซื้อโนมก่อน",
+["Rebirth First"] = "เกิดใหม่ก่อน",
+["Auto Best Gnomes"] = "คัดโนมตัวท็อป",
+["Auto Manage Best Gnomes"] = "วางโนมที่ดีที่สุดอัตโนมัติ",
+["Protect and place the strongest gnomes using the selected limit"] = "ล็อกและวางโนมที่รายได้สูงสุดลงแปลงตามจำนวนที่กำหนด",
+["Best Gnome Amount"] = "จำนวนโนมที่ต้องการวาง",
+["Enter an amount from 1 to 100"] = "ระบุจำนวนโนมที่ต้องการวาง (1 ถึง 100 ตัว)",
+["Targets & Protection"] = "เป้าหมาย & ป้องกันโนม",
+["Buy Rarity Targets"] = "ระดับโนมที่ต้องการซื้อ",
+["Select rarity levels to buy automatically"] = "เลือกระดับความหายากของโนมที่ต้องการซื้ออัตโนมัติ",
+["Buy Mutation Targets"] = "มิวเตชั่นโนมที่ต้องการซื้อ",
+["Select mutations to buy automatically"] = "เลือกมิวเตชั่นของโนมที่ต้องการซื้ออัตโนมัติ",
+["Keep Rarity Targets"] = "ระดับโนมที่ห้ามขาย (ล็อกไว้)",
+["Gnomes with these rarities will always be protected and kept in inventory"] = "โนมระดับเหล่านี้จะถูกล็อกไว้ในกระเป๋า ไม่ถูกขายเด็ดขาด",
+["Keep Mutation Targets"] = "มิวเตชั่นโนมที่ห้ามขาย (ล็อกไว้)",
+["Gnomes with these mutations will always be protected and kept in inventory"] = "โนมมิวเตชั่นเหล่านี้จะถูกล็อกไว้ในกระเป๋า ไม่ถูกขายเด็ดขาด",
+["Auto Collect"] = "เก็บผลผลิตอัตโนมัติ",
+["Collect all ready crops directly from distance"] = "เก็บผักและผลไม้ที่สุกแล้วทั้งหมดเข้าตัวทันทีจากระยะไกล",
+["Auto Sell Produce"] = "ขายผลผลิตอัตโนมัติ",
+["Sell only collected produce matching the selected mutations"] = "ขายผลผลิตตามมิวเตชั่นที่เลือกทันทีจากระยะไกล",
+["Produce Mutation Targets"] = "มิวเตชั่นผลผลิตที่ต้องการขาย",
+["Ticked mutations will be sold; choose Normal for produce without a mutation"] = "ผลผลิตที่ติ๊กถูกจะถูกขาย (เลือก Normal สำหรับผลผลิตธรรมดา)",
+["Farm Care & Buffs"] = "ดูแลฟาร์ม & บัฟไอเทม",
+["Auto Use Items"] = "ใช้งานไอเทมอัตโนมัติ",
+["Use selected sprinklers, fertilizers, watering cans, and gnome items"] = "ใช้สปริงเกอร์, ปุ๋ย, บัวรดน้ำ และกาแฟเพิ่มสปีดโนมอัตโนมัติ",
+["Use Item Targets"] = "ประเภทไอเทมที่ใช้",
+["Only selected item types will be used automatically"] = "เฉพาะไอเทมประเภทที่เลือกไว้เท่านั้นที่จะถูกนำมาใช้งานอัตโนมัติ",
+["Area items cover valuable crops, watering cans target growing crops, and coffee targets the strongest unboosted gnome."] = "สปริงเกอร์/ปุ๋ยจะวางคลุมพืชราคาแพง, บัวรดน้ำจะรดพืชที่กำลังโต, และกาแฟจะใช้กับโนมที่เก่งที่สุดในแปลง",
+["Item Shop Automation"] = "ซื้อของร้านค้าอัตโนมัติ",
+["Auto Buy Item Shop"] = "ซื้อไอเทมร้านค้าอัตโนมัติ",
+["Buy selected items whenever they are in stock"] = "ซื้อไอเทมที่เลือกไว้ทันทีเมื่อมีของในร้านค้า",
+["Shop Targets"] = "ไอเทมที่ต้องการซื้อ",
+["Items allowed for Auto Buy Item Shop"] = "ไอเทมที่อนุญาตให้ระบบซื้อจากร้านค้าอัตโนมัติ",
+["Upgrade Automation"] = "ระบบอัปเกรดอัตโนมัติ",
+["Auto Buy Expansion"] = "ซื้อขยายแปลงที่ดินอัตโนมัติ",
+["Buy affordable plot expansions in order"] = "ซื้อขยายพื้นที่ฟาร์มทันทีเมื่อมีเงินเพียงพอ",
+["Auto Upgrade Trees"] = "อัปเกรดสกิลต้นไม้อัตโนมัติ",
+["Unlock eligible upgrade tree nodes using available money and points"] = "อัปเกรดแต้มสกิลและต้นไม้ความสามารถทันทีที่ปลดล็อกได้",
+["Auto Rebirth"] = "เกิดใหม่อัตโนมัติ (Auto Rebirth)",
+["Rebirth as soon as requirements are fulfilled"] = "กดเกิดใหม่ทันทีเมื่อปลดล็อกโนมและมีเงินครบตามเงื่อนไข",
+["Upgrade order\n1. Affordable plot upgrades\n2. Eligible Upgrade Tree nodes\nServer validation prevents invalid or maxed purchases."] = "ลำดับการอัปเกรด:\n1. อัปเกรดแปลงที่เงินพอซื้อ\n2. อัปเกรดสกิลต้นไม้ที่ปลดล็อกแล้ว\nระบบป้องกันการซื้อเกินหรือคำสั่งไม่ถูกต้องอัตโนมัติ",
+["Gift Automation"] = "ระบบส่ง/รับของขวัญ",
+["Auto Give"] = "ส่งของขวัญอัตโนมัติ",
+["Offer held tradeable fruits or gnomes to the selected player"] = "ส่งโนมหรือผลไม้ที่ถืออยู่ในมือให้เพื่อนที่เลือกไว้",
+["Gift Recipient"] = "ผู้รับของขวัญ",
+["Select online player to receive items"] = "เลือกเพื่อนในเซิร์ฟเวอร์ที่ต้องการส่งของขวัญให้",
+["Auto Receive Gift"] = "รับของขวัญอัตโนมัติ",
+["Accept incoming gifts only from trusted friends in the list"] = "ยอมรับของขวัญอัตโนมัติเฉพาะจากเพื่อนที่อยู่ในรายชื่อที่เชื่อถือได้",
+["Give To Players"] = "รายชื่อเพื่อนที่จะส่งของให้",
+["Selected online recipient; the first available name is used"] = "เลือกเพื่อนในเซิร์ฟเวอร์ที่ต้องการส่งผลผลิตหรือโนมให้",
+["Accept From Players"] = "รายชื่อเพื่อนที่จะรับของ",
+["Only these senders are trusted for automatic acceptance"] = "ยอมรับการส่งของขวัญอัตโนมัติเฉพาะจากเพื่อนที่เลือกไว้",
+["Performance"] = "ประสิทธิภาพ & ประหยัดพลังงาน",
+["Anti AFK"] = "ป้องกันการหลุด (Anti-AFK)",
+["Simulate input when Roblox reports the player idle"] = "จำลองการขยับเพื่อป้องกัน Roblox เตะออกจากเกมเมื่ออยู่นิ่งนาน 20 นาที",
+["Auto Rejoin"] = "เชื่อมต่อใหม่อัตโนมัติ",
+["Rejoin this place after a disconnect/error prompt"] = "เข้าเกมใหม่อัตโนมัติหากเกมหลุดหรือขึ้น Error",
+["Low Ping Mode"] = "โหมดลดปิง/ลดแล็ก",
+["Reduce remote bursts; server distance still determines real ping"] = "ปรับจังหวะรับส่งข้อมูลให้เสถียรขึ้น ลดอาการกระตุก",
+["Potato Graphics"] = "โหมดภาพเบาพิเศษ (Potato)",
+["Disable expensive local effects and use the lowest graphics quality"] = "ปิดเอฟเฟกต์ภาพและแสงเงาทั้งหมดเพื่อความลื่นไหลสูงสุด",
+["Screen Sleep"] = "โหมดพักหน้าจอ (ประหยัดพลังงาน)",
+["Keep automation running with 3D rendering disabled and a 10 FPS cap"] = "ปิดการเรนเดอร์ 3D และจำกัด 10 FPS เพื่อประหยัดพลังงาน",
+["SLEEP SCREEN"] = "พักหน้าจอ",
+["TAP TO WAKE\nAutomation continues in low-power mode"] = "แตะหน้าจอเพื่อปลุก\nบอทกำลังทำงานต่อเนื่องในโหมดประหยัดพลังงาน",
+["Text Size"] = "ขนาดตัวหนังสือ",
+["Adjust all interface text from 70% to 160%"] = "ปรับขนาดตัวหนังสือทั้งหมดในเมนูตั้งแต่ 70% ถึง 160%",
+["Profile Management"] = "จัดการโปรไฟล์",
+["Profile Name"] = "ชื่อโปรไฟล์",
+["Save Profile"] = "บันทึกโปรไฟล์",
+["Load Profile"] = "โหลดโปรไฟล์",
+["Auto Load Profile"] = "โหลดโปรไฟล์อัตโนมัติ",
+["Load this profile automatically on the next execution"] = "โหลดการตั้งค่าโปรไฟล์นี้อัตโนมัติในการรันครั้งถัดไป",
+["Ready to save profiles"] = "พร้อมบันทึกโปรไฟล์",
+["Executor file API unavailable"] = "โปรแกรมรันสคริปต์ไม่รองรับ File API",
+["Reset Settings"] = "รีเซ็ตการตั้งค่า",
+["Rejoin Now"] = "เข้าเซิร์ฟใหม่ทันที",
+["Ctrl + Alt  |  Show / hide UI\nPAUSE stops all automation. RESUME restores the previous toggles.\nSettings stay active when the UI is minimized."] = "Ctrl + Alt  |  เปิด / ซ่อนหน้าต่าง UI\nPAUSE เพื่อหยุดบอททั้งหมด, RESUME เพื่อให้ทำงานต่อตามเดิม\nระบบยังคงทำงานต่อเนื่องเมื่อย่อหน้าต่าง",
+["Activity Logs"] = "บันทึกกิจกรรมการทำงาน",
+["Harvested"] = "เก็บเกี่ยวแล้ว",
+["Total Sold"] = "ขายผลผลิตแล้ว",
+["Target Rolls"] = "สุ่มได้เป้าหมาย",
+["Crops"] = "ต้น",
+["Items"] = "ชิ้น",
+["Clear Logs"] = "ล้างบันทึก",
+["Auto Scroll"] = "เลื่อนอัตโนมัติ",
+["All"] = "ทั้งหมด",
+["Important"] = "สำคัญ",
+["Roll"] = "สุ่ม",
+["Harvest"] = "เก็บผัก",
+["Sell"] = "ขาย",
+["Shop"] = "ร้านค้า",
+["Buff"] = "บัฟ",
+["No logs recorded yet"] = "ยังไม่มีประวัติกิจกรรม",
+["entries"] = "รายการ",
+["Select All"] = "เลือกทั้งหมด",
+["Clear"] = "ล้าง",
+["Search..."] = "ค้นหา...",
+["PAUSE"] = "หยุดชั่วคราว",
+["RESUME"] = "ทำงานต่อ",
+}
+local LanguageBindings = {}
+local LanguageRefreshers = {}
+local function translated(english)
+if State and State.Language == "TH" and english then
+local found = ThaiText[english]
+if found then return found end
+end
+return english
+end
+local function bindLanguage(object, property, english)
+object[property] = translated(english)
+table.insert(LanguageBindings, {
+Object = object,
+Property = property,
+English = english,
+})
+end
+local function formatNumber(n)
+local num = tonumber(n) or 0
+if num >= 1e9 then
+return string.format("%.2fB", num / 1e9)
+elseif num >= 1e6 then
+return string.format("%.2fM", num / 1e6)
+elseif num >= 1e3 then
+return string.format("%.1fK", num / 1e3)
+else
+return tostring(math.floor(num))
+end
+end
+local function refreshLanguage()
+for _, binding in ipairs(LanguageBindings) do
+if binding.Object and binding.Object.Parent then
+binding.Object[binding.Property] = translated(binding.English)
+end
+end
+for _, refresh in ipairs(LanguageRefreshers) do
+if type(refresh) == "function" then
+pcall(refresh)
+end
+end
+if type(Runtime.RefreshVisibleLists) == "function" then
+pcall(function() Runtime.RefreshVisibleLists(true) end)
+end
+end
 if type(State) ~= "table" then
 State = {}
 Environment.RollAGnomeSettings = State
@@ -577,6 +747,12 @@ end
 Runtime.ApplyStrategyPreset = function(preset)
 if not State then return end
 State.AutomationStrategy = preset
+if type(Runtime.Log) == "function" then
+local pName = tostring(preset)
+local msgEN = "Strategy switched to: " .. pName
+local msgTH = "เปลี่ยนโหมดการทำงานเป็น: " .. translated(pName)
+Runtime.Log("SYSTEM", msgEN, msgTH, "Auto targets configured", "ตั้งค่าเป้าหมายอัตโนมัติแล้ว")
+end
 if preset == "MaxProgression" then
 State.AutoRoll = true
 State.AutoBuyTarget = false
@@ -880,16 +1056,95 @@ Runtime.PlotObject = plotObject
 end
 return plotObject and plotObject.Value or nil
 end
+local function isHashString(str)
+if type(str) ~= "string" or #str < 10 then return false end
+if not string.find(str, "%s") and (string.match(str, "^[a-zA-Z0-9%-_]+$") ~= nil) then
+return true
+end
+return false
+end
+local function getCleanToolName(tool, itemType)
+if not tool then return "Item" end
+local name = tool:GetAttribute("DisplayName")
+or tool:GetAttribute("ItemName")
+or tool:GetAttribute("GnomeItemName")
+or tool:GetAttribute("SprinklerName")
+or tool:GetAttribute("FertilizerName")
+or tool:GetAttribute("WateringCanName")
+or tool:GetAttribute("FarmerName")
+or tool:GetAttribute("PetName")
+or tool:GetAttribute("PlantName")
+or tool:GetAttribute("FruitName")
+if not name and Replication and Replication.Data then
+local inv = Replication.Data.inventory or {}
+local toolId = tool:GetAttribute("Id") or tool.Name
+local invData = inv[toolId] or inv[tool.Name]
+if type(invData) == "table" and type(invData.name) == "string" and invData.name ~= "" then
+name = invData.name
+end
+end
+if not name and type(tool.Name) == "string" and tool.Name ~= "" then
+if not isHashString(tool.Name) then
+name = tool.Name
+end
+end
+if not name and type(tool.Name) == "string" then
+if (ItemShop and ItemShop.Items and ItemShop.Items[tool.Name])
+or (SprinklersConfig and SprinklersConfig[tool.Name])
+or (Runtime.FertilizersConfig and Runtime.FertilizersConfig[tool.Name])
+or (Runtime.WateringCansConfig and Runtime.WateringCansConfig[tool.Name])
+or (Runtime.GnomeItemsConfig and Runtime.GnomeItemsConfig[tool.Name])
+or (FarmersConfig and FarmersConfig[tool.Name])
+or (PlantsConfig and PlantsConfig[tool.Name])
+then
+name = tool.Name
+end
+end
+if not name or isHashString(name) then
+if itemType == "WateringCan" then
+name = "Watering Can"
+elseif itemType == "GnomeItem" then
+name = "Gnome Coffee"
+elseif itemType == "Sprinkler" then
+name = "Sprinkler"
+elseif itemType == "Fertilizer" then
+name = "Fertilizer"
+elseif itemType == "Farmer" then
+name = "Gnome"
+elseif itemType == "Plant" then
+name = "Produce"
+elseif itemType == "Pet" then
+name = "Pet"
+else
+name = "Item"
+end
+end
+return name
+end
 local function getFarmerName(instance)
 if not instance then
 return ""
 end
-return tostring(
-instance:GetAttribute("FarmerName")
+local name = instance:GetAttribute("FarmerName")
 or instance:GetAttribute("DisplayName")
 or instance:GetAttribute("GnomeName")
-or instance.Name
-)
+if not name and Replication and Replication.Data and Replication.Data.farmers then
+local fData = Replication.Data.farmers[instance.Name]
+if type(fData) == "table" and type(fData.name) == "string" then
+name = fData.name
+end
+end
+if not name and not isHashString(instance.Name) then
+name = instance.Name
+end
+if not name or isHashString(name) then
+if FarmersConfig and FarmersConfig[instance.Name] then
+name = instance.Name
+else
+name = "Gnome"
+end
+end
+return tostring(name)
 end
 local function getFarmerRarity(instance)
 local config = FarmersConfig[getFarmerName(instance)]
@@ -1102,146 +1357,6 @@ end
 local decoded = table.concat(output)
 Runtime.Text64Cache[encoded] = decoded
 return decoded
-end
-local function textKey(value)
-local hash = 5381
-for index = 1, #value do
-hash = (hash * 33 + string.byte(value, index)) % 2147483647
-end
-return hash
-end
-local ThaiText = {
-[749662789] = decodeText64("4LiB4Liz4Lir4LiZ4LiU4LmA4Lit4LiH"),
-[1675149125] = decodeText64("4LmB4LiV4Liw4LmA4Lie4Li34LmI4Lit4Lib4Lil4Li44LiBCuC4o+C4sOC4muC4muC4l+C4s+C4h+C4suC4meC4leC5iOC4reC5gOC4meC4t+C5iOC4reC4h+C5g+C4meC5guC4q+C4oeC4lOC4m+C4o+C4sOC4q+C4ouC4seC4lOC4nuC4peC4seC4h+C4h+C4suC4mQ=="),
-[2097717576] = decodeText64("4Lil4Liz4LiU4Lix4Lia4LiB4Liy4Lij4Lit4Lix4Lib4LmA4LiB4Lij4LiUCjEuIOC4reC4seC4m+C5gOC4geC4o+C4lOC5geC4m+C4peC4h+C4l+C4teC5iOC4quC4suC4oeC4suC4o+C4luC4i+C4t+C5ieC4reC5hOC4lOC5iQoyLiDguK3guLHguJvguYDguIHguKPguJTguKrguLLguKLguKrguIHguLTguKXguJfguLXguYjguJvguKXguJTguKXguYfguK3guIHguYHguKXguYnguKcK4Lij4Liw4Lia4Lia4LiI4Liw4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ4LiB4Liy4Lij4LiL4Li34LmJ4Lit4LmA4LiB4Li04LiZ4LiC4LiZ4Liy4LiU4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[1790338205] = decodeText64("Q3RybCArIEFsdCAgfCAg4LmA4Lib4Li04LiUIC8g4LiL4LmI4Lit4LiZ4Lir4LiZ4LmJ4Liy4LiV4LmI4Liy4LiHIFVJClBBVVNFIOC4q+C4ouC4uOC4lOC4geC4suC4o+C4l+C4s+C4h+C4suC4meC4l+C4seC5ieC4h+C4q+C4oeC4lCwgUkVTVU1FIOC4hOC4t+C4meC4hOC5iOC4suC4quC4luC4suC4meC4sOC5gOC4lOC4tOC4oQrguKPguLDguJrguJrguKLguLHguIfguITguIfguJfguLPguIfguLLguJnguJXguYjguK3guYDguJnguLfguYjguK3guIfguYDguKHguLfguYjguK3guJ7guLHguJrguKvguJnguYnguLLguJXguYjguLLguIc="),
-[1119051639] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lij4Li54Lib4LmB4Lia4Lia4LiB4Liy4Lij4LiI4Lix4LiU4Liq4Lij4Lij4LmA4LiH4Li04LiZ4LmB4Lil4Liw4Lil4Liz4LiU4Lix4Lia4LiB4Liy4Lij4LiX4Liz4LiH4Liy4LiZ4LiC4Lit4LiH4LiV4Lix4Lin4Lil4Liw4LiE4Lij"),
-[847828358] = decodeText64("4Liq4Li44LmI4Lih4LmC4LiZ4Lih4LiV4LmI4Lit4LmA4LiZ4Li34LmI4Lit4LiH4LmB4Lil4Liw4Lij4Lit4Lic4Lil4Lil4Lix4Lie4LiY4LmM4LiX4Li44LiB4Lij4Lit4Lia"),
-[1224226842] = decodeText64("4Lin4Liy4LiH4LmB4Lil4Liw4Lib4LiB4Lib4LmJ4Lit4LiH4LmC4LiZ4Lih4Lil4Liz4LiU4Lix4Lia4LiV4LmJ4LiZ4LmGIOC4leC4suC4oeC4iOC4s+C4meC4p+C4meC4l+C4teC5iOC4geC4s+C4q+C4meC4lA=="),
-[897751219] = decodeText64("4LmC4LiZ4Lih"),
-[2089098701] = decodeText64("4Lif4Liy4Lij4LmM4Lih"),
-[530659912] = decodeText64("4Lit4Lix4Lib4LmA4LiB4Lij4LiU"),
-[1368126117] = decodeText64("4LmC4LiL4LmA4LiK4Li14Lii4Lil"),
-[1380572431] = decodeText64("4Lij4Liw4Lia4Lia"),
-[742352128] = decodeText64("4LmC4Lib4Lij4LmE4Lif4Lil4LmM"),
-[2106297831] = decodeText64("4LmC4Lir4Lih4LiU4LmB4Lil4Liw4LiB4Lil4Lii4Li44LiX4LiY4LmM"),
-[1836895263] = decodeText64("4Liq4Li44LmI4Lih4LmC4LiZ4Lih4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[1475304190] = decodeText64("4LiI4Lix4LiU4LiB4Liy4Lij4LmC4LiZ4Lih4LiX4Li14LmI4LiU4Li14LiX4Li14LmI4Liq4Li44LiU"),
-[2085587169] = decodeText64("4LmA4LiB4LmH4Lia4LmA4LiB4Li14LmI4Lii4Lin4LmB4Lil4Liw4LiC4Liy4Lii4Lic4Lil4Lic4Lil4Li04LiV"),
-[1331036383] = decodeText64("4LmA4Lib4LmJ4Liy4Lir4Lih4Liy4Lii4LiL4Li34LmJ4Lit4LmB4Lil4Liw4LiB4Liy4Lij4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ"),
-[1735995099] = decodeText64("4LiU4Li54LmB4Lil4Lif4Liy4Lij4LmM4Lih4LmB4Lil4Liw4Lia4Lix4Lif"),
-[1898137625] = decodeText64("4LiL4Li34LmJ4Lit4LiC4Lit4LiH4Lij4LmJ4Liy4LiZ4LiE4LmJ4Liy4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[1216664228] = decodeText64("4LiL4Li34LmJ4Lit4LmC4LiZ4Lih4LiX4Li14LmI4Liq4Li44LmI4Lih4LmE4LiU4LmJ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[1052934764] = decodeText64("4LiL4Li34LmJ4Lit4LmC4LiZ4Lih4LiX4Li14LmI4Liq4Li44LmI4Lih4LmE4LiU4LmJ4LiV4Liy4Lih4Lij4Liw4LiU4Lix4LiaIOC4oeC4tOC4p+C5gOC4leC4iuC4seC5iOC4mSDguKvguKPguLfguK3guJXguLHguKfguYDguIHguLTguJTguYPguKvguKHguYjguJfguLXguYjguYDguKXguLfguK3guIHguYTguKfguYk="),
-[2130494790] = decodeText64("4Lir4Lii4Li44LiU4Liq4Li44LmI4Lih4Lij4Lit4LmA4LiH4Li04LiZ4LmA4Lih4Li34LmI4Lit4LmA4LiI4Lit4LiV4Lix4Lin4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij"),
-[1435780865] = decodeText64("4Lil4LmH4Lit4LiB4Lic4Lil4LiB4Liy4Lij4Liq4Li44LmI4Lih4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmE4Lin4LmJ4LiI4LiZ4LiB4Lin4LmI4Liy4LiI4Liw4Lih4Li14LmA4LiH4Li04LiZ4Lie4Lit4LiL4Li34LmJ4Lit"),
-[1054944133] = decodeText64("4LiI4Lix4LiU4LiB4Liy4Lij4LmC4LiZ4Lih4LiX4Li14LmI4LmA4LiB4LmI4LiH4LiX4Li14LmI4Liq4Li44LiU4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[247234402] = decodeText64("4Lin4Liy4LiH4LmB4Lil4Liw4Lib4LiB4Lib4LmJ4Lit4LiH4LmC4LiZ4Lih4Lil4Liz4LiU4Lix4Lia4LiV4LmJ4LiZ4LmGIOC4leC4suC4oeC4iOC4s+C4meC4p+C4meC4l+C4teC5iOC4geC4s+C4q+C4meC4lA=="),
-[960687958] = decodeText64("4LmA4LiB4LmH4Lia4Lic4Lil4Lic4Lil4Li04LiV4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[1207244955] = decodeText64("4Lin4Liy4Lij4LmM4Lib4LmE4Lib4LmA4LiB4LmH4Lia4Lic4Lil4Lic4Lil4Li04LiV4LiX4Li14LmI4Liq4Li44LiB4LmB4Lil4LmJ4Lin4LmB4Lil4Liw4LiB4Lil4Lix4Lia4Lih4Liy4LiX4Li14LmI4LmA4LiU4Li04Lih"),
-[734608302] = decodeText64("4LiC4Liy4Lii4Lic4Lil4Lic4Lil4Li04LiV4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[11884063] = decodeText64("4LiC4Liy4Lii4LmA4LiJ4Lie4Liy4Liw4Lic4Lil4Lic4Lil4Li04LiV4LiX4Li14LmI4Lih4Li14Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4LiV4Lij4LiH4LiV4Liy4Lih4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LmE4Lin4LmJ"),
-[695356572] = decodeText64("4LmD4LiK4LmJ4LmE4Lit4LmA4LiX4Lih4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[986399584] = decodeText64("4LmD4LiK4LmJ4Liq4Lib4Lij4Li04LiH4LmA4LiB4Lit4Lij4LmMIOC4m+C4uOC5i+C4oiDguJrguLHguKfguKPguJTguJnguYnguLMg4LmB4Lil4Liw4LiB4Liy4LmB4Lif4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[1950563464] = decodeText64("4LiL4Li34LmJ4Lit4LiC4Lit4LiH4LmD4LiZ4Lij4LmJ4Liy4LiZ4LiE4LmJ4Liy4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[2132620544] = decodeText64("4LiL4Li34LmJ4Lit4LmE4Lit4LmA4LiX4Lih4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LiX4Lix4LiZ4LiX4Li14LmA4Lih4Li34LmI4Lit4Lih4Li14LiC4Lit4LiH4LmD4LiZ4Lij4LmJ4Liy4LiZ"),
-[403129408] = decodeText64("4Liq4LmI4LiH4LmE4Lit4LmA4LiX4Lih4LmD4LiZ4Lih4Li34Lit4LmD4Lir4LmJ4LmA4Lie4Li34LmI4Lit4LiZ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[1517552053] = decodeText64("4Liq4LmI4LiH4Lic4Lil4Lic4Lil4Li04LiV4Lir4Lij4Li34Lit4LmC4LiZ4Lih4LiX4Li14LmI4LiW4Li34Lit4Lit4Lii4Li54LmI4LmD4LiZ4Lih4Li34Lit4LmD4Lir4LmJ4Lic4Li54LmJ4LmA4Lil4LmI4LiZ4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB"),
-[679397871] = decodeText64("4Lij4Lix4Lia4LiC4Lit4LiH4LiC4Lin4Lix4LiN4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[634013570] = decodeText64("4Lij4Lix4Lia4LiC4Lit4LiH4LiC4Lin4Lix4LiN4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4LiJ4Lie4Liy4Liw4LiI4Liy4LiB4LmA4Lie4Li34LmI4Lit4LiZ4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LmE4Lin4LmJ4LmA4LiX4LmI4Liy4LiZ4Lix4LmJ4LiZ"),
-[618208355] = decodeText64("4Lit4Lix4Lib4LmA4LiB4Lij4LiU4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[1347313269] = decodeText64("4LiL4Li34LmJ4Lit4LiB4Liy4Lij4Lit4Lix4Lib4LmA4LiB4Lij4LiU4LmB4Lib4Lil4LiH4LmB4Lil4Liw4Lit4Lix4Lib4Liq4LiB4Li04Lil4LiV4LmJ4LiZ4LmE4Lih4LmJ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[196116111] = decodeText64("4LiC4Lii4Liy4Lii4LiX4Li14LmI4LiU4Li04LiZ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[328824634] = decodeText64("4LiL4Li34LmJ4Lit4LiB4Liy4Lij4LiC4Lii4Liy4Lii4Lie4Li34LmJ4LiZ4LiX4Li14LmI4LmB4Lib4Lil4LiH4LiX4Li14LmI4LiW4Li54LiB4LiX4Li14LmI4Liq4Li44LiU4LiX4Lix4LiZ4LiX4Li14LmA4Lih4Li34LmI4Lit4LmA4LiH4Li04LiZ4Lie4Lit"),
-[602048425] = decodeText64("4LmA4LiB4Li04LiU4LmD4Lir4Lih4LmI4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0IChSZWJpcnRoKQ=="),
-[440181375] = decodeText64("4LmA4LiB4Li04LiU4LmD4Lir4Lih4LmI4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4Lih4Li34LmI4Lit4LmA4LiH4Li04LiZ4LmB4Lil4Liw4LmC4LiZ4Lih4LiX4Li14LmI4LiE4LmJ4LiZ4Lie4Lia4LiE4Lij4Lia4LiV4Liy4Lih4LmA4LiH4Li34LmI4Lit4LiZ4LmE4LiC"),
-[574315800] = decodeText64("4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ4LiB4Liy4Lij4Lir4Lil4Li44LiUIChBbnRpLUFGSyk="),
-[69350190] = decodeText64("4LiI4Liz4Lil4Lit4LiH4LiB4Liy4Lij4LiC4Lii4Lix4Lia4LiV4Lix4Lin4LmA4Lih4Li34LmI4Lit4Lij4Liw4Lia4Lia4LiV4Lij4Lin4LiI4Lie4Lia4Lin4LmI4Liy4Lic4Li54LmJ4LmA4Lil4LmI4LiZ4Lit4Lii4Li54LmI4LiZ4Li04LmI4LiH"),
-[1059741808] = decodeText64("4LmA4LiK4Li34LmI4Lit4Lih4LiV4LmI4Lit4LmD4Lir4Lih4LmI4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[2145984092] = decodeText64("4LiB4Lil4Lix4Lia4LmA4LiC4LmJ4Liy4LmA4LiL4Li04Lij4LmM4Lif4LmA4Lin4Lit4Lij4LmM4LmA4LiU4Li04Lih4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4Lih4Li34LmI4Lit4LmA4LiB4Lih4Lir4Lil4Li44LiU4Lir4Lij4Li34Lit4LiV4Lix4LiU4LiB4Liy4Lij4LmA4LiK4Li34LmI4Lit4Lih4LiV4LmI4Lit"),
-[1974862954] = decodeText64("4LmC4Lir4Lih4LiU4Lil4LiU4LiE4Lin4Liy4Lih4Lir4LiZ4LmI4Lin4LiHIChMb3cgUGluZyk="),
-[1618525399] = decodeText64("4LmA4LiB4Lil4Li14LmI4Lii4LiB4Liy4Lij4Liq4LmI4LiH4LiC4LmJ4Lit4Lih4Li54Lil4LmE4Lib4Lii4Lix4LiH4LmA4LiL4Li04Lij4LmM4Lif4LmA4Lin4Lit4Lij4LmM4LmD4Lir4LmJ4LmA4Liq4LiW4Li14Lii4Lij4LiC4Li24LmJ4LiZ"),
-[2034570322] = decodeText64("4LmC4Lir4Lih4LiU4Lig4Liy4Lie4LiB4Liy4LiBICjguKXguJTguYHguKXguYfguIEp"),
-[864013862] = decodeText64("4Lib4Li04LiU4LmA4Lit4Lif4LmA4Lif4LiB4LiV4LmM4Lig4Liy4Lie4LiX4Li14LmI4LmE4Lih4LmI4LiI4Liz4LmA4Lib4LmH4LiZ4LiX4Lix4LmJ4LiH4Lir4Lih4LiU4LmA4Lie4Li34LmI4Lit4LmA4Lie4Li04LmI4Lih4LiE4Lin4Liy4Lih4Lil4Li34LmI4LiZ4LmE4Lir4Lil"),
-[822158911] = decodeText64("4LmC4Lir4Lil4LiU4LmC4Lib4Lij4LmE4Lif4Lil4LmM4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[384180709] = decodeText64("4LmC4Lir4Lil4LiU4LiB4Liy4Lij4LiV4Lix4LmJ4LiH4LiE4LmI4Liy4LmC4Lib4Lij4LmE4Lif4Lil4LmM4LiZ4Li14LmJ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4Lih4Li34LmI4Lit4LmA4Lib4Li04LiU4Liq4LiE4Lij4Li04Lib4LiV4LmM4LiE4Lij4Lix4LmJ4LiH4LiW4Lix4LiU4LmE4Lib"),
-[1995119328] = decodeText64("4Lij4Liw4LiU4Lix4Lia4LmC4LiZ4Lih4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LiL4Li34LmJ4Lit"),
-[632921855] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lij4Liw4LiU4Lix4Lia4LiE4Lin4Liy4Lih4Lir4Liy4Lii4Liy4LiB4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmD4Lir4LmJ4Lia4Lit4LiX4LiL4Li34LmJ4Lit4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[478680938] = decodeText64("4Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LiL4Li34LmJ4Lit"),
-[122919227] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmD4Lir4LmJ4Lia4Lit4LiX4LiL4Li34LmJ4Lit4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[547907862] = decodeText64("4Lij4Liw4LiU4Lix4Lia4LmC4LiZ4Lih4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmA4LiB4LmH4LiaICjguYTguKHguYjguILguLLguKIp"),
-[1466324090] = decodeText64("4LmC4LiZ4Lih4LiX4Li14LmI4Lih4Li14Lij4Liw4LiU4Lix4Lia4LmA4Lir4Lil4LmI4Liy4LiZ4Li14LmJ4LiI4Liw4LiW4Li54LiB4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ4LmB4Lil4Liw4LmA4LiB4LmH4Lia4LmE4Lin4LmJ4LmD4LiZ4LiV4Lix4Lin4LmA4Liq4Lih4LitIOC4q+C5ieC4suC4oeC4guC4suC4og=="),
-[718391362] = decodeText64("4Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmA4LiB4LmH4LiaICjguYTguKHguYjguILguLLguKIp"),
-[1712556532] = decodeText64("4LmC4LiZ4Lih4LiX4Li14LmI4Lih4Li14Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4LmA4Lir4Lil4LmI4Liy4LiZ4Li14LmJ4LiI4Liw4LiW4Li54LiB4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ4LmB4Lil4Liw4LmA4LiB4LmH4Lia4LmE4Lin4LmJ4LmD4LiZ4LiV4Lix4Lin4LmA4Liq4Lih4LitIOC4q+C5ieC4suC4oeC4guC4suC4og=="),
-[390114212] = decodeText64("4Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4Lic4Lil4Lic4Lil4Li04LiV4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LiC4Liy4Lii"),
-[1526727371] = decodeText64("4Lic4Lil4Lic4Lil4Li04LiV4LiX4Li14LmI4Lih4Li14Lih4Li04Lin4LmA4LiV4LiK4Lix4LmI4LiZ4LiV4Liy4Lih4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LiI4Liw4LiW4Li54LiB4LiZ4Liz4LmE4Lib4LiC4Liy4LiiICjguJXguLTguYrguIEgTm9ybWFsIOC5gOC4nuC4t+C5iOC4reC4guC4suC4ouC4nOC4seC4geC4mOC4o+C4o+C4oeC4lOC4sik="),
-[68911190] = decodeText64("4LmE4Lit4LmA4LiX4Lih4Lif4Liy4Lij4LmM4Lih4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmD4LiK4LmJ"),
-[178505180] = decodeText64("4LmA4LiJ4Lie4Liy4Liw4LmE4Lit4LmA4LiX4Lih4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LmA4LiX4LmI4Liy4LiZ4Lix4LmJ4LiZ4LiX4Li14LmI4LiI4Liw4LiW4Li54LiB4LiZ4Liz4Lih4Liy4LmD4LiK4LmJ4LiH4Liy4LiZ4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[1510124033] = decodeText64("4LmE4Lit4LmA4LiX4Lih4Lij4LmJ4Liy4LiZ4LiE4LmJ4Liy4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LiL4Li34LmJ4Lit"),
-[1699707406] = decodeText64("4LmE4Lit4LmA4LiX4Lih4LiX4Li14LmI4Lit4LiZ4Li44LiN4Liy4LiV4LmD4Lir4LmJ4Lij4Liw4Lia4Lia4LiL4Li34LmJ4Lit4LiI4Liy4LiB4Lij4LmJ4Liy4LiZ4LiE4LmJ4Liy4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[395775933] = decodeText64("4Lij4Liy4Lii4LiK4Li34LmI4Lit4LmA4Lie4Li34LmI4Lit4LiZ4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4Liq4LmI4LiH4LiC4Lit4LiH4LmD4Lir4LmJ"),
-[2048754197] = decodeText64("4LmA4Lil4Li34Lit4LiB4LmA4Lie4Li34LmI4Lit4LiZ4LmD4LiZ4LmA4LiL4Li04Lij4LmM4Lif4LmA4Lin4Lit4Lij4LmM4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4Liq4LmI4LiH4Lic4Lil4Lic4Lil4Li04LiV4Lir4Lij4Li34Lit4LmC4LiZ4Lih4LmD4Lir4LmJ"),
-[1096463868] = decodeText64("4Lij4Liy4Lii4LiK4Li34LmI4Lit4LmA4Lie4Li34LmI4Lit4LiZ4LiX4Li14LmI4Lit4LiZ4Li44LiN4Liy4LiV4LmD4Lir4LmJ4Lij4Lix4Lia4LiC4Lit4LiH"),
-[381601337] = decodeText64("4Lii4Lit4Lih4Lij4Lix4Lia4LiB4Liy4Lij4Liq4LmI4LiH4LiC4Lit4LiH4LiC4Lin4Lix4LiN4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li04LmA4LiJ4Lie4Liy4Liw4LiI4Liy4LiB4LmA4Lie4Li34LmI4Lit4LiZ4LiX4Li14LmI4LmA4Lil4Li34Lit4LiB4LmE4Lin4LmJ"),
-[1489178280] = decodeText64("4LmA4Lil4Li34Lit4LiB4LiX4Lix4LmJ4LiH4Lir4Lih4LiU"),
-[217603534] = decodeText64("4Lil4LmJ4Liy4LiH"),
-[794030545] = decodeText64("4LiE4LmJ4LiZ4Lir4LiyLi4u"),
-[1230004093] = decodeText64("4LmC4Lir4Lih4LiU4LiB4Lil4Lii4Li44LiX4LiY4LmM4LiB4Liy4Lij4LiX4Liz4LiH4Liy4LiZ"),
-[873990212] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lij4Li54Lib4LmB4Lia4Lia4LiB4Liy4Lij4LiX4Liz4LiH4Liy4LiZ4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4LmA4LiZ4LmJ4LiZ4LmA4Lib4LmH4LiZ4Lie4Li04LmA4Lio4Lip"),
-[173500436] = decodeText64("4Liq4Lib4Li14LiU4Lij4Lix4LiZIFJlYmlydGg="),
-[294679592] = decodeText64("4Lil4LmI4Liy4LmC4LiZ4Lih4LmA4LiX4Lie"),
-[761187565] = decodeText64("4Lib4Lix4LmK4Lih4LmA4LiH4Li04LiZ4Lif4Liy4Lij4LmM4Lih"),
-[314142064] = decodeText64("4Liq4Lih4LiU4Li44Lil4Lit4Lix4LiI4LiJ4Lij4Li04Lii4Liw"),
-[1092575591] = decodeText64("4Lil4Liz4LiU4Lix4Lia4LiE4Lin4Liy4Lih4Liq4Liz4LiE4Lix4LiNICjguKrguLjguYjguKEgdnMgUmViaXJ0aCk="),
-[2058004565] = decodeText64("4LmA4Lil4Li34Lit4LiB4Lij4Liw4Lir4Lin4LmI4Liy4LiH4LiB4Liy4Lij4Lir4Lii4Li44LiU4LiL4Li34LmJ4Lit4LmC4LiZ4Lih4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4LijIOC4q+C4o+C4t+C4reC4geC4suC4o+C4geC4lOC5gOC4geC4tOC4lOC5g+C4q+C4oeC5iOC4geC5iOC4reC4mQ=="),
-[211053657] = decodeText64("4LiL4Li34LmJ4Lit4LmC4LiZ4Lih4LiB4LmI4Lit4LiZ"),
-[1415884188] = decodeText64("4LmA4LiB4Li04LiU4LmD4Lir4Lih4LmI4LiB4LmI4Lit4LiZ"),
-[564665951] = decodeText64("4LiI4Liz4LiZ4Lin4LiZ4LmC4LiZ4Lih4LiX4Li14LmI4LmA4LiB4LmI4LiH4LiX4Li14LmI4Liq4Li44LiU"),
-[1402248995] = decodeText64("4Lij4Liw4Lia4Li44LiI4Liz4LiZ4Lin4LiZ4LmC4LiZ4Lih4LiX4Li14LmI4LiV4LmJ4Lit4LiH4LiB4Liy4Lij4Lin4Liy4LiH4Lil4LiH4LmB4Lib4Lil4LiHICgxIOC4luC4tuC4hyAxMDAg4LiV4Lix4LinKQ=="),
-[790590637] = decodeText64("4LmC4Lir4Lih4LiU4Lie4Lix4LiB4Lir4LiZ4LmJ4Liy4LiI4LitICjguJvguKPguLDguKvguKLguLHguJTguJ7guKXguLHguIfguIfguLLguJkp"),
-[923391854] = decodeText64("4Lia4Lit4LiX4LiX4Liz4LiH4Liy4LiZ4LiV4LmI4Lit4LmA4LiZ4Li34LmI4Lit4LiH4LmC4LiU4Lii4Lib4Li04LiU4LiB4Liy4Lij4Lib4Lij4Liw4Lih4Lin4Lil4Lic4LilIDNEIOC5geC4peC4sOC4iOC4s+C4geC4seC4lCAxMCBGUFM="),
-[226089592] = decodeText64("4Lie4Lix4LiB4Lir4LiZ4LmJ4Liy4LiI4Lit"),
-[237978446] = decodeText64("4LiC4LiZ4Liy4LiU4LiV4Lix4Lin4Lir4LiZ4Lix4LiH4Liq4Li34Lit"),
-[1123865154] = decodeText64("4Lib4Lij4Lix4Lia4LiC4LiZ4Liy4LiU4LiV4Lix4Lin4Lir4LiZ4Lix4LiH4Liq4Li34Lit4LmD4LiZ4LmA4Lih4LiZ4Li54LiV4Lix4LmJ4LiH4LmB4LiV4LmIIDcwJSDguJbguLbguIcgMTYwJQ=="),
-[98108697] = decodeText64("4LiK4Li34LmI4Lit4LmC4Lib4Lij4LmE4Lif4Lil4LmM"),
-[1118359840] = decodeText64("4Lia4Lix4LiZ4LiX4Li24LiB4LmC4Lib4Lij4LmE4Lif4Lil4LmM"),
-[1685611255] = decodeText64("4LmC4Lir4Lil4LiU4LmC4Lib4Lij4LmE4Lif4Lil4LmM"),
-[193820477] = decodeText64("4LmA4LiC4LmJ4Liy4LmA4LiL4Li04Lij4LmM4Lif4LmD4Lir4Lih4LmI4LiX4Lix4LiZ4LiX4Li1"),
-[1625187216] = decodeText64("4Liq4Lib4Lij4Li04LiH4LmA4LiB4Lit4Lij4LmM4LmB4Lil4Liw4Lib4Li44LmL4Lii4LiI4Liw4Lin4Liy4LiH4LiE4Lil4Li44Lih4Lie4Li34LiK4Lij4Liy4LiE4Liy4LmB4Lie4LiHLCDguJrguLHguKfguKPguJTguJnguYnguLPguIjguLDguKPguJTguJ7guLfguIrguJfguLXguYjguIHguLPguKXguLHguIfguYLguJUsIOC5geC4peC4sOC4geC4suC5geC4n+C4iOC4sOC5g+C4iuC5ieC4geC4seC4muC5guC4meC4oeC4l+C4teC5iOC5gOC4geC5iOC4h+C4l+C4teC5iOC4quC4uOC4lOC5g+C4meC5geC4m+C4peC4hw=="),
-[895845879] = decodeText64("4Lil4Liz4LiU4Lix4Lia4LiB4Liy4Lij4Lit4Lix4Lib4LmA4LiB4Lij4LiUCjEuIOC4reC4seC4m+C5gOC4geC4o+C4lOC5geC4m+C4peC4h+C4l+C4teC5iOC5gOC4h+C4tOC4meC4nuC4reC4i+C4t+C5ieC4rQoyLiDguK3guLHguJvguYDguIHguKPguJTguKrguIHguLTguKXguJXguYnguJnguYTguKHguYnguJfguLXguYjguJvguKXguJTguKXguYfguK3guIHguYHguKXguYnguKcK4Lij4Liw4Lia4Lia4Lib4LmJ4Lit4LiH4LiB4Lix4LiZ4LiB4Liy4Lij4LiL4Li34LmJ4Lit4LmA4LiB4Li04LiZ4Lir4Lij4Li34Lit4LiE4Liz4Liq4Lix4LmI4LiH4LmE4Lih4LmI4LiW4Li54LiB4LiV4LmJ4Lit4LiH4Lit4Lix4LiV4LmC4LiZ4Lih4Lix4LiV4Li0"),
-[146757810] = decodeText64("Q3RybCArIEFsdCAgfCAg4LmA4Lib4Li04LiUIC8g4LiL4LmI4Lit4LiZ4Lir4LiZ4LmJ4Liy4LiV4LmI4Liy4LiHIFVJClBBVVNFIOC5gOC4nuC4t+C5iOC4reC4q+C4ouC4uOC4lOC4muC4reC4l+C4l+C4seC5ieC4h+C4q+C4oeC4lCwgUkVTVU1FIOC5gOC4nuC4t+C5iOC4reC5g+C4q+C5ieC4l+C4s+C4h+C4suC4meC4leC5iOC4reC4leC4suC4oeC5gOC4lOC4tOC4oQrguKPguLDguJrguJrguKLguLHguIfguITguIfguJfguLPguIfguLLguJnguJXguYjguK3guYDguJnguLfguYjguK3guIfguYDguKHguLfguYjguK3guKLguYjguK3guKvguJnguYnguLLguJXguYjguLLguIc="),
-[754771019] = decodeText64("4LmB4LiV4Liw4Lir4LiZ4LmJ4Liy4LiI4Lit4LmA4Lie4Li34LmI4Lit4Lib4Lil4Li44LiBCuC4muC4reC4l+C4geC4s+C4peC4seC4h+C4l+C4s+C4h+C4suC4meC4leC5iOC4reC5gOC4meC4t+C5iOC4reC4h+C5g+C4meC5guC4q+C4oeC4lOC4m+C4o+C4sOC4q+C4ouC4seC4lOC4nuC4peC4seC4h+C4h+C4suC4mQ=="),
-}
-local LanguageBindings = {}
-local LanguageRefreshers = {}
-local function translated(english)
-if State.Language == "TH" then
-return ThaiText[textKey(english)] or english
-end
-return english
-end
-local function bindLanguage(object, property, english)
-object[property] = translated(english)
-table.insert(LanguageBindings, {
-Object = object,
-Property = property,
-English = english,
-})
-end
-local function refreshLanguage()
-for _, binding in ipairs(LanguageBindings) do
-if binding.Object and binding.Object.Parent then
-binding.Object[binding.Property] = translated(binding.English)
-end
-end
-for _, refresh in ipairs(LanguageRefreshers) do
-if type(refresh) == "function" then
-pcall(refresh)
-end
-end
-if type(Runtime.RefreshVisibleLists) == "function" then
-pcall(function() Runtime.RefreshVisibleLists(true) end)
-end
 end
 local collectRarityOptions
 local collectShopOptions
@@ -1851,18 +1966,21 @@ if Runtime.RefreshVisibleLists then
 task.defer(Runtime.RefreshVisibleLists, false)
 end
 end
+local pageOrderCount = 0
 local function addPage(name)
+pageOrderCount = pageOrderCount + 1
 local button = create("TextButton", {
 Name = name,
-Size = UDim2.new(1, 0, 0, 42),
+Size = UDim2.new(1, 0, 0, 36),
 BackgroundColor3 = Theme.Surface,
 BorderSizePixel = 0,
 Font = Enum.Font.GothamMedium,
 Text = translated(name),
 TextColor3 = Theme.Muted,
-TextSize = 13,
+TextSize = 12,
 TextXAlignment = Enum.TextXAlignment.Left,
 AutoButtonColor = false,
+LayoutOrder = pageOrderCount,
 Parent = Navigation,
 })
 bindLanguage(button, "Text", name)
@@ -1925,6 +2043,7 @@ local FarmPage = addPage("Farm")
 local UpgradePage = addPage("Upgrade")
 local SocialPage = addPage("Social")
 local SystemPage = addPage("System")
+local LogsPage = addPage("Logs")
 local ShopPage = FarmPage
 local ConfigPage = SystemPage
 local function addGroupLabel(parent, title)
@@ -2539,7 +2658,7 @@ refreshBestToggle()
 Runtime.OnToggleChanged("AutoBest30", State.AutoBest30)
 end)
 addGroupLabel(FarmPage, "Auto Collect")
-addToggle(FarmPage, "Auto Collect", "Teleport to every ready crop, collect it, then return", "AutoCollect")
+addToggle(FarmPage, "Auto Collect", "Collect all ready crops directly from distance", "AutoCollect")
 addToggle(FarmPage, "Auto Sell Produce", "Sell only collected produce matching the selected mutations", "AutoSellProduce")
 local RarityOrder = {
 Common = 1,
@@ -2784,14 +2903,14 @@ or Theme.Muted
 end
 end
 addGroupLabel(SocialPage, "Social")
-addToggle(SocialPage, "Auto Give Held Item", "Give the currently held crop or gnome to the first selected online player", "AutoGive")
-addToggle(SocialPage, "Auto Accept Gifts", "Automatically accept item gifts only from selected players", "AutoReceiveGift")
+addToggle(SocialPage, "Auto Give", "Offer held tradeable fruits or gnomes to the selected player", "AutoGive")
+addToggle(SocialPage, "Auto Receive Gift", "Accept incoming gifts only from trusted friends in the list", "AutoReceiveGift")
 addMultiSelect(SocialPage, "Give To Players", "Selected online recipient; the first available name is used", State.GivePlayers, collectPlayerOptions)
 addMultiSelect(SocialPage, "Accept From Players", "Only these senders are trusted for automatic acceptance", State.ReceivePlayers, collectPlayerOptions)
 addGroupLabel(UpgradePage, "Upgrade")
-addToggle(UpgradePage, "Auto Upgrade", "Buy eligible plot upgrades and Upgrade Tree nodes", "AutoUpgrade")
-addToggle(UpgradePage, "Auto Buy Expansion", "Buy the cheapest available plot expansion", "AutoBuyExpansion")
-addToggle(UpgradePage, "Auto Rebirth", "Rebirth when money and discovered gnomes meet requirements", "AutoRebirth")
+addToggle(UpgradePage, "Auto Upgrade Trees", "Unlock eligible upgrade tree nodes using available money and points", "AutoUpgrade")
+addToggle(UpgradePage, "Auto Buy Expansion", "Buy affordable plot expansions in order", "AutoBuyExpansion")
+addToggle(UpgradePage, "Auto Rebirth", "Rebirth as soon as requirements are fulfilled", "AutoRebirth")
 local UpgradeInfo = create("TextLabel", {
 Size = UDim2.new(1, -4, 0, 88),
 BackgroundColor3 = Theme.Surface,
@@ -3009,6 +3128,473 @@ Parent = ConfigBox,
 })
 table.insert(LanguageRefreshers, function()
 ConfigStatus.Text = translated(type(writefile) == "function" and "Ready to save profiles" or "Executor file API unavailable")
+end)
+Runtime.Logs = {}
+Runtime.LogAutoScroll = true
+Runtime.LogFilter = "ALL"
+local logItemFrames = {}
+local logsContainer = nil
+local logsCountLabel = nil
+local logEmptyLabel = nil
+local statHarvestVal = nil
+local statHarvestSub = nil
+local statSoldVal = nil
+local statSoldSub = nil
+local statRollVal = nil
+local statRollSub = nil
+local lastLogEvent = { Category = "", TitleEN = "", Time = 0, Count = 1 }
+local LogColors = {
+ROLL = Color3.fromRGB(170, 115, 255),
+HARVEST = Color3.fromRGB(60, 205, 130),
+SELL = Color3.fromRGB(255, 195, 50),
+SHOP = Color3.fromRGB(90, 160, 255),
+UPGRADE = Color3.fromRGB(230, 110, 255),
+BUFF = Color3.fromRGB(55, 215, 235),
+PROTECT = Color3.fromRGB(130, 140, 255),
+REBIRTH = Color3.fromRGB(255, 130, 50),
+SYSTEM = Color3.fromRGB(150, 165, 180),
+}
+local function getCategoryColor(category)
+return LogColors[string.upper(tostring(category))] or LogColors.SYSTEM
+end
+local function getCategoryDisplay(category)
+local cat = string.upper(tostring(category))
+if State.Language == "TH" then
+if cat == "ROLL" then return "สุ่ม"
+elseif cat == "HARVEST" then return "เก็บผัก"
+elseif cat == "SELL" then return "ขาย"
+elseif cat == "SHOP" then return "ร้านค้า"
+elseif cat == "UPGRADE" then return "อัปเกรด"
+elseif cat == "BUFF" then return "บัฟ"
+elseif cat == "PROTECT" then return "ล็อก"
+elseif cat == "REBIRTH" then return "เกิดใหม่"
+else return "ระบบ"
+end
+end
+return cat
+end
+local function isImportantLog(entry)
+if not entry then return false end
+local cat = string.upper(tostring(entry.Category))
+if cat == "ROLL" and (string.find(entry.MessageEN, "Bought") or string.find(entry.MessageEN, "Godly") or string.find(entry.MessageEN, "Mythic") or string.find(entry.MessageEN, "IMPOSSIBLE")) then
+return true
+elseif cat == "SELL" and (string.find(entry.MessageEN, "batch") or string.find(entry.MessageEN, "SellAll") or string.find(entry.MessageEN, "+")) then
+return true
+elseif cat == "SHOP" or cat == "REBIRTH" or cat == "UPGRADE" or cat == "PROTECT" then
+return true
+end
+return entry.Important == true
+end
+local function renderLogEntry(entry, parent)
+local hasDetail = (entry.DetailEN ~= "" or entry.DetailTH ~= "")
+local card = create("Frame", {
+Size = UDim2.new(1, 0, 0, hasDetail and 44 or 34),
+BackgroundColor3 = Theme.Surface,
+BorderSizePixel = 0,
+Parent = parent,
+})
+create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = card })
+local badgeColor = getCategoryColor(entry.Category)
+local catBadge = create("Frame", {
+Size = UDim2.fromOffset(50, 20),
+Position = UDim2.fromOffset(8, 7),
+BackgroundColor3 = badgeColor,
+BorderSizePixel = 0,
+Parent = card,
+})
+create("UICorner", { CornerRadius = UDim.new(0, 5), Parent = catBadge })
+create("TextLabel", {
+Size = UDim2.new(1, 0, 1, 0),
+BackgroundTransparency = 1,
+Font = Enum.Font.GothamBold,
+Text = getCategoryDisplay(entry.Category),
+TextColor3 = (entry.Category == "SELL" or entry.Category == "BUFF") and Color3.fromRGB(20, 25, 35) or Color3.fromRGB(255, 255, 255),
+TextSize = 9,
+Parent = catBadge,
+})
+create("TextLabel", {
+Size = UDim2.fromOffset(58, 20),
+Position = UDim2.fromOffset(66, 7),
+BackgroundTransparency = 1,
+Font = Enum.Font.Code,
+Text = entry.Time,
+TextColor3 = Theme.Muted,
+TextSize = 10,
+TextXAlignment = Enum.TextXAlignment.Left,
+Parent = card,
+})
+local msgText = State.Language == "TH" and (entry.MessageTH ~= "" and entry.MessageTH or entry.MessageEN) or entry.MessageEN
+if entry.Count and entry.Count > 1 then
+msgText = msgText .. string.format(" (x%d)", entry.Count)
+end
+local detailText = State.Language == "TH" and (entry.DetailTH ~= "" and entry.DetailTH or entry.DetailEN) or entry.DetailEN
+create("TextLabel", {
+Size = UDim2.new(1, -148, 0, 20),
+Position = UDim2.fromOffset(138, 7),
+BackgroundTransparency = 1,
+Font = Enum.Font.GothamMedium,
+Text = msgText,
+TextColor3 = Theme.Text,
+TextSize = 11,
+TextXAlignment = Enum.TextXAlignment.Left,
+TextTruncate = Enum.TextTruncate.AtEnd,
+Parent = card,
+})
+if hasDetail then
+create("TextLabel", {
+Size = UDim2.new(1, -148, 0, 15),
+Position = UDim2.fromOffset(138, 26),
+BackgroundTransparency = 1,
+Font = Enum.Font.Gotham,
+Text = detailText,
+TextColor3 = Theme.Muted,
+TextSize = 9,
+TextXAlignment = Enum.TextXAlignment.Left,
+TextTruncate = Enum.TextTruncate.AtEnd,
+Parent = card,
+})
+end
+return card
+end
+local function updateDashboardStats()
+if not statHarvestVal or not statHarvestVal.Parent then return end
+local coll = Runtime.Stats and Runtime.Stats.Collected or 0
+local sold = Runtime.Stats and Runtime.Stats.Sold or 0
+local bgt = Runtime.Stats and Runtime.Stats.Bought or 0
+local rls = Runtime.Stats and Runtime.Stats.Rolls or 0
+if State.Language == "TH" then
+statHarvestSub.Text = "🌾 " .. translated("Harvested")
+statHarvestVal.Text = string.format("%s ต้น", formatNumber(coll))
+statSoldSub.Text = "💰 " .. translated("Total Sold")
+statSoldVal.Text = string.format("%s ชิ้น", formatNumber(sold))
+statRollSub.Text = "🧙‍♂️ " .. translated("Target Rolls")
+statRollVal.Text = string.format("%s / %s", formatNumber(bgt), formatNumber(rls))
+else
+statHarvestSub.Text = "🌾 " .. translated("Harvested")
+statHarvestVal.Text = string.format("%s crops", formatNumber(coll))
+statSoldSub.Text = "💰 " .. translated("Total Sold")
+statSoldVal.Text = string.format("%s items", formatNumber(sold))
+statRollSub.Text = "🧙‍♂️ " .. translated("Target Rolls")
+statRollVal.Text = string.format("%s / %s", formatNumber(bgt), formatNumber(rls))
+end
+end
+local function refreshLogsUI()
+if not logsContainer or not logsContainer.Parent or not logsContainer.Parent.Visible then
+return
+end
+updateDashboardStats()
+for _, item in ipairs(logItemFrames) do
+if item and item.Parent then item:Destroy() end
+end
+table.clear(logItemFrames)
+local visibleCount = 0
+for _, entry in ipairs(Runtime.Logs) do
+local matchesFilter = Runtime.LogFilter == "ALL"
+or (Runtime.LogFilter == "IMPORTANT" and isImportantLog(entry))
+or string.upper(entry.Category) == Runtime.LogFilter
+if matchesFilter then
+visibleCount = visibleCount + 1
+local card = renderLogEntry(entry, logsContainer)
+table.insert(logItemFrames, card)
+end
+end
+if logEmptyLabel then
+logEmptyLabel.Visible = visibleCount == 0
+end
+if logsCountLabel then
+logsCountLabel.Text = string.format("%d %s", visibleCount, translated("entries"))
+end
+if Runtime.LogAutoScroll and logsContainer.Parent and logsContainer.Parent:IsA("ScrollingFrame") then
+task.defer(function()
+if logsContainer and logsContainer.Parent then
+logsContainer.Parent.CanvasPosition = Vector2.new(0, math.max(0, logsContainer.AbsoluteSize.Y))
+end
+end)
+end
+end
+if type(Runtime.RefreshVisibleLists) ~= "function" then
+Runtime.RefreshVisibleLists = function() end
+end
+local oldRefreshVisible = Runtime.RefreshVisibleLists
+Runtime.RefreshVisibleLists = function(forced)
+pcall(oldRefreshVisible, forced)
+if logsContainer and logsContainer.Parent and logsContainer.Parent.Visible then
+refreshLogsUI()
+end
+end
+Runtime.Log = function(category, msgEN, msgTH, detailEN, detailTH, important)
+category = string.upper(tostring(category or "SYSTEM"))
+if type(msgTH) ~= "string" and detailEN == nil then
+local rawMsg = tostring(msgEN or "")
+local rawDetail = tostring(msgTH or "")
+local isImp = detailEN
+msgEN = rawMsg
+msgTH = rawMsg
+detailEN = rawDetail
+detailTH = rawDetail
+important = isImp
+else
+msgEN = tostring(msgEN or "")
+msgTH = tostring(msgTH or msgEN)
+detailEN = tostring(detailEN or "")
+detailTH = tostring(detailTH or detailEN)
+end
+local now = os.clock()
+if lastLogEvent.Category == category and lastLogEvent.TitleEN == msgEN and (now - lastLogEvent.Time) < 6 then
+lastLogEvent.Count = lastLogEvent.Count + 1
+lastLogEvent.Time = now
+if #Runtime.Logs > 0 then
+local newestEntry = Runtime.Logs[1]
+newestEntry.Count = lastLogEvent.Count
+newestEntry.Time = os.date("%H:%M:%S")
+if logsContainer and logsContainer.Parent and logsContainer.Parent.Visible then
+refreshLogsUI()
+end
+return
+end
+else
+lastLogEvent = { Category = category, TitleEN = msgEN, Time = now, Count = 1 }
+end
+local entry = {
+Category = category,
+MessageEN = msgEN,
+MessageTH = msgTH,
+DetailEN = detailEN,
+DetailTH = detailTH,
+Count = 1,
+Important = important == true or category == "SHOP" or category == "REBIRTH" or category == "UPGRADE",
+Time = os.date("%H:%M:%S"),
+Timestamp = now,
+}
+table.insert(Runtime.Logs, 1, entry)
+if #Runtime.Logs > 35 then
+table.remove(Runtime.Logs)
+end
+if logsContainer and logsContainer.Parent and logsContainer.Parent.Visible and not Runtime.ScreenSleeping then
+refreshLogsUI()
+end
+end
+addGroupLabel(LogsPage, "Activity Logs")
+local statsGrid = create("Frame", {
+Size = UDim2.new(1, 0, 0, 48),
+BackgroundTransparency = 1,
+Parent = LogsPage,
+})
+local statsLayout = create("UIGridLayout", {
+CellSize = UDim2.new(0.32, -4, 1, 0),
+CellPadding = UDim2.new(0.02, 0, 0, 0),
+SortOrder = Enum.SortOrder.LayoutOrder,
+Parent = statsGrid,
+})
+local card1 = create("Frame", {
+BackgroundColor3 = Theme.Surface,
+BorderSizePixel = 0,
+LayoutOrder = 1,
+Parent = statsGrid,
+})
+create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = card1 })
+statHarvestSub = create("TextLabel", {
+Size = UDim2.new(1, -12, 0, 16),
+Position = UDim2.fromOffset(8, 6),
+BackgroundTransparency = 1,
+Font = Enum.Font.GothamMedium,
+Text = "🌾 " .. translated("Harvested"),
+TextColor3 = Theme.Muted,
+TextSize = 9,
+TextXAlignment = Enum.TextXAlignment.Left,
+Parent = card1,
+})
+statHarvestVal = create("TextLabel", {
+Size = UDim2.new(1, -12, 0, 20),
+Position = UDim2.fromOffset(8, 22),
+BackgroundTransparency = 1,
+Font = Enum.Font.GothamBold,
+Text = "0",
+TextColor3 = Color3.fromRGB(60, 205, 130),
+TextSize = 12,
+TextXAlignment = Enum.TextXAlignment.Left,
+Parent = card1,
+})
+local card2 = create("Frame", {
+BackgroundColor3 = Theme.Surface,
+BorderSizePixel = 0,
+LayoutOrder = 2,
+Parent = statsGrid,
+})
+create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = card2 })
+statSoldSub = create("TextLabel", {
+Size = UDim2.new(1, -12, 0, 16),
+Position = UDim2.fromOffset(8, 6),
+BackgroundTransparency = 1,
+Font = Enum.Font.GothamMedium,
+Text = "💰 " .. translated("Total Sold"),
+TextColor3 = Theme.Muted,
+TextSize = 9,
+TextXAlignment = Enum.TextXAlignment.Left,
+Parent = card2,
+})
+statSoldVal = create("TextLabel", {
+Size = UDim2.new(1, -12, 0, 20),
+Position = UDim2.fromOffset(8, 22),
+BackgroundTransparency = 1,
+Font = Enum.Font.GothamBold,
+Text = "0",
+TextColor3 = Color3.fromRGB(255, 195, 50),
+TextSize = 12,
+TextXAlignment = Enum.TextXAlignment.Left,
+Parent = card2,
+})
+local card3 = create("Frame", {
+BackgroundColor3 = Theme.Surface,
+BorderSizePixel = 0,
+LayoutOrder = 3,
+Parent = statsGrid,
+})
+create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = card3 })
+statRollSub = create("TextLabel", {
+Size = UDim2.new(1, -12, 0, 16),
+Position = UDim2.fromOffset(8, 6),
+BackgroundTransparency = 1,
+Font = Enum.Font.GothamMedium,
+Text = "🧙‍♂️ " .. translated("Target Rolls"),
+TextColor3 = Theme.Muted,
+TextSize = 9,
+TextXAlignment = Enum.TextXAlignment.Left,
+Parent = card3,
+})
+statRollVal = create("TextLabel", {
+Size = UDim2.new(1, -12, 0, 20),
+Position = UDim2.fromOffset(8, 22),
+BackgroundTransparency = 1,
+Font = Enum.Font.GothamBold,
+Text = "0 / 0",
+TextColor3 = Color3.fromRGB(170, 115, 255),
+TextSize = 12,
+TextXAlignment = Enum.TextXAlignment.Left,
+Parent = card3,
+})
+local controlRow = create("Frame", {
+Size = UDim2.new(1, 0, 0, 30),
+BackgroundTransparency = 1,
+Parent = LogsPage,
+})
+local filterButtons = {}
+local filters = { "ALL", "IMPORTANT", "ROLL", "HARVEST", "SELL", "SHOP", "UPGRADE", "BUFF" }
+local filterListFrame = create("Frame", {
+Size = UDim2.new(1, -140, 1, 0),
+BackgroundTransparency = 1,
+Parent = controlRow,
+})
+create("UIListLayout", {
+FillDirection = Enum.FillDirection.Horizontal,
+Padding = UDim.new(0, 4),
+SortOrder = Enum.SortOrder.LayoutOrder,
+Parent = filterListFrame,
+})
+for idx, filterName in ipairs(filters) do
+local fBtn = create("TextButton", {
+Size = UDim2.fromOffset(filterName == "IMPORTANT" and 54 or 42, 26),
+BackgroundColor3 = Runtime.LogFilter == filterName and Theme.AccentDark or Theme.Surface,
+BorderSizePixel = 0,
+Font = Enum.Font.GothamMedium,
+Text = filterName == "ALL" and translated("All")
+or filterName == "IMPORTANT" and translated("Important")
+or filterName == "ROLL" and translated("Roll")
+or filterName == "HARVEST" and translated("Harvest")
+or filterName == "SELL" and translated("Sell")
+or filterName == "SHOP" and translated("Shop")
+or filterName == "UPGRADE" and translated("Upgrade")
+or filterName == "BUFF" and translated("Buff")
+or filterName,
+TextColor3 = Runtime.LogFilter == filterName and Theme.Text or Theme.Muted,
+TextSize = 9,
+AutoButtonColor = false,
+LayoutOrder = idx,
+Parent = filterListFrame,
+})
+create("UICorner", { CornerRadius = UDim.new(0, 5), Parent = fBtn })
+filterButtons[filterName] = fBtn
+connect(fBtn.Activated, function()
+Runtime.LogFilter = filterName
+for name, btn in pairs(filterButtons) do
+btn.BackgroundColor3 = name == filterName and Theme.AccentDark or Theme.Surface
+btn.TextColor3 = name == filterName and Theme.Text or Theme.Muted
+end
+refreshLogsUI()
+end)
+end
+local clearBtn = create("TextButton", {
+Size = UDim2.fromOffset(56, 26),
+Position = UDim2.new(1, -56, 0, 0),
+BackgroundColor3 = Color3.fromRGB(160, 45, 55),
+BorderSizePixel = 0,
+Font = Enum.Font.GothamBold,
+Text = translated("Clear"),
+TextColor3 = Theme.Text,
+TextSize = 9,
+AutoButtonColor = false,
+Parent = controlRow,
+})
+create("UICorner", { CornerRadius = UDim.new(0, 5), Parent = clearBtn })
+bindLanguage(clearBtn, "Text", "Clear")
+connect(clearBtn.Activated, function()
+table.clear(Runtime.Logs)
+refreshLogsUI()
+end)
+local scrollToggleBtn = create("TextButton", {
+Size = UDim2.fromOffset(72, 26),
+Position = UDim2.new(1, -134, 0, 0),
+BackgroundColor3 = Runtime.LogAutoScroll and Theme.AccentDark or Theme.Surface,
+BorderSizePixel = 0,
+Font = Enum.Font.GothamMedium,
+Text = translated("Auto Scroll"),
+TextColor3 = Theme.Text,
+TextSize = 9,
+AutoButtonColor = false,
+Parent = controlRow,
+})
+create("UICorner", { CornerRadius = UDim.new(0, 5), Parent = scrollToggleBtn })
+bindLanguage(scrollToggleBtn, "Text", "Auto Scroll")
+connect(scrollToggleBtn.Activated, function()
+Runtime.LogAutoScroll = not Runtime.LogAutoScroll
+scrollToggleBtn.BackgroundColor3 = Runtime.LogAutoScroll and Theme.AccentDark or Theme.Surface
+end)
+local logsListFrame = create("Frame", {
+Size = UDim2.new(1, 0, 0, 0),
+AutomaticSize = Enum.AutomaticSize.Y,
+BackgroundTransparency = 1,
+Parent = LogsPage,
+})
+create("UIListLayout", {
+Padding = UDim.new(0, 4),
+SortOrder = Enum.SortOrder.LayoutOrder,
+Parent = logsListFrame,
+})
+logsContainer = logsListFrame
+logEmptyLabel = create("TextLabel", {
+Size = UDim2.new(1, 0, 0, 50),
+BackgroundTransparency = 1,
+Font = Enum.Font.GothamMedium,
+Text = translated("No logs recorded yet"),
+TextColor3 = Theme.Muted,
+TextSize = 11,
+Parent = logsListFrame,
+})
+bindLanguage(logEmptyLabel, "Text", "No logs recorded yet")
+table.insert(LanguageRefreshers, function()
+updateDashboardStats()
+for filterName, btn in pairs(filterButtons) do
+btn.Text = filterName == "ALL" and translated("All")
+or filterName == "IMPORTANT" and translated("Important")
+or filterName == "ROLL" and translated("Roll")
+or filterName == "HARVEST" and translated("Harvest")
+or filterName == "SELL" and translated("Sell")
+or filterName == "SHOP" and translated("Shop")
+or filterName == "UPGRADE" and translated("Upgrade")
+or filterName == "BUFF" and translated("Buff")
+or filterName
+end
+refreshLogsUI()
 end)
 local function refreshConfigUI()
 for _, refresh in pairs(toggleRefreshers) do
@@ -3713,6 +4299,11 @@ attemptedPlacement = attemptedPlacement or remoteOk == true
 task.wait(0.65)
 if not tool.Parent then
 Runtime.Stats.Placed = Runtime.Stats.Placed + 1
+if type(Runtime.Log) == "function" then
+local msgEN = string.format("Placed Best Gnome: %s", tostring(farmerName))
+local msgTH = string.format("วางโนมตัวท็อป: %s", tostring(farmerName))
+Runtime.Log("PROTECT", msgEN, msgTH, "Auto Best Gnome Placed", "วางโนมที่ดีที่สุดลงแปลง")
+end
 end
 end
 if humanoid and humanoid.Parent then
@@ -4009,6 +4600,11 @@ best30Selling[tool] = nil
 end
 if soldCount > 0 then
 Runtime.RankedGnomeCache = nil
+if type(Runtime.Log) == "function" then
+local msgEN = string.format("Sold %d surplus gnomes", soldCount)
+local msgTH = string.format("ขายโนมส่วนเกิน %d ตัว", soldCount)
+Runtime.Log("SELL", msgEN, msgTH, "Cleaned backpack inventory", "เคลียร์พื้นที่กระเป๋า")
+end
 end
 return soldCount
 end
@@ -4210,9 +4806,19 @@ local cached = Runtime.UseItemInfoCache[tool]
 if cached then
 return cached.Name, cached.Type, cached.Config
 end
-local name = tostring(tool:GetAttribute("ItemName") or tool:GetAttribute("SprinklerName")
-or tool:GetAttribute("FertilizerName") or tool:GetAttribute("WateringCanName")
-or tool:GetAttribute("GnomeItemName") or tool.Name)
+local lowered = string.lower(tostring(tool:GetAttribute("type") or tool:GetAttribute("Type") or ""))
+local compactType = string.gsub(lowered, "[%s_%-]", "")
+local itemType = ""
+if compactType == "sprinkler" or compactType == "sprikler" then
+itemType = "Sprinkler"
+elseif compactType == "fertilizer" or compactType == "fertiliser" then
+itemType = "Fertilizer"
+elseif compactType == "wateringcan" or compactType == "watercan" then
+itemType = "WateringCan"
+elseif compactType == "gnomeitem" then
+itemType = "GnomeItem"
+end
+local name = getCleanToolName(tool, itemType)
 local shopData = (ItemShop.Items or {})[name] or {}
 if next(shopData) == nil then
 local loweredName = string.lower(name)
@@ -4228,19 +4834,7 @@ end
 end
 shopData = (ItemShop.Items or {})[name] or {}
 end
-local lowered = string.lower(tostring(tool:GetAttribute("type") or tool:GetAttribute("Type")
-or shopData.type or ""))
-local compactType = string.gsub(lowered, "[%s_%-]", "")
-local itemType = ""
-if compactType == "sprinkler" or compactType == "sprikler" then
-itemType = "Sprinkler"
-elseif compactType == "fertilizer" or compactType == "fertiliser" then
-itemType = "Fertilizer"
-elseif compactType == "wateringcan" or compactType == "watercan" then
-itemType = "WateringCan"
-elseif compactType == "gnomeitem" then
-itemType = "GnomeItem"
-else
+if itemType == "" then
 itemType = tostring(shopData.type or "")
 end
 local config = itemType == "Sprinkler" and SprinklersConfig[name]
@@ -4700,6 +5294,12 @@ Runtime.ItemFailureCount[tool] = nil
 Runtime.ItemPlacementRejected[tool] = nil
 itemRetryAt[tool] = nil
 Runtime.SetUseItemStatus("USED " .. itemName, true)
+if type(Runtime.Log) == "function" then
+local targetName = target and (getFarmerName(target) or target.Name) or "Crops Area"
+local msgEN = string.format("Used %s on %s", tostring(itemName), tostring(targetName))
+local msgTH = string.format("ใช้ %s กับ %s", tostring(itemName), tostring(targetName))
+Runtime.Log("BUFF", msgEN, msgTH, tostring(itemType) .. " Applied", "เปิดใช้งาน " .. tostring(itemType))
+end
 elseif waitingForTurn and tool.Parent then
 itemRetryAt[tool] = os.clock() + 0.15
 Runtime.SetUseItemStatus(itemName .. " | WAITING FOR TURN")
@@ -5129,6 +5729,16 @@ local deadline = os.clock() + 0.6
 repeat
 task.wait()
 until not instance.Parent or os.clock() >= deadline or not Runtime.Alive
+if not instance.Parent and type(Runtime.Log) == "function" then
+local fName = getFarmerName(instance) or "Gnome"
+local fRarity = getFarmerRarity(instance) or "Common"
+local fMut = tostring(instance:GetAttribute("Mutations") or instance:GetAttribute("Mutation") or "")
+local mutText = fMut ~= "" and (" (" .. fMut .. ")") or ""
+local priceStr = (price and price > 0) and (" (-$" .. formatNumber(price) .. ")") or ""
+local msgEN = string.format("Bought Gnome: %s [%s]%s%s", fName, fRarity, mutText, priceStr)
+local msgTH = string.format("ซื้อโนม: %s [%s]%s%s", fName, fRarity, mutText, priceStr)
+Runtime.Log("ROLL", msgEN, msgTH, "Matched targets - Purchased into inventory", "ตรงกับเป้าหมาย - ซื้อเข้าตัวเรียบร้อย", true)
+end
 end
 Runtime.EndAction(actionToken)
 if ok and not instance.Parent then
@@ -5225,6 +5835,7 @@ end
 end
 end
 local collectedThisPass = 0
+local specialMutations = {}
 for _, plant in ipairs(readyPlants) do
 if not Runtime.Alive or not State.AutoCollect or collectedThisPass >= 12 then
 break
@@ -5233,15 +5844,25 @@ local fruitReady = plant:GetAttribute("FruitReady") ~= false
 if plant:GetAttribute("READY") == true and fruitReady and not collecting[plant] then
 collecting[plant] = true
 local ok, result = invoke("CollectPlant", plant)
-collectedThisPass = collectedThisPass + 1
 if ok and result ~= false then
+collectedThisPass = collectedThisPass + 1
 Runtime.Stats.Collected = Runtime.Stats.Collected + 1
+local pMut = tostring(plant:GetAttribute("Mutations") or plant:GetAttribute("Mutation") or "")
+if pMut ~= "" and pMut ~= "None" and pMut ~= "Normal" then
+table.insert(specialMutations, pMut)
+end
 end
 task.delay(0.4, function()
 collecting[plant] = nil
 end)
 task.wait(0.03)
 end
+end
+if collectedThisPass > 0 and type(Runtime.Log) == "function" then
+local mutDetail = #specialMutations > 0 and (" [" .. table.concat(specialMutations, ", ") .. "]") or ""
+local msgEN = string.format("Harvested %d crops%s", collectedThisPass, mutDetail)
+local msgTH = string.format("เก็บผลผลิต %d ต้น%s", collectedThisPass, mutDetail)
+Runtime.Log("HARVEST", msgEN, msgTH, "Added to backpack", "เข้ากระเป๋าเรียบร้อย")
 end
 end
 end)
@@ -5268,6 +5889,13 @@ if okAll and type(resAll) == "number" and resAll > 0 then
 count = #batch
 Runtime.Stats.Sold = Runtime.Stats.Sold + count
 lastResponse = "SellAll " .. tostring(resAll) .. "$"
+if type(Runtime.Log) == "function" then
+local msgEN = "Sold produce batch (+" .. tostring(resAll) .. "$)"
+local msgTH = "ขายผลผลิตสำเร็จ (+" .. tostring(resAll) .. "$)"
+local detEN = string.format("%d items sold via SellAll", count)
+local detTH = string.format("ขายผ่าน SellAll %d ชิ้น", count)
+Runtime.Log("SELL", msgEN, msgTH, detEN, detTH, true)
+end
 else
 for _, produce in ipairs(batch) do
 if not Runtime.Alive or not (State.AutoSellProduce or Runtime.IsBackpackNearFull()) then
@@ -5295,6 +5923,9 @@ end
 if success then
 count = count + 1
 Runtime.Stats.Sold = Runtime.Stats.Sold + 1
+if type(Runtime.Log) == "function" then
+Runtime.Log("SELL", "Sold " .. tostring(produce.Name) .. " (+" .. tostring(response) .. "$)", "Selective Mutation Sale")
+end
 elseif produce.Parent then
 Runtime.ProduceSellRetry[produce] = os.clock() + 0.5
 end
@@ -5552,6 +6183,11 @@ if purchased then
 count = count + 1
 Runtime.Stats.Shop = Runtime.Stats.Shop + 1
 response = "BOUGHT " .. itemName
+if type(Runtime.Log) == "function" then
+local msgEN = "Bought " .. tostring(itemName) .. " (-$" .. tostring(shopData.price or 0) .. ")"
+local msgTH = "ซื้อ " .. tostring(itemName) .. " สำเร็จ (-$" .. tostring(shopData.price or 0) .. ")"
+Runtime.Log("SHOP", msgEN, msgTH, "Item Shop Purchase", "ซื้อจากร้านค้า", true)
+end
 elseif response == "SERVER REJECTED" then
 response = directDetail
 end
@@ -5705,6 +6341,11 @@ local boundaryConsumed = not boundary.Parent or not boundary:IsDescendantOf(expa
 if ok and (boundaryConsumed or not expansion:IsDescendantOf(expandFolder)) then
 Runtime.ExpansionCandidateCache = nil
 Runtime.Stats.Expansions = Runtime.Stats.Expansions + 1
+if type(Runtime.Log) == "function" then
+local msgEN = string.format("Bought Plot Expansion: %s (-$%s)", tostring(expansion.Name), formatNumber(candidate.Price))
+local msgTH = string.format("ซื้อขยายแปลงที่ดิน: %s (-$%s)", tostring(expansion.Name), formatNumber(candidate.Price))
+Runtime.Log("UPGRADE", msgEN, msgTH, "Plot Expansion", "ขยายพื้นที่แปลง", true)
+end
 return true
 end
 task.delay(1.5, function()
@@ -5738,6 +6379,11 @@ return invoke("Upgrade", name)
 end)
 if actionOk and ok and result ~= false and result ~= "Not Enough" and result ~= "Maxed" and result ~= "Invalid" then
 Runtime.Stats.Upgrades = Runtime.Stats.Upgrades + 1
+if type(Runtime.Log) == "function" then
+local msgEN = string.format("Upgraded %s to Tier %s (-$%s)", tostring(name), tostring(nextTier), formatNumber(price))
+local msgTH = string.format("อัปเกรด %s ขั้น %s (-$%s)", tostring(name), tostring(nextTier), formatNumber(price))
+Runtime.Log("UPGRADE", msgEN, msgTH, "Plot Upgrade Purchased", "ซื้ออัปเกรดแปลงสำเร็จ", true)
+end
 return true
 end
 end
@@ -5817,6 +6463,12 @@ return invoke("Upgrade", pageName, nodeId)
 end)
 if actionOk and ok and result then
 Runtime.Stats.Upgrades = Runtime.Stats.Upgrades + 1
+if type(Runtime.Log) == "function" then
+local nodeTitle = data.Title or data.Name or nodeId
+local msgEN = string.format("Unlocked Skill: %s (-$%s)", tostring(nodeTitle), formatNumber(data.Price))
+local msgTH = string.format("ปลดล็อกสกิล: %s (-$%s)", tostring(nodeTitle), formatNumber(data.Price))
+Runtime.Log("UPGRADE", msgEN, msgTH, "Upgrade Tree Node", "อัปเกรดสกิลต้นไม้", true)
+end
 return true
 end
 end
@@ -5872,6 +6524,12 @@ return ok, result
 end)
 if actionOk and ok and result then
 Runtime.Stats.Rebirths = Runtime.Stats.Rebirths + 1
+if type(Runtime.Log) == "function" then
+local rCount = Runtime.GetRebirthCount and Runtime.GetRebirthCount() or Runtime.Stats.Rebirths
+local msgEN = string.format("Rebirth Completed! (#%s)", tostring(rCount))
+local msgTH = string.format("เกิดใหม่สำเร็จ! (รอบที่ %s)", tostring(rCount))
+Runtime.Log("REBIRTH", msgEN, msgTH, "Rebirth Milestone reached", "ผ่านเงื่อนไขเกิดใหม่เรียบร้อย", true)
+end
 end
 end
 task.wait(State.AutoRebirth and 1 or 1.75)

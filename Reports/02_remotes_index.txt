@@ -1,7 +1,8 @@
 REMOTES INDEX  — DUMPER v7.0
-Total: 104
+Total: 109
 
--- UnreliableRemoteEvent (38) --
+-- UnreliableRemoteEvent (39) --
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
@@ -41,7 +42,7 @@ Total: 104
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
 
--- RemoteEvent (46) --
+-- RemoteEvent (47) --
   [ReplicatedStorage] game.ReplicatedStorage.Library.GrowPlants.GrowthStarted
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
@@ -81,15 +82,19 @@ Total: 104
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
+  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.invoke_server_command
+  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.create_user
+  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.update_user_roles
+  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.update_role_permissions
   [ReplicatedStorage] game.ReplicatedStorage.conch_networking.register_command
   [ReplicatedStorage] game.ReplicatedStorage.conch_networking.log
   [ReplicatedStorage] game.ReplicatedStorage.conch_networking.log_command
-  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.update_role_permissions
-  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.update_user_roles
-  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.create_user
-  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.invoke_server_command
 
--- RemoteFunction (20) --
+-- RemoteFunction (23) --
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Functions.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Functions.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Functions.
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Functions.
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Functions.
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Functions.

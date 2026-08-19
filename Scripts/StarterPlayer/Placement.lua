@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.2
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Mon Aug 17 02:37:09 2026
+  Time:     Thu Aug 20 00:11:29 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -62,7 +62,7 @@ local function isMobile() -- Line: 61
 end;
 
 local function getAimResult(p24) -- Line: 66
-    -- upvalues: u7 (copy), u12 (copy), LocalPlayer (copy), u16 (ref), u17 (ref), CurrentCamera (copy), UserInputService (copy), GuiService (copy)
+    -- upvalues: u7 (copy), LocalPlayer (copy), u16 (ref), u17 (ref), CurrentCamera (copy), u12 (copy), UserInputService (copy), GuiService (copy)
     local v25 = u7 and u7.Value;
     local v26;
 
@@ -76,7 +76,9 @@ local function getAimResult(p24) -- Line: 66
         v25 = v25:FindFirstChild("Workers");
     end;
 
-    u12.FilterDescendantsInstances = {
+    local v27 = {};
+
+    for _, v in {
         LocalPlayer.Character,
         u16,
         u17,
@@ -86,38 +88,44 @@ local function getAimResult(p24) -- Line: 66
         workspace:FindFirstChild("Workers"),
         v26,
         v25
-    };
-    local v27;
+    } do
+        if v then
+            table.insert(v27, v);
+        end;
+    end;
+
+    u12.FilterDescendantsInstances = v27;
+    local v28;
 
     if LocalPlayer:GetAttribute("Device") == "Mobile" then
-        v27 = true;
+        v28 = true;
     else
-        v27 = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.GamepadEnabled;
+        v28 = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.GamepadEnabled;
     end;
 
-    if not v27 then
+    if not v28 then
         if LocalPlayer:GetAttribute("Device") == "Controller" then
-            local v28 = CurrentCamera.ViewportSize / 2;
-            local v29 = CurrentCamera:ViewportPointToRay(v28.X, v28.Y);
+            local v29 = CurrentCamera.ViewportSize / 2;
+            local v30 = CurrentCamera:ViewportPointToRay(v29.X, v29.Y);
 
-            return workspace:Raycast(v29.Origin, v29.Direction * 1000, u12);
+            return workspace:Raycast(v30.Origin, v30.Direction * 1000, u12);
         end;
 
-        local v30 = UserInputService:GetMouseLocation();
+        local v31 = UserInputService:GetMouseLocation();
         local Y = GuiService:GetGuiInset().Y;
-        local v31 = CurrentCamera:ScreenPointToRay(v30.X, v30.Y - Y);
+        local v32 = CurrentCamera:ScreenPointToRay(v31.X, v31.Y - Y);
 
-        return workspace:Raycast(v31.Origin, v31.Direction * 1000, u12);
+        return workspace:Raycast(v32.Origin, v32.Direction * 1000, u12);
     end;
 
-    local v32 = Vector3.new(p24.CFrame.LookVector.X, 0, p24.CFrame.LookVector.Z);
+    local v33 = Vector3.new(p24.CFrame.LookVector.X, 0, p24.CFrame.LookVector.Z);
 
-    if v32.Magnitude > 0 then
-        return workspace:Raycast(p24.Position + v32.Unit * 6 + Vector3.new(0, 20, 0), Vector3.new(0, -40, 0), u12);
+    if v33.Magnitude > 0 then
+        return workspace:Raycast(p24.Position + v33.Unit * 6 + Vector3.new(0, 20, 0), Vector3.new(0, -40, 0), u12);
     end;
 end;
 
-local function placeCurrent() -- Line: 104
+local function placeCurrent() -- Line: 110
     -- upvalues: u11 (ref), u16 (ref), u18 (ref), u2 (copy), u22 (ref), u21 (ref), u19 (ref), u20 (ref)
     if u11 then
         return;
@@ -145,7 +153,7 @@ local function placeCurrent() -- Line: 104
     u11 = false;
 end;
 
-local function stop() -- Line: 127
+local function stop() -- Line: 133
     -- upvalues: u9 (ref), u10 (ref), u3 (copy), Highlight (copy), u16 (ref), u17 (ref), u18 (ref), u19 (ref), u20 (ref), u21 (ref), u22 (ref), u11 (ref)
     if u9 then
         u9:Disconnect();
@@ -180,72 +188,79 @@ local function stop() -- Line: 127
     u11 = false;
 end;
 
-local function setHighlight(p33) -- Line: 160
+local function setHighlight(p34) -- Line: 166
     -- upvalues: Highlight (copy), u14 (copy), u15 (copy)
     Highlight.Enabled = true;
-    Highlight.FillColor = p33 and u14 or u15;
-    Highlight.OutlineColor = p33 and u14 or u15;
+    Highlight.FillColor = p34 and u14 or u15;
+    Highlight.OutlineColor = p34 and u14 or u15;
 end;
 
-local function isGroundValid(p34, p35) -- Line: 166
-    if not (p34 and p35) then
+local function isGroundValid(p35, p36) -- Line: 172
+    if not (p35 and p36) then
         return false;
     end;
 
-    local Instance2 = p34.Instance;
+    local Instance2 = p35.Instance;
 
-    return Instance2 == p35 and true or Instance2:IsDescendantOf(p35);
+    return Instance2 == p36 and true or Instance2:IsDescendantOf(p36);
 end;
 
-local function getFloorIdFromGround(p36, p37) -- Line: 176
-    while p36 and p36 ~= p37 do
-        local v38 = string.match(p36.Name, "^Floor(%d+)$");
+local function getFloorIdFromGround(p37, p38) -- Line: 182
+    while p37 and p37 ~= p38 do
+        local v39 = string.match(p37.Name, "^Floor(%d+)$");
 
-        if v38 then
-            return v38;
+        if v39 then
+            return v39;
         end;
 
-        p36 = p36.Parent;
+        p37 = p37.Parent;
     end;
 
     return "1";
 end;
 
-local function isBoxClear(p39, p40, p41) -- Line: 189
-    -- upvalues: u7 (copy), u13 (copy), LocalPlayer (copy), CurrentCamera (copy)
-    if p41 == "Farmer" or p41 == "Fertilizer" then
+local function isBoxClear(p40, p41, p42) -- Line: 195
+    -- upvalues: u7 (copy), LocalPlayer (copy), CurrentCamera (copy), u13 (copy)
+    if p42 == "Farmer" or p42 == "Fertilizer" then
         return true;
     end;
 
-    local v42, v43 = p39:GetBoundingBox();
-    local v44 = u7 and u7.Value;
-    local v45;
+    local v43, v44 = p40:GetBoundingBox();
+    local v45 = u7 and u7.Value;
+    local v46;
 
-    if v44 then
-        v45 = v44:FindFirstChild("Plants");
+    if v45 then
+        v46 = v45:FindFirstChild("Plants");
     else
-        v45 = v44;
+        v46 = v45;
     end;
 
-    if v44 then
-        v44 = v44:FindFirstChild("Workers");
+    if v45 then
+        v45 = v45:FindFirstChild("Workers");
     end;
 
-    local v46 = Vector3.new(v43.X * 0.95, v43.Y * 0.9, v43.Z * 0.95);
-    u13.FilterDescendantsInstances = {
+    local v47 = {};
+
+    for _, v in {
         LocalPlayer.Character,
-        p39,
+        p40,
         CurrentCamera,
-        p40
-    };
-    local v47 = workspace:GetPartBoundsInBox(v42, v46, u13);
-
-    for _, v in ipairs(v47) do
-        if p41 ~= "Farmer" and (v45 and (v:IsDescendantOf(v45) and v.Transparency < 1)) then
-            return false;
+        p41,
+        v45,
+        workspace:FindFirstChild("Farmers"),
+        workspace:FindFirstChild("Workers")
+    } do
+        if v then
+            table.insert(v47, v);
         end;
+    end;
 
-        if p41 ~= "Farmer" and (v44 and (v:IsDescendantOf(v44) and v.Transparency < 1)) then
+    local v48 = Vector3.new(v44.X * 0.95, v44.Y * 0.9, v44.Z * 0.95);
+    u13.FilterDescendantsInstances = v47;
+    local v49 = workspace:GetPartBoundsInBox(v43, v48, u13);
+
+    for _, v in ipairs(v49) do
+        if p42 ~= "Farmer" and (v46 and (v:IsDescendantOf(v46) and v.Transparency < 1)) then
             return false;
         end;
 
@@ -257,23 +272,23 @@ local function isBoxClear(p39, p40, p41) -- Line: 189
     return true;
 end;
 
-local function normalizeItemType(p48) -- Line: 231
-    local v49 = type(p48) == "string" and p48 and p48 or "";
-    local v50 = string.lower(v49);
+local function normalizeItemType(p50) -- Line: 243
+    local v51 = type(p50) == "string" and p50 and p50 or "";
+    local v52 = string.lower(v51);
 
-    return (v50 == "gnome" or v50 == "farmer") and "Farmer" or ((v50 == "sprikler" or v50 == "sprinkler") and "Sprinkler" or ((v50 == "fertilizer" or v50 == "fertiliser") and "Fertilizer" or v49));
+    return (v52 == "gnome" or v52 == "farmer") and "Farmer" or ((v52 == "sprikler" or v52 == "sprinkler") and "Sprinkler" or ((v52 == "fertilizer" or v52 == "fertiliser") and "Fertilizer" or v51));
 end;
 
-local function findPlacementAsset(p51, p52) -- Line: 246
+local function findPlacementAsset(p53, p54) -- Line: 258
     -- upvalues: Assets (copy)
     for _, v in {
-        Assets:FindFirstChild(p52),
-        Assets:FindFirstChild(p52 .. "s"),
+        Assets:FindFirstChild(p54),
+        Assets:FindFirstChild(p54 .. "s"),
         Assets:FindFirstChild("Items"),
         Assets:FindFirstChild("Tools")
     } do
         if v then
-            local v = v:FindFirstChild(p51) or v:FindFirstChild(p52);
+            local v = v:FindFirstChild(p53) or v:FindFirstChild(p54);
         end;
 
         if v then
@@ -282,48 +297,48 @@ local function findPlacementAsset(p51, p52) -- Line: 246
     end;
 end;
 
-local function getRangeTemplate(p53) -- Line: 262
+local function getRangeTemplate(p55) -- Line: 274
     -- upvalues: Assets (copy)
-    return Assets:FindFirstChild(p53 and p53.ring or "SprinklerRing") or Assets:FindFirstChild("SprinklerRing");
+    return Assets:FindFirstChild(p55 and p55.ring or "SprinklerRing") or Assets:FindFirstChild("SprinklerRing");
 end;
 
-local function getFertilizerTemplate() -- Line: 267
+local function getFertilizerTemplate() -- Line: 279
     -- upvalues: Assets (copy)
     return Assets:FindFirstChild("FertilizerPart");
 end;
 
-local function modelFromInstance(p54, p55) -- Line: 271
-    if not p54 then
+local function modelFromInstance(p56, p57) -- Line: 283
+    if not p56 then
         return;
     end;
 
-    if p54:IsA("Model") then
-        local v56 = p54:Clone();
+    if p56:IsA("Model") then
+        local v58 = p56:Clone();
 
-        if not v56.PrimaryPart then
-            v56.PrimaryPart = v56:FindFirstChildWhichIsA("BasePart", true);
+        if not v58.PrimaryPart then
+            v58.PrimaryPart = v58:FindFirstChildWhichIsA("BasePart", true);
         end;
 
-        return v56;
+        return v58;
     end;
 
     local Model = Instance.new("Model");
-    Model.Name = p55;
+    Model.Name = p57;
 
-    if p54:IsA("BasePart") then
-        local v57 = p54:Clone();
-        v57.Name = "PrimaryPart";
-        v57.Parent = Model;
-        Model.PrimaryPart = v57;
-    elseif p54:IsA("Tool") then
-        for _, descendant in p54:GetDescendants() do
+    if p56:IsA("BasePart") then
+        local v59 = p56:Clone();
+        v59.Name = "PrimaryPart";
+        v59.Parent = Model;
+        Model.PrimaryPart = v59;
+    elseif p56:IsA("Tool") then
+        for _, descendant in p56:GetDescendants() do
             if descendant:IsA("BasePart") then
-                local v58 = descendant:Clone();
-                v58.Anchored = true;
-                v58.Parent = Model;
+                local v60 = descendant:Clone();
+                v60.Anchored = true;
+                v60.Parent = Model;
 
                 if descendant.Name == "Handle" or not Model.PrimaryPart then
-                    Model.PrimaryPart = v58;
+                    Model.PrimaryPart = v60;
                 end;
             end;
         end;
@@ -336,158 +351,158 @@ local function modelFromInstance(p54, p55) -- Line: 271
     Model:Destroy();
 end;
 
-local function createPlaceholderModel(p59, p60) -- Line: 312
+local function createPlaceholderModel(p61, p62) -- Line: 324
     local Model = Instance.new("Model");
-    Model.Name = p59;
+    Model.Name = p61;
     local Part = Instance.new("Part");
     Part.Name = "PrimaryPart";
-    Part.Size = p60 == "Sprinkler" and Vector3.new(2, 0.4, 2) or Vector3.new(2, 2, 2);
+    Part.Size = p62 == "Sprinkler" and Vector3.new(2, 0.4, 2) or Vector3.new(2, 2, 2);
     Part.Anchored = true;
     Part.CanCollide = false;
-    Part.Color = p60 == "Sprinkler" and Color3.fromRGB(70, 180, 255) or Color3.fromRGB(255, 255, 255);
+    Part.Color = p62 == "Sprinkler" and Color3.fromRGB(70, 180, 255) or Color3.fromRGB(255, 255, 255);
     Part.Material = Enum.Material.SmoothPlastic;
-    Part.Shape = p60 == "Sprinkler" and Enum.PartType.Cylinder or Enum.PartType.Block;
+    Part.Shape = p62 == "Sprinkler" and Enum.PartType.Cylinder or Enum.PartType.Block;
     Part.Parent = Model;
     Model.PrimaryPart = Part;
 
     return Model;
 end;
 
-local function addRangePart(p61, p62) -- Line: 331
+local function addRangePart(p63, p64) -- Line: 343
     -- upvalues: Assets (copy)
-    local v63;
+    local v65;
 
-    if p62 then
-        v63 = p62.range;
+    if p64 then
+        v65 = p64.range;
     else
-        v63 = p62;
+        v65 = p64;
     end;
 
-    if type(v63) ~= "number" or v63 <= 0 then
+    if type(v65) ~= "number" or v65 <= 0 then
         return;
     end;
 
-    local v64 = Assets:FindFirstChild(p62 and (p62.ring or "SprinklerRing") or "SprinklerRing") or Assets:FindFirstChild("SprinklerRing");
+    local v66 = Assets:FindFirstChild(p64 and (p64.ring or "SprinklerRing") or "SprinklerRing") or Assets:FindFirstChild("SprinklerRing");
 
-    if v64 and v64:IsA("BasePart") then
-        local v65 = v63 * 2;
-        local v66 = v64:Clone();
-        v66.Name = p62 and p62.ring or "Range";
-        v66:SetAttribute("VisualOnly", true);
-        v66:SetAttribute("Range", v63);
-        v66:SetAttribute("Diameter", v65);
-        v66.Anchored = true;
-        v66.CanCollide = false;
-        v66.CanTouch = false;
-        v66.CanQuery = false;
-        v66.CastShadow = false;
-        v66.Size = Vector3.new(v65, v66.Size.Y, v65);
-        v66.CFrame = p61:GetPivot();
-        v66.Parent = workspace.Previews;
+    if v66 and v66:IsA("BasePart") then
+        local v67 = v65 * 2;
+        local v68 = v66:Clone();
+        v68.Name = p64 and p64.ring or "Range";
+        v68:SetAttribute("VisualOnly", true);
+        v68:SetAttribute("Range", v65);
+        v68:SetAttribute("Diameter", v67);
+        v68.Anchored = true;
+        v68.CanCollide = false;
+        v68.CanTouch = false;
+        v68.CanQuery = false;
+        v68.CastShadow = false;
+        v68.Size = Vector3.new(v67, v68.Size.Y, v67);
+        v68.CFrame = p63:GetPivot();
+        v68.Parent = workspace.Previews;
 
-        return v66;
+        return v68;
     end;
 end;
 
-local function getPreviewModel(p67, p68, p69) -- Line: 357
+local function getPreviewModel(p69, p70, p71) -- Line: 369
     -- upvalues: u4 (copy), findPlacementAsset (copy), modelFromInstance (copy), u5 (copy), createPlaceholderModel (copy), Assets (copy), u6 (copy)
-    if p68 == "Farmer" then
-        local v70 = p69 and (p69:GetAttribute("Mutations") or "") or "";
+    if p70 == "Farmer" then
+        local v72 = p71 and (p71:GetAttribute("Mutations") or "") or "";
 
-        if p69 then
-            p67 = p69:GetAttribute("FarmerName") or p67;
+        if p71 then
+            p69 = p71:GetAttribute("FarmerName") or p69;
         end;
 
-        if p69 then
-            p69 = p69:GetAttribute("Huge") == true;
+        if p71 then
+            p71 = p71:GetAttribute("Huge") == true;
         end;
 
-        return u4.getModel(p67, v70, p69) or u4.getDisplayModel(p67, v70, p69), p67;
+        return u4.getModel(p69, v72, p71) or u4.getDisplayModel(p69, v72, p71), p69;
     end;
 
-    if p68 == "Sprinkler" then
-        local v71 = modelFromInstance(findPlacementAsset(p67, p68), p67);
-        local v72 = u5[p67];
-        local v73 = v71 or createPlaceholderModel(p67, p68);
+    if p70 == "Sprinkler" then
+        local v73 = modelFromInstance(findPlacementAsset(p69, p70), p69);
+        local v74 = u5[p69];
+        local v75 = v73 or createPlaceholderModel(p69, p70);
 
-        if v73 then
-            if v72 then
-                v72 = v72.range;
+        if v75 then
+            if v74 then
+                v74 = v74.range;
             end;
 
-            v73:SetAttribute("Range", v72);
+            v75:SetAttribute("Range", v74);
         end;
 
-        return v73, p67;
+        return v75, p69;
     end;
 
-    if p68 == "Fertilizer" then
-        local v74 = modelFromInstance(Assets:FindFirstChild("FertilizerPart"), p67);
-        local v75 = u6[p67];
-        local v76 = v74 or createPlaceholderModel(p67, p68);
+    if p70 == "Fertilizer" then
+        local v76 = modelFromInstance(Assets:FindFirstChild("FertilizerPart"), p69);
+        local v77 = u6[p69];
+        local v78 = v76 or createPlaceholderModel(p69, p70);
 
-        if v76 and v76.PrimaryPart then
-            if v75 then
-                v75 = v75.range;
+        if v78 and v78.PrimaryPart then
+            if v77 then
+                v77 = v77.range;
             end;
 
-            local v77 = type(v75) == "number" and v75 * 2 or v76.PrimaryPart.Size.X;
-            v76.PrimaryPart.Size = Vector3.new(v77, v76.PrimaryPart.Size.Y, v77);
-            v76:SetAttribute("Range", v75);
+            local v79 = type(v77) == "number" and v77 * 2 or v78.PrimaryPart.Size.X;
+            v78.PrimaryPart.Size = Vector3.new(v79, v78.PrimaryPart.Size.Y, v79);
+            v78:SetAttribute("Range", v77);
         end;
 
-        return v76, p67;
+        return v78, p69;
     end;
 end;
 
-local function start(p78, p79) -- Line: 394
+local function start(p80, p81) -- Line: 406
     -- upvalues: u9 (ref), u3 (copy), LocalPlayer (copy), UserInputService (copy), u16 (ref), getPreviewModel (copy), u21 (ref), u22 (ref), u17 (ref), addRangePart (copy), u5 (copy), Highlight (copy), RunService (copy), u7 (copy), getAimResult (copy), u18 (ref), u15 (copy), u19 (ref), isBoxClear (copy), u20 (ref), getFloorIdFromGround (copy), u14 (copy), u10 (ref), placeCurrent (copy)
     if u9 then
         return;
     end;
 
     local Fire = u3.Fire;
-    local v80;
+    local v82;
 
     if LocalPlayer:GetAttribute("Device") == "Mobile" then
-        v80 = true;
+        v82 = true;
     else
-        v80 = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.GamepadEnabled;
+        v82 = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.GamepadEnabled;
     end;
 
-    Fire("PlaceButton", v80);
+    Fire("PlaceButton", v82);
     local Character = LocalPlayer.Character;
     local Backpack = LocalPlayer:FindFirstChild("Backpack");
-    local v81 = Character and Character:FindFirstChild(p78);
+    local v83 = Character and Character:FindFirstChild(p80);
 
-    if v81 then
-        Backpack = v81;
+    if v83 then
+        Backpack = v83;
     elseif Backpack then
-        Backpack = Backpack:FindFirstChild(p78);
+        Backpack = Backpack:FindFirstChild(p80);
     end;
 
-    local v82 = p79 or (Backpack and (Backpack:GetAttribute("type") or "Farmer") or "Farmer");
-    local v83 = type(v82) == "string" and (v82 or "") or "";
-    local v84 = string.lower(v83);
-    local v85 = (v84 == "gnome" or v84 == "farmer") and "Farmer" or ((v84 == "sprikler" or v84 == "sprinkler") and "Sprinkler" or ((v84 == "fertilizer" or v84 == "fertiliser") and "Fertilizer" or v83));
-    local v86, v87 = getPreviewModel(p78, v85, Backpack);
-    u16 = v86;
+    local v84 = p81 or (Backpack and (Backpack:GetAttribute("type") or "Farmer") or "Farmer");
+    local v85 = type(v84) == "string" and (v84 or "") or "";
+    local v86 = string.lower(v85);
+    local v87 = (v86 == "gnome" or v86 == "farmer") and "Farmer" or ((v86 == "sprikler" or v86 == "sprinkler") and "Sprinkler" or ((v86 == "fertilizer" or v86 == "fertiliser") and "Fertilizer" or v85));
+    local v88, v89 = getPreviewModel(p80, v87, Backpack);
+    u16 = v88;
 
     if not u16 then
         return;
     end;
 
-    u21 = v87;
-    u22 = v85;
+    u21 = v89;
+    u22 = v87;
 
     if u16.PrimaryPart then
         u16.PrimaryPart.Anchored = true;
     end;
 
-    local v88 = next;
-    local v89, v90 = u16:GetDescendants();
+    local v90 = next;
+    local v91, v92 = u16:GetDescendants();
 
-    for _, v in v88, v89, v90 do
+    for _, v in v90, v91, v92 do
         if v:IsA("BasePart") then
             v.Anchored = true;
             v.CanCollide = false;
@@ -496,23 +511,23 @@ local function start(p78, p79) -- Line: 394
 
     u16.Parent = workspace.Previews;
 
-    if v85 == "Sprinkler" then
-        u17 = addRangePart(u16, u5[v87]);
+    if v87 == "Sprinkler" then
+        u17 = addRangePart(u16, u5[v89]);
     end;
 
     Highlight.Parent = u16;
     Highlight.Adornee = u16;
-    local u91 = tick();
-    u9 = RunService.RenderStepped:Connect(function() -- Line: 433
-        -- upvalues: u91 (ref), LocalPlayer (ref), u7 (ref), u16 (ref), getAimResult (ref), u18 (ref), Highlight (ref), u15 (ref), u17 (ref), u19 (ref), isBoxClear (ref), u22 (ref), u20 (ref), getFloorIdFromGround (ref), u14 (ref)
-        if tick() - u91 <= 0.01 then
+    local u93 = tick();
+    u9 = RunService.RenderStepped:Connect(function() -- Line: 445
+        -- upvalues: u93 (ref), LocalPlayer (ref), u7 (ref), u16 (ref), getAimResult (ref), u18 (ref), Highlight (ref), u15 (ref), u17 (ref), u19 (ref), isBoxClear (ref), u22 (ref), u20 (ref), getFloorIdFromGround (ref), u14 (ref)
+        if tick() - u93 <= 0.01 then
             return;
         end;
 
-        u91 = tick();
-        local v92 = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart");
+        u93 = tick();
+        local v94 = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart");
 
-        if not v92 then
+        if not v94 then
             return;
         end;
 
@@ -526,9 +541,9 @@ local function start(p78, p79) -- Line: 394
             return;
         end;
 
-        local v93 = getAimResult(v92);
+        local v95 = getAimResult(v94);
 
-        if not v93 then
+        if not v95 then
             u18 = false;
             Highlight.Enabled = true;
             Highlight.FillColor = u15;
@@ -537,72 +552,72 @@ local function start(p78, p79) -- Line: 394
             return;
         end;
 
-        local Position = v93.Position;
+        local Position = v95.Position;
         local Position2 = u7.Value:GetPivot().Position;
-        local v94 = Vector3.new(Position.X - Position2.X, 0, Position.Z - Position2.Z);
+        local v96 = Vector3.new(Position.X - Position2.X, 0, Position.Z - Position2.Z);
 
-        if v94.Magnitude <= 0 then
+        if v96.Magnitude <= 0 then
             return;
         end;
 
-        local v95 = CFrame.lookAt(Position, Position + v94.Unit);
-        u16:PivotTo(v95);
+        local v97 = CFrame.lookAt(Position, Position + v96.Unit);
+        u16:PivotTo(v97);
 
         if u17 then
-            u17.CFrame = v95;
+            u17.CFrame = v97;
         end;
 
-        u19 = v95;
-        local v96;
+        u19 = v97;
+        local v98;
 
-        if v93 and Ground then
-            local Instance2 = v93.Instance;
-            v96 = Instance2 == Ground and true or Instance2:IsDescendantOf(Ground);
+        if v95 and Ground then
+            local Instance2 = v95.Instance;
+            v98 = Instance2 == Ground and true or Instance2:IsDescendantOf(Ground);
         else
-            v96 = false;
+            v98 = false;
         end;
 
-        u18 = v96 and isBoxClear(u16, Ground, u22);
-        u20 = v96 and getFloorIdFromGround(v93.Instance, Ground) or "1";
-        local v97 = u18;
+        u18 = v98 and isBoxClear(u16, Ground, u22);
+        u20 = v98 and getFloorIdFromGround(v95.Instance, Ground) or "1";
+        local v99 = u18;
         Highlight.Enabled = true;
-        Highlight.FillColor = v97 and u14 or u15;
-        Highlight.OutlineColor = v97 and u14 or u15;
+        Highlight.FillColor = v99 and u14 or u15;
+        Highlight.OutlineColor = v99 and u14 or u15;
     end);
-    local v98;
+    local v100;
 
     if LocalPlayer:GetAttribute("Device") == "Mobile" then
-        v98 = true;
+        v100 = true;
     else
-        v98 = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.GamepadEnabled;
+        v100 = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.GamepadEnabled;
     end;
 
-    if not v98 then
-        u10 = UserInputService.InputBegan:Connect(function(p99, p100) -- Line: 480
+    if not v100 then
+        u10 = UserInputService.InputBegan:Connect(function(p101, p102) -- Line: 492
             -- upvalues: placeCurrent (ref)
-            if p100 then
+            if p102 then
                 return;
             end;
 
-            if p99.UserInputType == Enum.UserInputType.MouseButton1 or (p99.KeyCode == Enum.KeyCode.ButtonA or p99.KeyCode == Enum.KeyCode.ButtonR2) then
+            if p101.UserInputType == Enum.UserInputType.MouseButton1 or (p101.KeyCode == Enum.KeyCode.ButtonA or p101.KeyCode == Enum.KeyCode.ButtonR2) then
                 task.spawn(placeCurrent);
             end;
         end);
     end;
 end;
 
-function v8.Initialize(p101) -- Line: 492
+function v8.Initialize(p103) -- Line: 504
     -- upvalues: u16 (ref), u18 (ref), u20 (ref), placeCurrent (copy), u3 (copy), stop (copy), start (copy), u2 (copy)
-    function _G.GetPlacingItem() -- Line: 494
+    function _G.GetPlacingItem() -- Line: 506
         -- upvalues: u16 (ref), u18 (ref), u20 (ref)
         return u16, u18, u20;
     end;
 
     _G.PlaceCurrentItem = placeCurrent;
-    u3.new("Place"):Connect(function(p102, p103, p104) -- Line: 499
+    u3.new("Place"):Connect(function(p104, p105, p106) -- Line: 511
         -- upvalues: stop (ref), start (ref)
-        if p102 then
-            start(p103, p104);
+        if p104 then
+            start(p105, p106);
 
             return;
         end;
@@ -610,7 +625,7 @@ function v8.Initialize(p101) -- Line: 492
         stop();
     end);
     u2:BindEvents({
-        StopPlacement = function() -- Line: 509, Name: StopPlacement
+        StopPlacement = function() -- Line: 521, Name: StopPlacement
             -- upvalues: stop (ref)
             stop();
         end

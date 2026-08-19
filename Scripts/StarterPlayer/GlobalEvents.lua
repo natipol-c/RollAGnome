@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.2
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Mon Aug 17 02:37:09 2026
+  Time:     Thu Aug 20 00:11:29 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -72,17 +72,38 @@ local function getEventIcon(p12, p13) -- Line: 52
     return nil;
 end;
 
-local function formatTime(p16) -- Line: 74
-    if p16 <= 0 then
+local function getClientEventName(p16) -- Line: 74
+    -- upvalues: u5 (copy), getWeatherEvent (copy)
+    if u5[p16] then
+        return p16;
+    end;
+
+    local v17 = getWeatherEvent(p16);
+
+    if not v17 then
+        return p16;
+    end;
+
+    local v18 = v17.moduleName or v17.eventName or (v17.id or v17.key);
+
+    if v18 and u5[v18] then
+        return v18;
+    end;
+
+    return p16;
+end;
+
+local function formatTime(p19) -- Line: 96
+    if p19 <= 0 then
         return "0:00";
     end;
 
-    local v17 = math.floor(p16 / 60);
+    local v20 = math.floor(p19 / 60);
 
-    return string.format("%d:%02d", v17, p16 % 60);
+    return string.format("%d:%02d", v20, p19 % 60);
 end;
 
-local function getActiveWeathersContainer() -- Line: 81
+local function getActiveWeathersContainer() -- Line: 103
     -- upvalues: Players (copy)
     local PlayerGui = Players.LocalPlayer:FindFirstChild("PlayerGui");
 
@@ -99,7 +120,7 @@ local function getActiveWeathersContainer() -- Line: 81
     return Display;
 end;
 
-local function waitForActiveWeathersContainer() -- Line: 88
+local function waitForActiveWeathersContainer() -- Line: 110
     -- upvalues: Players (copy)
     local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui", 10);
 
@@ -116,171 +137,216 @@ local function waitForActiveWeathersContainer() -- Line: 88
     return nil;
 end;
 
-local function addHudIcon(p18, p19, p20, p21, u22, p23, u24) -- Line: 98
+local function addHudIcon(p21, p22, p23, p24, u25, p26, u27) -- Line: 120
     -- upvalues: WeatherIcon (copy), RunService (copy)
-    local u25 = WeatherIcon();
+    local u28 = WeatherIcon();
 
-    if p20 and p20 ~= "" then
-        u25.Image = p20;
+    if p23 and p23 ~= "" then
+        u28.Image = p23;
     else
-        u25.Image = "";
+        u28.Image = "";
     end;
 
-    u25.Name = p21;
-    u25.Parent = p19;
-    p18:Add(u25);
-    local v26 = p23 and u25:FindFirstChild("Multi");
+    u28.Name = p24;
+    u28.Parent = p22;
+    p21:Add(u28);
+    local v29 = p26 and u28:FindFirstChild("Multi");
 
-    if v26 then
-        v26.Text = p23;
-        v26.Visible = true;
+    if v29 then
+        v29.Text = p26;
+        v29.Visible = true;
     end;
 
-    local Timer = u25:FindFirstChild("Timer");
-    local u27 = nil;
-    u27 = RunService.Heartbeat:Connect(function() -- Line: 119
-        -- upvalues: u22 (copy), Timer (copy), u24 (copy), u27 (ref), u25 (copy)
-        local v28 = u22.value - os.clock();
-        local v29 = math.ceil(v28);
+    local Timer = u28:FindFirstChild("Timer");
+    local u30 = nil;
+    u30 = RunService.Heartbeat:Connect(function() -- Line: 141
+        -- upvalues: u25 (copy), Timer (copy), u27 (copy), u30 (ref), u28 (copy)
+        local v31 = u25.value - os.clock();
+        local v32 = math.ceil(v31);
 
-        if v29 > 0 then
-            local v30;
+        if v32 > 0 then
+            local v33;
 
-            if v29 <= 0 then
-                v30 = "0:00";
+            if v32 <= 0 then
+                v33 = "0:00";
             else
-                local v31 = math.floor(v29 / 60);
-                v30 = string.format("%d:%02d", v31, v29 % 60);
+                local v34 = math.floor(v32 / 60);
+                v33 = string.format("%d:%02d", v34, v32 % 60);
             end;
 
-            Timer.Text = v30;
+            Timer.Text = v33;
 
             return;
         end;
 
-        if not u24 then
+        if not u27 then
             Timer.Text = "0:00";
 
             return;
         end;
 
-        u27:Disconnect();
-        u25:Destroy();
+        u30:Disconnect();
+        u28:Destroy();
     end);
-    p18:Add(u27);
+    p21:Add(u30);
 end;
 
-local function createWeatherHudIcons(p32, p33, p34, p35) -- Line: 133
+local function createWeatherHudIcons(p35, p36, p37, p38) -- Line: 155
     -- upvalues: getWeatherEvent (copy), Players (copy), addHudIcon (copy), getEventIcon (copy)
-    local v36 = getWeatherEvent(p33);
+    local v39 = getWeatherEvent(p36);
     local PlayerGui = Players.LocalPlayer:FindFirstChild("PlayerGui");
-    local v37;
+    local v40;
 
     if PlayerGui then
-        v37 = PlayerGui:FindFirstChild("Display");
+        v40 = PlayerGui:FindFirstChild("Display");
 
-        if v37 then
-            v37 = v37:FindFirstChild("ActiveWeathers");
+        if v40 then
+            v40 = v40:FindFirstChild("ActiveWeathers");
         end;
     else
-        v37 = nil;
+        v40 = nil;
     end;
 
-    if not v37 then
+    if not v40 then
         local PlayerGui2 = Players.LocalPlayer:WaitForChild("PlayerGui", 10);
 
         if PlayerGui2 then
             local Display = PlayerGui2:WaitForChild("Display", 10);
 
             if Display then
-                v37 = Display:WaitForChild("ActiveWeathers", 10);
+                v40 = Display:WaitForChild("ActiveWeathers", 10);
             else
-                v37 = nil;
+                v40 = nil;
             end;
         else
-            v37 = nil;
+            v40 = nil;
         end;
     end;
 
-    if not v37 then
+    if not v40 then
         return;
     end;
 
-    if p34.value <= os.clock() then
+    if p37.value <= os.clock() then
         return;
     end;
 
-    addHudIcon(p32, v37, getEventIcon(v36, p35), p33, p34, nil);
+    addHudIcon(p35, v40, getEventIcon(v39, p38), p36, p37, nil);
 end;
 
-local function onEventStart(p38, p39, p40, p41) -- Line: 143
-    -- upvalues: u7 (copy), u5 (copy), u2 (copy), createWeatherHudIcons (copy)
-    if u7[p38] then
+local function onEventStart(p41, p42, p43, p44) -- Line: 165
+    -- upvalues: u7 (copy), u5 (copy), getWeatherEvent (copy), u2 (copy), createWeatherHudIcons (copy)
+    if u7[p41] then
         return;
     end;
 
-    local v42 = u5[p39];
+    local v45;
 
-    if not v42 then
-        warn("[GlobalEvents Client] no client module for event:", p39);
+    if u5[p42] then
+        v45 = p42;
+    else
+        local v46 = getWeatherEvent(p42);
 
-        return;
+        if v46 then
+            v45 = v46.moduleName or v46.eventName or (v46.id or v46.key);
+
+            if v45 then
+                if not u5[v45] then
+                    v45 = p42;
+                end;
+            else
+                v45 = p42;
+            end;
+        else
+            v45 = p42;
+        end;
     end;
 
-    local v43 = u2.new();
-    local v44 = {
-        value = os.clock() + p40
-    };
-    u7[p38] = {
-        trove = v43,
-        eventName = p39,
-        endTimeRef = v44
-    };
-    local success, result = pcall(v42.OnStart, v43, p41 or {});
-
-    if not success then
-        warn("[GlobalEvents Client] OnStart error for", p39, ":", result);
-    end;
-
-    createWeatherHudIcons(v43, p39, v44, p41);
-end;
-
-local function onEventEnd(p45, p46) -- Line: 171
-    -- upvalues: u7 (copy), u5 (copy)
-    local v47 = u7[p45];
+    local v47 = u5[v45];
 
     if not v47 then
+        warn("[GlobalEvents Client] no client module for event:", p42);
+
         return;
     end;
 
-    local v48 = u5[p46 or v47.eventName];
+    local v48 = u2.new();
+    local v49 = {
+        value = os.clock() + p43
+    };
+    u7[p41] = {
+        trove = v48,
+        eventName = v45,
+        endTimeRef = v49
+    };
+    local success, result = pcall(v47.OnStart, v48, p44 or {});
 
-    if v48 and v48.OnEnd then
-        local success, result = pcall(v48.OnEnd);
-
-        if not success then
-            warn("[GlobalEvents Client] OnEnd error for", p46, ":", result);
-        end;
+    if not success then
+        warn("[GlobalEvents Client] OnStart error for", p42, ":", result);
     end;
 
-    v47.trove:Clean();
-    u7[p45] = nil;
+    createWeatherHudIcons(v48, p42, v49, p44);
 end;
 
-local function onEventExtend(p49, p50, p51) -- Line: 189
-    -- upvalues: u7 (copy)
-    local v52 = u7[p49];
+local function onEventEnd(p50, p51) -- Line: 194
+    -- upvalues: u7 (copy), u5 (copy), getWeatherEvent (copy)
+    local v52 = u7[p50];
 
     if not v52 then
         return;
     end;
 
-    if v52.endTimeRef then
-        v52.endTimeRef.value = os.clock() + p51;
+    local v53 = p51 or v52.eventName;
+    local v54;
+
+    if u5[v53] then
+        v54 = v53;
+    else
+        local v55 = getWeatherEvent(v53);
+
+        if v55 then
+            v54 = v55.moduleName or v55.eventName or (v55.id or v55.key);
+
+            if v54 then
+                if not u5[v54] then
+                    v54 = v53;
+                end;
+            else
+                v54 = v53;
+            end;
+        else
+            v54 = v53;
+        end;
+    end;
+
+    local v56 = u5[v54];
+
+    if v56 and v56.OnEnd then
+        local success, result = pcall(v56.OnEnd);
+
+        if not success then
+            warn("[GlobalEvents Client] OnEnd error for", p51, ":", result);
+        end;
+    end;
+
+    v52.trove:Clean();
+    u7[p50] = nil;
+end;
+
+local function onEventExtend(p57, p58, p59) -- Line: 212
+    -- upvalues: u7 (copy)
+    local v60 = u7[p57];
+
+    if not v60 then
+        return;
+    end;
+
+    if v60.endTimeRef then
+        v60.endTimeRef.value = os.clock() + p59;
     end;
 end;
 
-function v8.Initialize(p53) -- Line: 198
+function v8.Initialize(p61) -- Line: 221
     -- upvalues: u1 (copy), onEventStart (copy), onEventEnd (copy), onEventExtend (copy)
     u1:BindEvents({
         GlobalEventStart = onEventStart,
