@@ -431,15 +431,15 @@ local ThaiText = {
     ["Auto fill all available farm slots or set a custom limit"] = "วางให้เต็มแปลงอัตโนมัติ หรือระบุจำนวนตัวที่ต้องการวาง",
     ["Auto Fill All Slots"] = "วางเต็มแปลง",
     ["Custom Limit"] = "กำหนดจำนวนตัว",
-    ["Protect High-Tier Gnomes"] = "ล็อกโนมระดับสูงห้ามขาย",
-    ["Protect the best live rarity and mutation tiers plus Huge gnomes"] = "ล็อกระดับและมิวเทชั่นกลุ่มดีที่สุดจากข้อมูลเกม รวมถึงโนม Huge",
+    ["Automatically Keep High-Tier Gnomes"] = "เก็บโนมระดับสูงอัตโนมัติ",
+    ["Never sell the best live rarity and mutation tiers or Huge gnomes"] = "ไม่ขายโนมระดับและมิวเทชั่นกลุ่มดีที่สุดจากข้อมูลเกม รวมถึงโนม Huge",
 
     -- Unified Targets & Protection (Gnomes Page)
-    ["Gnome Targets & Protection"] = "เป้าหมายโนมและระบบล็อก",
-    ["Wanted Gnomes"] = "เป้าหมายโนม",
-    ["One list: [R] rarity and [M] mutation; different categories must both match"] = "รวมในรายการเดียว: [R] ระดับ และ [M] มิวเทชั่น โดยคนละหมวดต้องตรงพร้อมกัน",
-    ["Extra Protection"] = "ล็อกเพิ่มเติม",
-    ["Kept without buying; choosing a trait here removes it from Wanted Gnomes"] = "ล็อกไว้โดยไม่ซื้อ และหากเลือกซ้ำจะย้ายออกจากรายการเป้าหมายโนม",
+    ["Gnome Targets & Keep Rules"] = "เป้าหมายและกฎการเก็บโนม",
+    ["Buy & Place Targets"] = "เป้าหมายซื้อและวาง",
+    ["Auto-buy, prioritize for placement, and never sell; active categories must all match"] = "ตามซื้อ ให้ความสำคัญตอนวาง และไม่ขาย โดยต้องตรงกับทุกหมวดที่เลือก",
+    ["Keep - Never Sell"] = "เก็บไว้ - ห้ามขาย",
+    ["Keep matching gnomes without auto-buying or placement priority; duplicate choices move here"] = "เก็บโนมที่ตรงเงื่อนไขโดยไม่ตามซื้อหรือแย่งลำดับวาง หากเลือกซ้ำระบบจะย้ายมาไว้ที่นี่",
     ["Target Gnome Names"] = "เลือกชื่อโนมเป้าหมาย",
     ["Gnomes prioritized for auto-buying and plot placement, and protected from selling"] = "เลือกชื่อโนมสำหรับสุ่มซื้อ วางลงแปลง และล็อกห้ามขายอัตโนมัติ",
     ["Selected names must also match every active rarity and mutation category"] = "ชื่อที่เลือกต้องตรงกับหมวดระดับและมิวเทชั่นที่เปิดเลือกไว้ทั้งหมดด้วย",
@@ -454,9 +454,9 @@ local ThaiText = {
     ["Additional rarity levels that are always protected from selling"] = "ระดับโนมเพิ่มเติมที่จะล็อกไว้และไม่ขาย",
     ["Keep Mutations"] = "มิวเทชั่นโนมที่ห้ามขาย",
     ["Additional mutations that are always protected from selling"] = "มิวเทชั่นเพิ่มเติมที่จะล็อกไว้และไม่ขาย",
-    ["Surplus Gnome Selling"] = "การขายโนมส่วนเกิน",
-    ["Sell Policy"] = "นโยบายการขายโนม",
-    ["Choose how gnomes outside the protected best set are handled"] = "เลือกวิธีจัดการโนมที่อยู่นอกกลุ่มตัวที่ดีที่สุดและไม่ได้ล็อกไว้",
+    ["Surplus Gnome Rules"] = "การจัดการโนมส่วนเกิน",
+    ["Surplus Gnome Action"] = "วิธีขายโนมส่วนเกิน",
+    ["Choose what happens to gnomes outside the best and keep lists"] = "เลือกวิธีจัดการโนมที่ไม่อยู่ในกลุ่มตัวที่ดีที่สุดและรายการห้ามขาย",
     ["Sell Below Best"] = "ขายตัวที่ต่ำกว่ากลุ่มดีที่สุด",
     ["Sell Checked Rarities"] = "ขายเฉพาะระดับที่เลือก",
     ["Keep All Extras"] = "เก็บตัวส่วนเกินทั้งหมด",
@@ -750,25 +750,52 @@ State.AutoSellTarget = nil
 State.Language = string.upper(tostring(State.Language or "EN")) == "TH" and "TH" or "EN"
 State.TextScale = math.clamp(tonumber(State.TextScale) or 1, 0.7, 1.6)
 
+Runtime.InventoryRevision = 0
+Runtime.InventoryWatched = setmetatable({}, { __mode = "k" })
+Runtime.InvalidateInventory = function()
+    Runtime.InventoryRevision = Runtime.InventoryRevision + 1
+    Runtime.InventoryToolsCache = nil
+    Runtime.RankedGnomeCache = nil
+end
+local function watchInventoryContainer(container)
+    if not container or Runtime.InventoryWatched[container] then return end
+    Runtime.InventoryWatched[container] = true
+    connect(container.ChildAdded, Runtime.InvalidateInventory)
+    connect(container.ChildRemoved, Runtime.InvalidateInventory)
+    Runtime.InvalidateInventory()
+end
+watchInventoryContainer(LocalPlayer:FindFirstChildOfClass("Backpack") or LocalPlayer:FindFirstChild("Backpack"))
+watchInventoryContainer(LocalPlayer.Character)
+connect(LocalPlayer.CharacterAdded, function(character)
+    watchInventoryContainer(character)
+end)
+connect(LocalPlayer.ChildAdded, function(child)
+    if child:IsA("Backpack") then watchInventoryContainer(child) end
+end)
+
+Runtime.GetInventoryTools = function()
+    local cached = Runtime.InventoryToolsCache
+    if cached and cached.Revision == Runtime.InventoryRevision then return cached.Records end
+    local result, seen = {}, {}
+    for _, container in ipairs({
+        LocalPlayer:FindFirstChildOfClass("Backpack") or LocalPlayer:FindFirstChild("Backpack"),
+        LocalPlayer.Character,
+    }) do
+        if container then
+            for _, child in ipairs(container:GetChildren()) do
+                if child:IsA("Tool") and not seen[child] then
+                    seen[child] = true
+                    table.insert(result, child)
+                end
+            end
+        end
+    end
+    Runtime.InventoryToolsCache = { Revision = Runtime.InventoryRevision, Records = result }
+    return result
+end
+
 Runtime.GetBackpackItemCount = function()
-    local backpack = LocalPlayer and LocalPlayer:FindFirstChild("Backpack")
-    local character = LocalPlayer and LocalPlayer.Character
-    local count = 0
-    if backpack then
-        for _, child in ipairs(backpack:GetChildren()) do
-            if child:IsA("Tool") then
-                count = count + 1
-            end
-        end
-    end
-    if character then
-        for _, child in ipairs(character:GetChildren()) do
-            if child:IsA("Tool") then
-                count = count + 1
-            end
-        end
-    end
-    return count
+    return #Runtime.GetInventoryTools()
 end
 
 Runtime.GetBackpackCapacity = function()
@@ -879,13 +906,21 @@ local function includeTraitNames(target, prefix, ...)
     end
 end
 
+Runtime.TraitSelectionCache = setmetatable({}, { __mode = "k" })
 Runtime.HasTraitSelection = function(selection, prefix)
-    for option, enabled in pairs(type(selection) == "table" and selection or {}) do
-        if enabled == true and type(option) == "string" and string.sub(option, 1, #prefix) == prefix then
-            return true
+    if type(selection) ~= "table" then return false end
+    local cached = Runtime.TraitSelectionCache[selection]
+    if not cached or cached.Version ~= Runtime.SelectionVersion then
+        local prefixes = {}
+        for option, enabled in pairs(selection) do
+            if enabled == true and type(option) == "string" then
+                prefixes[string.sub(option, 1, 4)] = true
+            end
         end
+        cached = { Version = Runtime.SelectionVersion, Prefixes = prefixes }
+        Runtime.TraitSelectionCache[selection] = cached
     end
-    return false
+    return cached.Prefixes[prefix] == true
 end
 
 local function namesFromSet(set)
@@ -903,7 +938,7 @@ local function readCatalogCache(key)
     return nil
 end
 local function writeCatalogCache(key, records, extra)
-    local cached = { Records = records, Until = os.clock() + 2, Version = Runtime.SelectionVersion }
+    local cached = { Records = records, Until = os.clock() + 5, Version = Runtime.SelectionVersion }
     if type(extra) == "table" then
         for name, value in pairs(extra) do cached[name] = value end
     end
@@ -1035,19 +1070,19 @@ Runtime.GetMutationOptions = function()
     local containers = {
         rng and rng:FindFirstChild("Preview"),
         plot and plot:FindFirstChild("Workers"),
-        LocalPlayer and LocalPlayer:FindFirstChild("Backpack"),
-        LocalPlayer and LocalPlayer.Character,
     }
-    for _, container in ipairs(containers) do
-        if container then
-            for _, item in ipairs(container:GetChildren()) do
-                local mutations = item:GetAttribute("Mutations") or item:GetAttribute("Mutation") or ""
-                for _, mutation in ipairs(string.split(tostring(mutations), "_")) do
-                    if mutation ~= "" then unique[mutation] = true end
-                end
-            end
+    local function includeItemMutations(item)
+        local mutations = item:GetAttribute("Mutations") or item:GetAttribute("Mutation") or ""
+        for _, mutation in ipairs(string.split(tostring(mutations), "_")) do
+            if mutation ~= "" then unique[mutation] = true end
         end
     end
+    for _, container in ipairs(containers) do
+        if container then
+            for _, item in ipairs(container:GetChildren()) do includeItemMutations(item) end
+        end
+    end
+    for _, tool in ipairs(Runtime.GetInventoryTools()) do includeItemMutations(tool) end
     includeSelectedNames(unique, State.SellProduceMutationTargets)
     includeTraitNames(unique, TraitPrefix.Mutation, State.GnomeTargetTraits, State.GnomeKeepTraits)
     local result = namesFromSet(unique)
@@ -1082,33 +1117,46 @@ Runtime.GetGnomeTraitOptions = function()
     return result
 end
 
-local function isInBestFraction(name, options, fraction, excludeNormal)
-    if type(name) ~= "string" or name == "" then return false end
-    local eligible = {}
-    for _, option in ipairs(options) do
-        if not excludeNormal or string.lower(option) ~= "normal" then table.insert(eligible, option) end
+Runtime.GetHighTierSets = function()
+    local rarityOptions = Runtime.GetRarityOptions()
+    local mutationOptions = Runtime.GetMutationOptions()
+    local cached = Runtime.HighTierSetCache
+    if cached and cached.RaritiesSource == rarityOptions and cached.MutationsSource == mutationOptions then
+        return cached.Rarities, cached.Mutations
     end
-    local count = math.min(#eligible, math.max(#eligible > 0 and 1 or 0, math.ceil(#eligible * fraction)))
-    for index = 1, count do
-        if string.lower(eligible[index]) == string.lower(name) then return true end
+    local raritySet, mutationSet = {}, {}
+    local rarityCount = math.min(#rarityOptions, math.max(#rarityOptions > 0 and 1 or 0, math.ceil(#rarityOptions * 0.25)))
+    for index = 1, rarityCount do
+        local name = rarityOptions[index]
+        if Runtime.RarityScores[name] ~= nil then raritySet[string.lower(name)] = true end
     end
-    return false
+    local eligibleMutations = {}
+    for _, name in ipairs(mutationOptions) do
+        if string.lower(name) ~= "normal" and Runtime.GetMutationMultiplier(name) > 1 then
+            table.insert(eligibleMutations, name)
+        end
+    end
+    local mutationCount = math.min(#eligibleMutations,
+        math.max(#eligibleMutations > 0 and 1 or 0, math.ceil(#eligibleMutations * 0.25)))
+    for index = 1, mutationCount do mutationSet[string.lower(eligibleMutations[index])] = true end
+    Runtime.HighTierSetCache = {
+        RaritiesSource = rarityOptions,
+        MutationsSource = mutationOptions,
+        Rarities = raritySet,
+        Mutations = mutationSet,
+    }
+    return raritySet, mutationSet
 end
 
 Runtime.IsHighTierRarity = function(rarity)
-    local name = tostring(rarity or "")
-    local options = Runtime.GetRarityOptions()
-    return Runtime.RarityScores[name] ~= nil and isInBestFraction(name, options, 0.25, false)
+    local raritySet = Runtime.GetHighTierSets()
+    return raritySet[string.lower(tostring(rarity or ""))] == true
 end
 
 Runtime.HasHighTierMutation = function(value)
-    local options = Runtime.GetMutationOptions()
+    local _, mutationSet = Runtime.GetHighTierSets()
     for _, mutation in ipairs(string.split(tostring(value or ""), "_")) do
-        if Runtime.GetMutationMultiplier(mutation) > 1
-            and isInBestFraction(mutation, options, 0.25, true)
-        then
-            return true
-        end
+        if mutationSet[string.lower(mutation)] then return true end
     end
     return false
 end
@@ -1132,7 +1180,14 @@ local function ensurePresetTargets(preset)
 
     -- Shop targets use the same authoritative catalog as item usage.
     if State.AutoBuyShop and not Runtime.HasAnySelection(State.ShopTargets) then
-        for _, name in ipairs(Runtime.GetShopItemNames()) do State.ShopTargets[name] = true end
+        for _, name in ipairs(Runtime.GetShopItemNames()) do
+            -- Presets fill UseItemTargets from this same canonical catalog just
+            -- above, so an exact lookup is sufficient here. Do not call the
+            -- later local isSelected() from this earlier-declared function.
+            if preset ~= "GnomeHunter" or State.UseItemTargets[name] == true then
+                State.ShopTargets[name] = true
+            end
+        end
     end
 
     -- Sell every mutation currently advertised by the game/config/UI.
@@ -1231,8 +1286,10 @@ Runtime.ApplyStrategyPreset = function(preset)
         State.AutoCollect = true
         State.AutoSellProduce = true
         State.AutoUseItems = true
-        -- Keep cash available for a wanted roll instead of spending it on stock.
-        State.AutoBuyShop = false
+        -- Selected farm items are part of the hunting loop: buy them when in
+        -- stock, use them to improve crop income, then reserve money whenever
+        -- a wanted roll is actually waiting to be purchased.
+        State.AutoBuyShop = true
         State.AutoBuyExpansion = false
         State.AutoUpgrade = false
         State.AutoRebirth = false
@@ -1576,15 +1633,22 @@ end
 Runtime.GetPlot = getPlot
 
 local function isHashString(str)
-    if type(str) ~= "string" or #str < 10 then return false end
-    if not string.find(str, "%s") and (string.match(str, "^[a-zA-Z0-9%-_]+$") ~= nil) then
+    if type(str) ~= "string" then return false end
+    -- Item names such as "Fertilizer", "Dragonfruit", and "Impossible" are
+    -- long single words, not inventory IDs. Only classify UUIDs or genuinely
+    -- long mixed identifiers as hashes; the old 10-character rule renamed
+    -- Fertilizer to Good Fertilizer and sent the wrong Place argument.
+    if string.match(str, "^%x%x%x%x%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%-%x%x%x%x%x%x%x%x%x%x%x%x$") then
         return true
     end
-    return false
+    return #str >= 20 and not string.find(str, "%s")
+        and string.match(str, "^[a-zA-Z0-9_%-]+$") ~= nil
+        and string.match(str, "%d") ~= nil
 end
 
 local function getCleanToolName(tool, itemType)
-    if not tool then return "Item" end
+    if not tool then return "Item", false end
+    local reliable = false
     local name = tool:GetAttribute("DisplayName")
         or tool:GetAttribute("ItemName")
         or tool:GetAttribute("GnomeItemName")
@@ -1595,6 +1659,7 @@ local function getCleanToolName(tool, itemType)
         or tool:GetAttribute("PetName")
         or tool:GetAttribute("PlantName")
         or tool:GetAttribute("FruitName")
+    if name and not isHashString(tostring(name)) then reliable = true end
     
     if not name and Replication and Replication.Data then
         local inv = Replication.Data.inventory or {}
@@ -1602,12 +1667,14 @@ local function getCleanToolName(tool, itemType)
         local invData = inv[toolId] or inv[tool.Name]
         if type(invData) == "table" and type(invData.name) == "string" and invData.name ~= "" then
             name = invData.name
+            reliable = not isHashString(name)
         end
     end
 
     if not name and type(tool.Name) == "string" and tool.Name ~= "" then
         if not isHashString(tool.Name) then
             name = tool.Name
+            reliable = true
         end
     end
 
@@ -1621,6 +1688,7 @@ local function getCleanToolName(tool, itemType)
             or (PlantsConfig and PlantsConfig[tool.Name])
         then
             name = tool.Name
+            reliable = true
         end
     end
 
@@ -1644,16 +1712,28 @@ local function getCleanToolName(tool, itemType)
         end
     end
 
-    return name
+    return name, reliable
 end
 
+Runtime.FarmerNameCache = setmetatable({}, { __mode = "k" })
 local function getFarmerName(instance)
     if not instance then
         return ""
     end
-    local name = instance:GetAttribute("FarmerName")
-        or instance:GetAttribute("DisplayName")
-        or instance:GetAttribute("GnomeName")
+    local farmerAttribute = instance:GetAttribute("FarmerName")
+    local displayAttribute = instance:GetAttribute("DisplayName")
+    local gnomeAttribute = instance:GetAttribute("GnomeName")
+    local idAttribute = instance:GetAttribute("Id")
+    local cached = Runtime.FarmerNameCache[instance]
+    if cached and cached.InstanceName == instance.Name
+        and cached.FarmerAttribute == farmerAttribute
+        and cached.DisplayAttribute == displayAttribute
+        and cached.GnomeAttribute == gnomeAttribute
+        and cached.IdAttribute == idAttribute and instance.Parent
+    then
+        return cached.Name
+    end
+    local name = farmerAttribute or displayAttribute or gnomeAttribute
     
     if not name and Replication and Replication.Data and Replication.Data.farmers then
         local fData = Replication.Data.farmers[instance.Name]
@@ -1664,7 +1744,7 @@ local function getFarmerName(instance)
 
     if not name and Replication and Replication.Data and Replication.Data.inventory then
         local inventory = Replication.Data.inventory
-        local identifier = instance:GetAttribute("Id") or instance.Name
+        local identifier = idAttribute or instance.Name
         local itemData = inventory[identifier] or inventory[instance.Name]
         if type(itemData) == "table" and type(itemData.name) == "string" then
             name = itemData.name
@@ -1683,7 +1763,18 @@ local function getFarmerName(instance)
         end
     end
 
-    return tostring(name)
+    name = tostring(name)
+    if name ~= "Gnome" and not isHashString(name) then
+        Runtime.FarmerNameCache[instance] = {
+            InstanceName = instance.Name,
+            FarmerAttribute = farmerAttribute,
+            DisplayAttribute = displayAttribute,
+            GnomeAttribute = gnomeAttribute,
+            IdAttribute = idAttribute,
+            Name = name,
+        }
+    end
+    return name
 end
 
 local function getFarmerRarity(instance)
@@ -1694,6 +1785,28 @@ local function getFarmerRarity(instance)
     return tostring(instance and instance:GetAttribute("Rarity") or "")
 end
 
+Runtime.SelectionLookupCache = setmetatable({}, { __mode = "k" })
+local function getSelectionLookup(selection)
+    if type(selection) ~= "table" then return {}, 0 end
+    local cached = Runtime.SelectionLookupCache[selection]
+    if cached and cached.Version == Runtime.SelectionVersion then
+        return cached.Lookup, cached.Count
+    end
+    local lookup, count = {}, 0
+    for selected, enabled in pairs(selection) do
+        if enabled == true then
+            lookup[string.lower(tostring(selected))] = true
+            count = count + 1
+        end
+    end
+    Runtime.SelectionLookupCache[selection] = {
+        Version = Runtime.SelectionVersion,
+        Lookup = lookup,
+        Count = count,
+    }
+    return lookup, count
+end
+
 local function isSelected(selection, name)
     if type(selection) ~= "table" then
         return false
@@ -1701,24 +1814,13 @@ local function isSelected(selection, name)
     if selection[name] == true then
         return true
     end
-    local lowered = string.lower(tostring(name))
-    for selected, enabled in pairs(selection) do
-        if enabled == true and string.lower(tostring(selected)) == lowered then
-            return true
-        end
-    end
-    return false
+    local lookup = getSelectionLookup(selection)
+    return lookup[string.lower(tostring(name))] == true
 end
 
 Runtime.HasAnySelection = function(selection)
-    if type(selection) == "table" then
-        for _, enabled in pairs(selection) do
-            if enabled == true then
-                return true
-            end
-        end
-    end
-    return false
+    local _, count = getSelectionLookup(selection)
+    return count > 0
 end
 
 Runtime.ResolveGnomeTraitConflicts = function(preferred)
@@ -1876,19 +1978,26 @@ Runtime.IsGiftReserved = function(tool)
         and (itemType == "plant" or itemType == "fruit" or itemType == "farmer" or itemType == "gnome")
 end
 
+local function paceRemote(remoteName)
+    local now = os.clock()
+    local perRemoteInterval = State.LowPingMode
+        and (remoteName == "CollectPlant" and 0.16 or remoteName == "Roll" and 0.12 or 0.05)
+        or 0
+    local globalInterval = State.LowPingMode and 0.02 or 0.008
+    local sendAt = math.max(now,
+        (Runtime.LastRemoteAt[remoteName] or 0) + perRemoteInterval,
+        (Runtime.LastAnyRemoteAt or 0) + globalInterval)
+    -- Reserve the slot before yielding so concurrent automation loops queue
+    -- instead of waking on the same frame and creating a remote burst.
+    Runtime.LastRemoteAt[remoteName] = sendAt
+    Runtime.LastAnyRemoteAt = sendAt
+    if sendAt > now then task.wait(sendAt - now) end
+end
+
 local function invoke(remoteName, ...)
-    if Runtime.Paused then
-        return false, "paused"
-    end
-    if State.LowPingMode then
-        local now = os.clock()
-        local interval = remoteName == "CollectPlant" and 0.16 or remoteName == "Roll" and 0.12 or 0.05
-        local delay = interval - (now - (Runtime.LastRemoteAt[remoteName] or 0))
-        if delay > 0 then
-            task.wait(delay)
-        end
-        Runtime.LastRemoteAt[remoteName] = os.clock()
-    end
+    if Runtime.Paused then return false, "paused" end
+    paceRemote(remoteName)
+    if Runtime.Paused or not Runtime.Alive then return false, "paused" end
     if not Network or type(Network.InvokeServer) ~= "function" then
         return false, "network unavailable"
     end
@@ -1896,18 +2005,9 @@ local function invoke(remoteName, ...)
 end
 
 local function fire(remoteName, ...)
-    if Runtime.Paused then
-        return false, "paused"
-    end
-    if State.LowPingMode then
-        local now = os.clock()
-        local interval = remoteName == "CollectPlant" and 0.16 or remoteName == "Roll" and 0.12 or 0.05
-        local delay = interval - (now - (Runtime.LastRemoteAt[remoteName] or 0))
-        if delay > 0 then
-            task.wait(delay)
-        end
-        Runtime.LastRemoteAt[remoteName] = os.clock()
-    end
+    if Runtime.Paused then return false, "paused" end
+    paceRemote(remoteName)
+    if Runtime.Paused or not Runtime.Alive then return false, "paused" end
     if not Network or type(Network.FireServer) ~= "function" then
         return false, "network unavailable"
     end
@@ -1937,6 +2037,8 @@ local Theme = {
     Muted = Color3.fromRGB(148, 157, 174),
     Positive = Color3.fromRGB(75, 210, 139),
     Negative = Color3.fromRGB(91, 98, 113),
+    Warning = Color3.fromRGB(255, 170, 95),
+    Waiting = Color3.fromRGB(255, 201, 92),
 }
 Runtime.Theme = Theme
 
@@ -2414,7 +2516,7 @@ Runtime.RestorePotatoObjects = function(generation, yielding)
             end
         end
         processed = processed + 1
-        if yielding and processed % 150 == 0 then
+        if yielding and processed % 75 == 0 then
             task.wait()
         end
     end
@@ -2454,7 +2556,7 @@ Runtime.ApplyPotatoGraphics = function(enabled)
                     end
                     Runtime.ApplyPotatoInstance(object)
                     processed = processed + 1
-                    if processed % 150 == 0 then
+                    if processed % 75 == 0 then
                         task.wait()
                     end
                 end
@@ -2528,6 +2630,7 @@ Runtime.OnToggleChanged = function(key, enabled)
         Runtime.ApplyPotatoGraphics(enabled)
     elseif key == "LowPingMode" and not enabled then
         table.clear(Runtime.LastRemoteAt)
+        Runtime.LastAnyRemoteAt = nil
     elseif key == "AutoBest30" and Runtime.RefreshGnomePolicyUI then
         Runtime.RefreshGnomePolicyUI()
     end
@@ -2890,6 +2993,19 @@ local function addMultiSelect(parent, title, detail, selection, optionProvider, 
 
     local optionButtons = {}
     local currentOptionsList = {}
+    local function displayOption(option)
+        local value = tostring(option)
+        local prefix = string.sub(value, 1, 4)
+        local name = string.sub(value, 5)
+        if prefix == TraitPrefix.Rarity then
+            return (State.Language == "TH" and "ระดับ: " or "Rarity: ") .. name
+        elseif prefix == TraitPrefix.Mutation then
+            return (State.Language == "TH" and "มิวเทชัน: " or "Mutation: ") .. name
+        elseif prefix == TraitPrefix.Gnome then
+            return (State.Language == "TH" and "ชื่อโนม: " or "Gnome: ") .. name
+        end
+        return value
+    end
 
     local function updateSubtitles(visibleCount)
         local selectedCount = 0
@@ -2911,7 +3027,7 @@ local function addMultiSelect(parent, title, detail, selection, optionProvider, 
                 local selected = isSelected(selection, option)
                 btn.BackgroundColor3 = selected and Theme.AccentDark or Theme.Background
                 btn.TextColor3 = selected and Theme.Text or Theme.Muted
-                btn.Text = (selected and "  [✓]  " or "  [  ]  ") .. tostring(option)
+                btn.Text = (selected and "  [✓]  " or "  [  ]  ") .. displayOption(option)
             end
         end
         updateSubtitles()
@@ -2984,7 +3100,8 @@ local function addMultiSelect(parent, title, detail, selection, optionProvider, 
 
         local visibleCount = 0
         for _, option in ipairs(options) do
-            if filter == "" or string.find(string.lower(option), filter, 1, true) then
+            local optionLabel = displayOption(option)
+            if filter == "" or string.find(string.lower(optionLabel), filter, 1, true) then
                 visibleCount = visibleCount + 1
                 local selected = isSelected(selection, option)
                 local choice = create("TextButton", {
@@ -2994,7 +3111,7 @@ local function addMultiSelect(parent, title, detail, selection, optionProvider, 
                     BackgroundColor3 = selected and Theme.AccentDark or Theme.Background,
                     BorderSizePixel = 0,
                     Font = Enum.Font.Gotham,
-                    Text = (selected and "  [✓]  " or "  [  ]  ") .. tostring(option),
+                    Text = (selected and "  [✓]  " or "  [  ]  ") .. optionLabel,
                     TextColor3 = selected and Theme.Text or Theme.Muted,
                     TextSize = 11,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -3009,7 +3126,7 @@ local function addMultiSelect(parent, title, detail, selection, optionProvider, 
                     local nowSelected = isSelected(selection, option)
                     choice.BackgroundColor3 = nowSelected and Theme.AccentDark or Theme.Background
                     choice.TextColor3 = nowSelected and Theme.Text or Theme.Muted
-                    choice.Text = (nowSelected and "  [✓]  " or "  [  ]  ") .. tostring(option)
+                    choice.Text = (nowSelected and "  [✓]  " or "  [  ]  ") .. displayOption(option)
                     updateSubtitles(visibleCount)
                 end)
             end
@@ -3535,13 +3652,13 @@ do
     refreshGnomeCapacityUI()
 end
 
-addToggle(GnomesPage, "Protect High-Tier Gnomes", "Protect the best live rarity and mutation tiers plus Huge gnomes", "ProtectHighTier")
+addToggle(GnomesPage, "Automatically Keep High-Tier Gnomes", "Never sell the best live rarity and mutation tiers or Huge gnomes", "ProtectHighTier")
 
-addGroupLabel(GnomesPage, "Gnome Targets & Protection")
-addMultiSelect(GnomesPage, "Wanted Gnomes", "One list: [R] rarity and [M] mutation; different categories must both match", State.GnomeTargetTraits, collectGnomeTraitOptions, true)
-addMultiSelect(GnomesPage, "Extra Protection", "Kept without buying; choosing a trait here removes it from Wanted Gnomes", State.GnomeKeepTraits, collectGnomeTraitOptions, true)
-addGroupLabel(GnomesPage, "Surplus Gnome Selling")
-addSegmentedSetting(GnomesPage, "Sell Policy", "Choose how gnomes outside the protected best set are handled", "GnomeSellPolicy", {
+addGroupLabel(GnomesPage, "Gnome Targets & Keep Rules")
+addMultiSelect(GnomesPage, "Buy & Place Targets", "Auto-buy, prioritize for placement, and never sell; active categories must all match", State.GnomeTargetTraits, collectGnomeTraitOptions, true)
+addMultiSelect(GnomesPage, "Keep - Never Sell", "Keep matching gnomes without auto-buying or placement priority; duplicate choices move here", State.GnomeKeepTraits, collectGnomeTraitOptions, true)
+addGroupLabel(GnomesPage, "Surplus Gnome Rules")
+addSegmentedSetting(GnomesPage, "Surplus Gnome Action", "Choose what happens to gnomes outside the best and keep lists", "GnomeSellPolicy", {
     { Key = "BelowBest", Label = "Sell Below Best" },
     { Key = "SelectedRarities", Label = "Sell Checked Rarities" },
     { Key = "KeepExtras", Label = "Keep All Extras" },
@@ -3573,12 +3690,15 @@ Runtime.UseItemStatusLabel = create("TextLabel", {
 })
 create("UICorner", { CornerRadius = UDim.new(0, 9), Parent = Runtime.UseItemStatusLabel })
 Runtime.SetUseItemStatus = function(message, positive)
-    Runtime.LastUseItemResult = tostring(message or "IDLE")
+    local nextResult = tostring(message or "IDLE")
+    local nextText = "ITEM | " .. nextResult
+    Runtime.LastUseItemResult = nextResult
     if Runtime.UseItemStatusLabel and Runtime.UseItemStatusLabel.Parent then
-        Runtime.UseItemStatusLabel.Text = "ITEM | " .. Runtime.LastUseItemResult
-        Runtime.UseItemStatusLabel.TextColor3 = positive == true and Theme.Positive
-            or positive == false and Color3.fromRGB(255, 170, 95)
+        local nextColor = positive == true and Theme.Positive
+            or positive == false and Theme.Warning
             or Theme.Muted
+        if Runtime.UseItemStatusLabel.Text ~= nextText then Runtime.UseItemStatusLabel.Text = nextText end
+        if Runtime.UseItemStatusLabel.TextColor3 ~= nextColor then Runtime.UseItemStatusLabel.TextColor3 = nextColor end
     end
 end
 local UseItemInfo = create("TextLabel", {
@@ -3617,12 +3737,15 @@ Runtime.ShopStatusLabel = create("TextLabel", {
 })
 create("UICorner", { CornerRadius = UDim.new(0, 9), Parent = Runtime.ShopStatusLabel })
 Runtime.SetShopStatus = function(message, positive)
-    Runtime.LastShopResult = tostring(message or "IDLE")
+    local nextResult = tostring(message or "IDLE")
+    local nextText = "SHOP | " .. nextResult
+    Runtime.LastShopResult = nextResult
     if Runtime.ShopStatusLabel and Runtime.ShopStatusLabel.Parent then
-        Runtime.ShopStatusLabel.Text = "SHOP | " .. Runtime.LastShopResult
-        Runtime.ShopStatusLabel.TextColor3 = positive == true and Theme.Positive
-            or positive == false and Color3.fromRGB(255, 170, 95)
+        local nextColor = positive == true and Theme.Positive
+            or positive == false and Theme.Warning
             or Theme.Muted
+        if Runtime.ShopStatusLabel.Text ~= nextText then Runtime.ShopStatusLabel.Text = nextText end
+        if Runtime.ShopStatusLabel.TextColor3 ~= nextColor then Runtime.ShopStatusLabel.TextColor3 = nextColor end
     end
 end
 
@@ -4044,6 +4167,13 @@ local function refreshLogsUI()
         return
     end
     updateDashboardStats()
+    local renderSignature = table.concat({
+        tostring(Runtime.LogVersion or 0),
+        tostring(Runtime.LogFilter),
+        tostring(State.Language),
+    }, "|")
+    if Runtime.LogRenderSignature == renderSignature then return end
+    Runtime.LogRenderSignature = renderSignature
 
     for _, item in ipairs(logItemFrames) do
         if item and item.Parent then item:Destroy() end
@@ -4078,6 +4208,15 @@ local function refreshLogsUI()
             end
         end)
     end
+end
+
+Runtime.RequestLogRefresh = function()
+    if Runtime.LogRefreshScheduled then return end
+    Runtime.LogRefreshScheduled = true
+    task.delay(0.12, function()
+        Runtime.LogRefreshScheduled = false
+        if Runtime.Alive then refreshLogsUI() end
+    end)
 end
 
 -- Hook tab show event to lazy-render only when looking at Logs
@@ -4120,8 +4259,9 @@ Runtime.Log = function(category, msgEN, msgTH, detailEN, detailTH, important)
             local newestEntry = Runtime.Logs[1]
             newestEntry.Count = lastLogEvent.Count
             newestEntry.Time = os.date("%H:%M:%S")
+            Runtime.LogVersion = (Runtime.LogVersion or 0) + 1
             if logsContainer and logsContainer.Parent and logsContainer.Parent.Visible then
-                refreshLogsUI()
+                Runtime.RequestLogRefresh()
             end
             return
         end
@@ -4143,6 +4283,7 @@ Runtime.Log = function(category, msgEN, msgTH, detailEN, detailTH, important)
 
     -- Insert at the very TOP (Index 1) so newest entries appear first!
     table.insert(Runtime.Logs, 1, entry)
+    Runtime.LogVersion = (Runtime.LogVersion or 0) + 1
     -- Strict Circular Buffer: Cap at 35 to guarantee zero memory growth during long AFK (evict oldest from tail)
     if #Runtime.Logs > 35 then
         table.remove(Runtime.Logs)
@@ -4150,7 +4291,7 @@ Runtime.Log = function(category, msgEN, msgTH, detailEN, detailTH, important)
 
     -- Lazy UI: Only refresh GUI if user is actively looking at the Logs tab!
     if logsContainer and logsContainer.Parent and logsContainer.Parent.Visible and not Runtime.ScreenSleeping then
-        refreshLogsUI()
+        Runtime.RequestLogRefresh()
     end
 end
 
@@ -4339,6 +4480,7 @@ bindLanguage(clearBtn, "Text", "Clear")
 
 connect(clearBtn.Activated, function()
     table.clear(Runtime.Logs)
+    Runtime.LogVersion = (Runtime.LogVersion or 0) + 1
     refreshLogsUI()
 end)
 
@@ -4481,7 +4623,7 @@ refreshMasterControl()
 connect(SaveProfileButton.Activated, function()
     if Runtime.Paused then
         ConfigStatus.Text = State.Language == "TH" and "กรุณากดทำงานต่อก่อนบันทึกโปรไฟล์" or "Resume automation before saving a profile"
-        ConfigStatus.TextColor3 = Color3.fromRGB(255, 170, 95)
+        ConfigStatus.TextColor3 = Theme.Warning
         return
     end
     local ok, message = saveProfile(ProfileInput.Text)
@@ -4496,7 +4638,7 @@ end)
 connect(LoadProfileButton.Activated, function()
     if Runtime.Paused then
         ConfigStatus.Text = State.Language == "TH" and "กรุณากดทำงานต่อก่อนโหลดโปรไฟล์" or "Resume automation before loading a profile"
-        ConfigStatus.TextColor3 = Color3.fromRGB(255, 170, 95)
+        ConfigStatus.TextColor3 = Theme.Warning
         return
     end
     local ok, message = loadProfile(ProfileInput.Text)
@@ -4910,12 +5052,18 @@ Runtime.IsCharacterOnOwnPlot = function()
     if not boundary or not root then
         return false
     end
+    local cached = Runtime.CharacterPlotCache
+    if cached and cached.Boundary == boundary and cached.Root == root and cached.Until > os.clock() then
+        return cached.Result
+    end
     local params = RaycastParams.new()
     params.FilterType = Enum.RaycastFilterType.Include
     params.FilterDescendantsInstances = { boundary }
     params.IgnoreWater = true
     local hit = workspace:Raycast(root.Position, Vector3.new(0, -100, 0), params)
-    return hit ~= nil and (hit.Instance == boundary or hit.Instance:IsDescendantOf(boundary))
+    local result = hit ~= nil and (hit.Instance == boundary or hit.Instance:IsDescendantOf(boundary))
+    Runtime.CharacterPlotCache = { Boundary = boundary, Root = root, Until = os.clock() + 0.12, Result = result }
+    return result
 end
 
 local function getFloorId(hitInstance, ground)
@@ -4960,13 +5108,21 @@ local function findGnomePlacement()
         return nil
     end
 
-    local occupied = {}
+    local spacing = 4
+    local occupiedBuckets = {}
+    local function bucketKey(x, z)
+        return tostring(math.floor(x / spacing)) .. ":" .. tostring(math.floor(z / spacing))
+    end
     local workers = plot:FindFirstChild("Workers")
     if workers then
         for _, worker in ipairs(workers:GetChildren()) do
             local ok, pivot = pcall(getInstancePivot, worker)
             if ok and pivot then
-                table.insert(occupied, pivot.Position)
+                local position = pivot.Position
+                local key = bucketKey(position.X, position.Z)
+                local bucket = occupiedBuckets[key]
+                if not bucket then bucket = {}; occupiedBuckets[key] = bucket end
+                table.insert(bucket, position)
             end
         end
     end
@@ -4976,37 +5132,50 @@ local function findGnomePlacement()
     raycastParams.FilterDescendantsInstances = { ground }
     raycastParams.IgnoreWater = true
 
-    local spacing = 4
+    Runtime.PlacementOffsetCache = Runtime.PlacementOffsetCache or {}
     for _, groundPart in ipairs(groundParts) do
         local halfX = math.max(0, math.floor((groundPart.Size.X - 3) / (spacing * 2)))
         local halfZ = math.max(0, math.floor((groundPart.Size.Z - 3) / (spacing * 2)))
         halfX = math.min(halfX, 12)
         halfZ = math.min(halfZ, 12)
-        local candidates = {}
-        for gridZ = -halfZ, halfZ do
-            for gridX = -halfX, halfX do
-                table.insert(candidates, {
-                    X = gridX * spacing,
-                    Z = gridZ * spacing,
-                    Distance = math.abs(gridX) + math.abs(gridZ),
-                })
+        local offsetKey = tostring(halfX) .. ":" .. tostring(halfZ)
+        local candidates = Runtime.PlacementOffsetCache[offsetKey]
+        if not candidates then
+            candidates = {}
+            for gridZ = -halfZ, halfZ do
+                for gridX = -halfX, halfX do
+                    table.insert(candidates, {
+                        X = gridX * spacing,
+                        Z = gridZ * spacing,
+                        Distance = math.abs(gridX) + math.abs(gridZ),
+                    })
+                end
             end
+            table.sort(candidates, function(a, b) return a.Distance < b.Distance end)
+            Runtime.PlacementOffsetCache[offsetKey] = candidates
         end
-        table.sort(candidates, function(a, b)
-            return a.Distance < b.Distance
-        end)
 
         for _, candidate in ipairs(candidates) do
             local rayOrigin = groundPart.CFrame:PointToWorldSpace(Vector3.new(candidate.X, groundPart.Size.Y / 2 + 30, candidate.Z))
             local result = workspace:Raycast(rayOrigin, Vector3.new(0, -80, 0), raycastParams)
             if result then
                 local free = true
-                for _, position in ipairs(occupied) do
-                    local difference = Vector2.new(position.X - result.Position.X, position.Z - result.Position.Z)
-                    if difference.Magnitude < spacing * 0.8 then
-                        free = false
-                        break
+                local cellX = math.floor(result.Position.X / spacing)
+                local cellZ = math.floor(result.Position.Z / spacing)
+                for offsetZ = -1, 1 do
+                    for offsetX = -1, 1 do
+                        local bucket = occupiedBuckets[tostring(cellX + offsetX) .. ":" .. tostring(cellZ + offsetZ)]
+                        for _, position in ipairs(bucket or {}) do
+                            local dx = position.X - result.Position.X
+                            local dz = position.Z - result.Position.Z
+                            if dx * dx + dz * dz < (spacing * 0.8) ^ 2 then
+                                free = false
+                                break
+                            end
+                        end
+                        if not free then break end
                     end
+                    if not free then break end
                 end
                 if free then
                     local direction = Vector3.new(groundPart.CFrame.LookVector.X, 0, groundPart.CFrame.LookVector.Z)
@@ -5062,19 +5231,14 @@ end
 Runtime.ProduceSellRetry = setmetatable({}, { __mode = "k" })
 Runtime.FindSelectedProduceBatch = function(limit)
     local result = {}
-    for _, container in ipairs({ getBackpack(), LocalPlayer.Character }) do
-        if container then
-            for _, tool in ipairs(container:GetChildren()) do
-                if (Runtime.ProduceSellRetry[tool] or 0) <= os.clock()
-                    and Runtime.IsProduceTool(tool)
-                    and Runtime.IsSelectedProduceMutation(tool)
-                then
-                    table.insert(result, tool)
-                    if #result >= (limit or 8) then
-                        return result
-                    end
-                end
-            end
+    local now = os.clock()
+    for _, tool in ipairs(Runtime.GetInventoryTools()) do
+        if tool.Parent and (Runtime.ProduceSellRetry[tool] or 0) <= now
+            and Runtime.IsProduceTool(tool)
+            and Runtime.IsSelectedProduceMutation(tool)
+        then
+            table.insert(result, tool)
+            if #result >= (limit or 8) then return result end
         end
     end
     return result
@@ -5212,12 +5376,16 @@ end
 
 Runtime.PlotCapacityCache = nil
 Runtime.GetExplicitPlotCapacity = function()
+    local cached = Runtime.ExplicitPlotCapacityCache
+    if cached and cached.Until > os.clock() then return cached.Capacity end
     local plot = getPlot()
     local data = type(Replication) == "table" and type(Replication.Data) == "table" and Replication.Data or {}
     local capacity = tonumber(data.max_gnomes or data.maxGnomes or data.max_farmers or data.maxFarmers)
         or tonumber(plot and (plot:GetAttribute("MaxGnomes") or plot:GetAttribute("MaxFarmers")))
         or tonumber(LocalPlayer and (LocalPlayer:GetAttribute("MaxGnomes") or LocalPlayer:GetAttribute("MaxFarmers")))
-    return capacity and math.max(1, math.floor(capacity)) or nil
+    capacity = capacity and math.max(1, math.floor(capacity)) or nil
+    Runtime.ExplicitPlotCapacityCache = { Until = os.clock() + 0.75, Capacity = capacity }
+    return capacity
 end
 Runtime.GetPlotCapacity = function()
     local cached = Runtime.PlotCapacityCache
@@ -5285,31 +5453,82 @@ end
 
 local function matchesPlaceTargets(instance)
     if not instance then return false end
+    Runtime.TargetMatchCache = Runtime.TargetMatchCache or setmetatable({}, { __mode = "k" })
+    local rawMutation = tostring(instance:GetAttribute("Mutations") or instance:GetAttribute("Mutation") or "")
+    local farmerName = getFarmerName(instance)
+    local cached = Runtime.TargetMatchCache[instance]
+    if cached and cached.Version == Runtime.SelectionVersion and cached.RawMutation == rawMutation
+        and cached.FarmerName == farmerName
+    then
+        return cached.Result
+    end
     local hasNameFilter = Runtime.HasTraitSelection(State.GnomeTargetTraits, TraitPrefix.Gnome)
     local hasRarityFilter = Runtime.HasTraitSelection(State.GnomeTargetTraits, TraitPrefix.Rarity)
     local hasMutationFilter = Runtime.HasTraitSelection(State.GnomeTargetTraits, TraitPrefix.Mutation)
 
     local hasAnyFilter = hasNameFilter or hasRarityFilter or hasMutationFilter
-    return hasAnyFilter
+    local result = hasAnyFilter
         and (not hasNameFilter or hasPlaceGnomeName(instance))
         and (not hasRarityFilter or hasPlaceRarity(instance))
         and (not hasMutationFilter or hasPlaceMutation(instance))
+    Runtime.TargetMatchCache[instance] = {
+        Version = Runtime.SelectionVersion,
+        RawMutation = rawMutation,
+        FarmerName = farmerName,
+        Result = result,
+    }
+    return result
 end
 Runtime.MatchesPlaceTargets = matchesPlaceTargets
 
+Runtime.GnomePowerCache = Runtime.GnomePowerCache or setmetatable({}, { __mode = "k" })
 local function getGnomePower(instance, ignorePlacementTargets)
     local farmerName = getFarmerName(instance)
+    local mutations = tostring(instance:GetAttribute("Mutations") or instance:GetAttribute("Mutation") or "")
+    local isHuge = instance:GetAttribute("Huge") == true
+    local level = math.max(1, tonumber(instance:GetAttribute("Level")) or 1)
+    local rolledRarity = tonumber(instance:GetAttribute("RolledRarity")) or 0
+    local placementMode = ignorePlacementTargets and "" or (State.GnomePlacementMode or "TargetsFirst")
+    local selectionVersion = ignorePlacementTargets and -1 or Runtime.SelectionVersion
+    local bucket = Runtime.GnomePowerCache[instance]
+    local cacheKey = ignorePlacementTargets and "Base" or "Placement"
+    local cached = bucket and bucket[cacheKey]
+    if cached
+        and cached.FarmerName == farmerName
+        and cached.Mutations == mutations
+        and cached.IsHuge == isHuge
+        and cached.Level == level
+        and cached.RolledRarity == rolledRarity
+        and cached.PlacementMode == placementMode
+        and cached.SelectionVersion == selectionVersion
+    then
+        local result = cached.Result
+        return result[1], result[2], result[3], result[4], result[5]
+    end
+    bucket = bucket or {}
+    Runtime.GnomePowerCache[instance] = bucket
+    local function finish(power, progression, rarity, currentLevel, currentFarmerName)
+        bucket[cacheKey] = {
+            FarmerName = farmerName,
+            Mutations = mutations,
+            IsHuge = isHuge,
+            Level = level,
+            RolledRarity = rolledRarity,
+            PlacementMode = placementMode,
+            SelectionVersion = selectionVersion,
+            Result = { power, progression, rarity, currentLevel, currentFarmerName },
+        }
+        return power, progression, rarity, currentLevel, currentFarmerName
+    end
     local config = FarmersConfig[farmerName]
     -- Unknown/event gnomes are protected instead of being sold accidentally.
     if type(config) ~= "table" then
-        return math.huge, math.huge, 0, 1, farmerName
+        return finish(math.huge, math.huge, rolledRarity, level, farmerName)
     end
     local plantName = tostring(config.plant or "")
     local plantConfig = PlantsConfig[plantName] or {}
     local cropName = type(plantConfig.fruit) == "table" and tostring(plantConfig.fruit.name or plantName) or plantName
-    local mutations = tostring(instance:GetAttribute("Mutations") or instance:GetAttribute("Mutation") or "")
-    local hugeMultiplier = instance:GetAttribute("Huge") == true and 1.5 or 1
-    local level = math.max(1, tonumber(instance:GetAttribute("Level")) or 1)
+    local hugeMultiplier = isHuge and 1.5 or 1
     local baseValue
     local usedExactCropPrice = false
     if type(CropsUtil.getPrice) == "function" then
@@ -5356,16 +5575,16 @@ local function getGnomePower(instance, ignorePlacementTargets)
         end
     end
 
-    return productionRate, progression,
-        tonumber(instance:GetAttribute("RolledRarity")) or 0,
-        level,
-        farmerName
+    return finish(productionRate, progression, rolledRarity, level, farmerName)
 end
 
 Runtime.RankedGnomeCache = nil
 local function getRankedGnomes()
     local cached = Runtime.RankedGnomeCache
-    if cached and cached.Until > os.clock() then
+    if cached and cached.Until > os.clock()
+        and cached.InventoryRevision == Runtime.InventoryRevision
+        and cached.SelectionVersion == Runtime.SelectionVersion
+    then
         return cached.Records
     end
     local records = {}
@@ -5395,14 +5614,8 @@ local function getRankedGnomes()
             add(worker, "Worker")
         end
     end
-    for _, container in ipairs({ getBackpack(), LocalPlayer.Character }) do
-        if container then
-            for _, tool in ipairs(container:GetChildren()) do
-                if isGnomeTool(tool) then
-                    add(tool, "Tool")
-                end
-            end
-        end
+    for _, tool in ipairs(Runtime.GetInventoryTools()) do
+        if tool.Parent and isGnomeTool(tool) then add(tool, "Tool") end
     end
 
     table.sort(records, function(a, b)
@@ -5421,7 +5634,12 @@ local function getRankedGnomes()
         return a.Instance.Name < b.Instance.Name
     end)
 
-    Runtime.RankedGnomeCache = { Until = os.clock() + 0.35, Records = records }
+    Runtime.RankedGnomeCache = {
+        Until = os.clock() + 0.6,
+        Records = records,
+        InventoryRevision = Runtime.InventoryRevision,
+        SelectionVersion = Runtime.SelectionVersion,
+    }
     return records
 end
 
@@ -5433,6 +5651,20 @@ local function getProtectedGnomeCount(records)
         end
     end
     return math.min(getBestGnomeLimit(), eligible)
+end
+
+local function getProtectedRankSet()
+    local records = getRankedGnomes()
+    local protectedCount = getProtectedGnomeCount(records)
+    local cached = Runtime.ProtectedRankCache
+    if cached and cached.Records == records and cached.Count == protectedCount then return cached.Set end
+    local protected = {}
+    for index = 1, protectedCount do
+        local record = records[index]
+        if record and record.Eligible ~= false then protected[record.Instance] = true end
+    end
+    Runtime.ProtectedRankCache = { Records = records, Count = protectedCount, Set = protected }
+    return protected
 end
 
 local function hasKeepRarity(instance)
@@ -5466,10 +5698,26 @@ local function matchesKeepTargets(instance)
     if not instance then
         return false
     end
+    Runtime.KeepMatchCache = Runtime.KeepMatchCache or setmetatable({}, { __mode = "k" })
+    local rawMutation = tostring(instance:GetAttribute("Mutations") or instance:GetAttribute("Mutation") or "")
+    local farmerName = getFarmerName(instance)
+    local cached = Runtime.KeepMatchCache[instance]
+    if cached and cached.Version == Runtime.SelectionVersion and cached.RawMutation == rawMutation
+        and cached.FarmerName == farmerName
+    then
+        return cached.Result
+    end
     -- Protection traits are independent (OR); wanted target categories use AND.
-    return isSelected(State.GnomeKeepTraits, TraitPrefix.Gnome .. getFarmerName(instance))
+    local result = isSelected(State.GnomeKeepTraits, TraitPrefix.Gnome .. getFarmerName(instance))
         or hasKeepRarity(instance)
         or hasKeepMutation(instance)
+    Runtime.KeepMatchCache[instance] = {
+        Version = Runtime.SelectionVersion,
+        RawMutation = rawMutation,
+        FarmerName = farmerName,
+        Result = result,
+    }
+    return result
 end
 Runtime.MatchesKeepTargets = matchesKeepTargets
 
@@ -5500,17 +5748,7 @@ local function isProtectedGnome(tool)
         end
     end
     -- Tier 1: Placed on plot or ranked in the Top-N set
-    local ranked = getRankedGnomes()
-    local protectedCount = getProtectedGnomeCount(ranked)
-    for index, record in ipairs(ranked) do
-        if index > protectedCount then
-            break
-        end
-        if record.Instance == tool and record.Power >= 0 then
-            return true
-        end
-    end
-    return false
+    return getProtectedRankSet()[tool] == true
 end
 
 local function sellInventoryGnomeBatch(tools)
@@ -5604,12 +5842,6 @@ local function policySellsGnome(record)
         return false
     end
     if type(FarmersConfig[record.FarmerName]) ~= "table" then
-        return false
-    end
-    if Runtime.NeedsRebirthGnome and Runtime.NeedsRebirthGnome(record.Instance) then
-        return false
-    end
-    if matchesPlaceTargets(record.Instance) or matchesKeepTargets(record.Instance) then
         return false
     end
     local policy = State.GnomeSellPolicy or "BelowBest"
@@ -5811,7 +6043,7 @@ task.spawn(function()
                 end
             end
         end
-        task.wait(State.AutoBest30 and (State.LowPingMode and 0.55 or 0.25) or 1.5)
+        task.wait(State.AutoBest30 and (State.LowPingMode and 0.65 or 0.35) or 1.5)
     end
 end)
 
@@ -5843,7 +6075,7 @@ local function getUseItemInfo(tool)
         itemType = "GnomeItem"
     end
 
-    local name = getCleanToolName(tool, itemType)
+    local name, reliableName = getCleanToolName(tool, itemType)
 
     local shopData = (ItemShop.Items or {})[name] or {}
     if next(shopData) == nil then
@@ -5871,7 +6103,10 @@ local function getUseItemInfo(tool)
         or itemType == "GnomeItem" and Runtime.GnomeItemsConfig[name]
         or {}
 
-    if itemType ~= "" then
+    -- Do not freeze a type-based guessed name in cache. Some shop tools expose
+    -- their ItemName a frame after entering Backpack; retry until that identity
+    -- is authoritative so target matching and Place arguments stay exact.
+    if itemType ~= "" and reliableName then
         Runtime.UseItemInfoCache[tool] = { Name = name, Type = itemType, Config = config or {} }
     end
     return name, itemType, config or {}
@@ -5884,6 +6119,39 @@ local function isUseItemTool(tool)
     local _, itemType = getUseItemInfo(tool)
     return itemType == "Sprinkler" or itemType == "Fertilizer"
         or itemType == "WateringCan" or itemType == "GnomeItem"
+end
+
+Runtime.UseCandidateCache = nil
+local function getUseItemCandidates()
+    local cached = Runtime.UseCandidateCache
+    if cached and cached.InventoryRevision == Runtime.InventoryRevision
+        and cached.SelectionVersion == Runtime.SelectionVersion and cached.Until > os.clock()
+    then
+        return cached.Tools
+    end
+    local candidates = {}
+    for _, tool in ipairs(Runtime.GetInventoryTools()) do
+        local itemName, itemType = getUseItemInfo(tool)
+        if tool.Parent and (itemType == "Sprinkler" or itemType == "Fertilizer"
+            or itemType == "WateringCan" or itemType == "GnomeItem")
+            and isSelected(State.UseItemTargets, itemName)
+        then
+            table.insert(candidates, tool)
+        end
+    end
+    table.sort(candidates, function(a, b)
+        local nameA = getUseItemInfo(a)
+        local nameB = getUseItemInfo(b)
+        return (tonumber(((ItemShop.Items or {})[nameA] or {}).order) or 0)
+            > (tonumber(((ItemShop.Items or {})[nameB] or {}).order) or 0)
+    end)
+    Runtime.UseCandidateCache = {
+        InventoryRevision = Runtime.InventoryRevision,
+        SelectionVersion = Runtime.SelectionVersion,
+        Until = os.clock() + 1,
+        Tools = candidates,
+    }
+    return candidates
 end
 
 local function getPlantRecord(plant)
@@ -6406,35 +6674,16 @@ task.spawn(function()
                 Runtime.ItemActionActive = false
                 Runtime.ItemActionActiveAt = nil
             end
-            local candidates = {}
             local now = os.clock()
-            for _, container in ipairs({ getBackpack(), LocalPlayer.Character }) do
-                if container then
-                    for _, tool in ipairs(container:GetChildren()) do
-                        local itemName, itemType = getUseItemInfo(tool)
-                        if (itemType == "Sprinkler" or itemType == "Fertilizer"
-                            or itemType == "WateringCan" or itemType == "GnomeItem")
-                            and isSelected(State.UseItemTargets, itemName)
-                            and not itemPending[tool] and (itemRetryAt[tool] or 0) <= now
-                        then
-                            table.insert(candidates, tool)
-                        end
-                    end
-                end
-            end
-            table.sort(candidates, function(a, b)
-                local nameA = getUseItemInfo(a)
-                local nameB = getUseItemInfo(b)
-                return (tonumber(((ItemShop.Items or {})[nameA] or {}).order) or 0)
-                    > (tonumber(((ItemShop.Items or {})[nameB] or {}).order) or 0)
-            end)
-            for _, tool in ipairs(candidates) do
-                if tryUseItem(tool) then
+            for _, tool in ipairs(getUseItemCandidates()) do
+                if tool.Parent and not itemPending[tool] and (itemRetryAt[tool] or 0) <= now
+                    and tryUseItem(tool)
+                then
                     break
                 end
             end
         end
-        task.wait(State.AutoUseItems and (State.LowPingMode and 0.4 or 0.15) or 1.5)
+        task.wait(State.AutoUseItems and (State.LowPingMode and 0.45 or 0.2) or 1.5)
     end
 end)
 
@@ -6505,9 +6754,16 @@ end
 
 Runtime.TryAcceptVisibleGift = function()
     local playerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
-    local tabs = playerGui and playerGui:FindFirstChild("Tabs")
-    local prompt = tabs and tabs:FindFirstChild("Are You Sure")
-        or playerGui and playerGui:FindFirstChild("Are You Sure", true)
+    local prompt = Runtime.GiftPromptCache
+    if not prompt or not prompt.Parent then
+        local now = os.clock()
+        if (Runtime.GiftPromptSearchAt or 0) > now then return false end
+        Runtime.GiftPromptSearchAt = now + 0.5
+        local tabs = playerGui and playerGui:FindFirstChild("Tabs")
+        prompt = tabs and tabs:FindFirstChild("Are You Sure")
+            or playerGui and playerGui:FindFirstChild("Are You Sure", true)
+        Runtime.GiftPromptCache = prompt
+    end
     if not prompt or not prompt.Enabled then
         return false
     end
@@ -6617,16 +6873,25 @@ Runtime.NeedsRebirthGnome = function(instance)
     local rebirth = Runtime.GetRebirthCount and Runtime.GetRebirthCount()
         or tonumber(LocalPlayer:GetAttribute("rebirth") or LocalPlayer:GetAttribute("rebirths")
             or stats.rebirth or stats.rebirths) or 0
-    local config = RebirthConfig["Rebirth" .. tostring(rebirth + 1)]
-    local required = type(config) == "table" and config.requirements and config.requirements.gnomes or {}
-    local discovered = type(Replication.Data) == "table" and Replication.Data.discovered or {}
-    local farmerName = getFarmerName(instance)
-    for _, name in ipairs(required or {}) do
-        if name == farmerName and discovered[name] ~= true and table.find(discovered, name) == nil then
-            return true
+    local now = os.clock()
+    local cached = Runtime.RebirthGnomeNeedCache
+    if not cached or cached.Rebirth ~= rebirth or cached.Until <= now then
+        local config = RebirthConfig["Rebirth" .. tostring(rebirth + 1)]
+        local required = type(config) == "table" and config.requirements and config.requirements.gnomes or {}
+        local discovered = type(Replication.Data) == "table" and Replication.Data.discovered or {}
+        local discoveredSet = {}
+        for key, value in pairs(discovered) do
+            if value == true and type(key) == "string" then discoveredSet[key] = true end
+            if type(value) == "string" then discoveredSet[value] = true end
         end
+        local needed = {}
+        for _, name in ipairs(required or {}) do
+            if not discoveredSet[name] then needed[name] = true end
+        end
+        cached = { Rebirth = rebirth, Until = now + 0.25, Needed = needed }
+        Runtime.RebirthGnomeNeedCache = cached
     end
-    return false
+    return cached.Needed[getFarmerName(instance)] == true
 end
 
 local function isWantedPreview(instance)
@@ -6794,6 +7059,7 @@ local function tryBuyPreview(instance)
     Runtime.EndAction(actionToken)
     if ok and not instance.Parent then
         Runtime.Stats.Bought = Runtime.Stats.Bought + 1
+        Runtime.RebirthGnomeNeedCache = nil
         if Runtime.PendingPurchase == instance then
             clearPendingPurchase()
         end
@@ -6868,6 +7134,30 @@ task.spawn(function()
     end
 end)
 
+Runtime.ReadyCollectCache = nil
+local function getReadyCollectPlants(plot)
+    local cached = Runtime.ReadyCollectCache
+    if cached and cached.Plot == plot and cached.Until > os.clock() then return cached.Records end
+    local result, seen = {}, {}
+    for _, container in ipairs({
+        plot and plot:FindFirstChild("Plants"),
+        plot and plot:FindFirstChild("ReadyToCollect"),
+    }) do
+        if container then
+            for _, plant in ipairs(container:GetChildren()) do
+                if not seen[plant] and plant:GetAttribute("READY") == true
+                    and plant:GetAttribute("FruitReady") ~= false
+                then
+                    seen[plant] = true
+                    table.insert(result, plant)
+                end
+            end
+        end
+    end
+    Runtime.ReadyCollectCache = { Plot = plot, Until = os.clock() + 0.35, Records = result }
+    return result
+end
+
 task.spawn(function()
     local collecting = setmetatable({}, { __mode = "k" })
     while Runtime.Alive do
@@ -6877,21 +7167,8 @@ task.spawn(function()
         if State.AutoCollect and not Runtime.IsBackpackNearFull() then
             Runtime.WithAction("Collect", { "Farm" }, function()
                 local plot = getPlot()
-                local plants = plot and plot:FindFirstChild("Plants")
-                local readyToCollect = plot and plot:FindFirstChild("ReadyToCollect")
-                if plants or readyToCollect then
-                    local readyPlants = {}
-                    local seenPlants = {}
-                    for _, container in pairs({ plants, readyToCollect }) do
-                        if container then
-                            for _, plant in ipairs(container:GetChildren()) do
-                                if not seenPlants[plant] then
-                                    seenPlants[plant] = true
-                                    table.insert(readyPlants, plant)
-                                end
-                            end
-                        end
-                    end
+                local readyPlants = getReadyCollectPlants(plot)
+                if readyPlants[1] then
                     local collectedThisPass = 0
                     local specialMutations = {}
                     for _, plant in ipairs(readyPlants) do
@@ -6900,11 +7177,14 @@ task.spawn(function()
                         then
                             break
                         end
-                        local fruitReady = plant:GetAttribute("FruitReady") ~= false
-                        if plant:GetAttribute("READY") == true and fruitReady and not collecting[plant] then
-                            collecting[plant] = true
+                        if plant.Parent and plant:GetAttribute("READY") == true
+                            and plant:GetAttribute("FruitReady") ~= false
+                            and (collecting[plant] or 0) <= os.clock()
+                        then
+                            collecting[plant] = os.clock() + 0.4
                             local ok, result = invoke("CollectPlant", plant)
                             if ok and result ~= false then
+                                Runtime.ReadyCollectCache = nil
                                 collectedThisPass = collectedThisPass + 1
                                 Runtime.Stats.Collected = Runtime.Stats.Collected + 1
                                 local pMut = tostring(plant:GetAttribute("Mutations") or plant:GetAttribute("Mutation") or "")
@@ -6912,9 +7192,6 @@ task.spawn(function()
                                     table.insert(specialMutations, pMut)
                                 end
                             end
-                            task.delay(0.4, function()
-                                collecting[plant] = nil
-                            end)
                             task.wait(0.03)
                         end
                     end
@@ -6927,7 +7204,7 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(State.AutoCollect and 0.15 or 1)
+        task.wait(State.AutoCollect and (State.LowPingMode and 0.3 or 0.18) or 1)
     end
 end)
 
@@ -7041,16 +7318,10 @@ end)
 Runtime.CountOwnedShopItem = function(itemName)
     local count = 0
     local wanted = string.lower(tostring(itemName))
-    for _, container in ipairs({ getBackpack(), LocalPlayer.Character }) do
-        if container then
-            for _, tool in ipairs(container:GetChildren()) do
-                if tool:IsA("Tool") then
-                    local name = getUseItemInfo(tool)
-                    if string.lower(tostring(name)) == wanted then
-                        count = count + 1
-                    end
-                end
-            end
+    for _, tool in ipairs(Runtime.GetInventoryTools()) do
+        if tool.Parent then
+            local name = getUseItemInfo(tool)
+            if string.lower(tostring(name)) == wanted then count = count + 1 end
         end
     end
     return count
@@ -7225,7 +7496,7 @@ task.spawn(function()
                 Runtime.SetShopStatus("IDLE")
             end
         end
-        task.wait(State.AutoBuyShop and (State.LowPingMode and 0.75 or 0.3) or 1.5)
+        task.wait(State.AutoBuyShop and (State.LowPingMode and 1 or 0.5) or 1.5)
     end
 end)
 
@@ -7538,6 +7809,8 @@ task.spawn(function()
                 local ok, result = invoke("Rebirth")
                 if ok and result then
                     clearPendingPurchase()
+                    Runtime.RebirthGnomeNeedCache = nil
+                    Runtime.CanRebirthCache = nil
                     Runtime.ClearActionReservation("Rebirth")
                     task.wait(1.25)
                 end
@@ -7650,12 +7923,12 @@ task.spawn(function()
         local elapsed = math.floor(os.clock() - Runtime.StartedAt)
         if Runtime.Paused then
             Runtime.SetIfChanged(Runtime.CompactSubtitle, "Text", State.Language == "TH" and "หยุดชั่วคราว" or "PAUSED")
-            Runtime.SetIfChanged(Runtime.CompactSubtitle, "TextColor3", Color3.fromRGB(255, 170, 95))
-            Runtime.SetIfChanged(Runtime.CompactArrow, "BackgroundColor3", Color3.fromRGB(255, 170, 95))
+            Runtime.SetIfChanged(Runtime.CompactSubtitle, "TextColor3", Runtime.Theme.Warning)
+            Runtime.SetIfChanged(Runtime.CompactArrow, "BackgroundColor3", Runtime.Theme.Warning)
         elseif Runtime.WaitingForMoney and Runtime.PendingPurchase and Runtime.PendingPurchase.Parent then
             Runtime.SetIfChanged(Runtime.CompactSubtitle, "Text", State.Language == "TH" and "กำลังรอ..." or "WAITING")
-            Runtime.SetIfChanged(Runtime.CompactSubtitle, "TextColor3", Color3.fromRGB(255, 201, 92))
-            Runtime.SetIfChanged(Runtime.CompactArrow, "BackgroundColor3", Color3.fromRGB(255, 201, 92))
+            Runtime.SetIfChanged(Runtime.CompactSubtitle, "TextColor3", Runtime.Theme.Waiting)
+            Runtime.SetIfChanged(Runtime.CompactArrow, "BackgroundColor3", Runtime.Theme.Waiting)
         elseif State.AutoBest30 then
             local plot = getPlot()
             local workers = plot and plot:FindFirstChild("Workers")
@@ -7673,14 +7946,14 @@ task.spawn(function()
             Runtime.SetIfChanged(Runtime.LiveLabel, "Text", State.Language == "TH"
                 and "หยุดชั่วคราว | กด ทำงานต่อ เพื่อให้ระบบทำงานตามเดิม"
                 or "PAUSED | press RESUME to restore previous automation")
-            Runtime.SetIfChanged(Runtime.LiveLabel, "TextColor3", Color3.fromRGB(255, 170, 95))
+            Runtime.SetIfChanged(Runtime.LiveLabel, "TextColor3", Runtime.Theme.Warning)
         elseif Runtime.WaitingForMoney and Runtime.PendingPurchase and Runtime.PendingPurchase.Parent then
             local currentMoney = math.floor(getPlayerMoney())
             local neededMoney = math.floor(Runtime.PendingPurchasePrice or 0)
             Runtime.SetIfChanged(Runtime.LiveLabel, "Text", State.Language == "TH"
                 and string.format("รอเงินซื้อ %s | %s / %s", getFarmerName(Runtime.PendingPurchase), formatNumber(currentMoney), formatNumber(neededMoney))
                 or string.format("WAITING FOR MONEY | %s | %d / %d", getFarmerName(Runtime.PendingPurchase), currentMoney, neededMoney))
-            Runtime.SetIfChanged(Runtime.LiveLabel, "TextColor3", Color3.fromRGB(255, 201, 92))
+            Runtime.SetIfChanged(Runtime.LiveLabel, "TextColor3", Runtime.Theme.Waiting)
         else
             local liveFormat = State.Language == "TH"
                 and "ทำงานอยู่ | %dms | %02d:%02d | แปลง %d | R:%d B:%d P:%d E:%d RB:%d C:%d S:%d"
