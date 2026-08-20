@@ -5,9 +5,9 @@
   Path:     game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets Handler.Animations
   Service:  StarterPlayer
   Success:  true
-  Executor: Potassium v2.4.2
+  Executor: Potassium v2.4.3
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Thu Aug 20 00:11:29 2026
+  Time:     Thu Aug 20 23:43:09 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -66,6 +66,7 @@ function u1.LoadAnimations(u10) -- Line: 56
 
     for _, v in next, v14 do
         local u15 = u10.animator:LoadAnimation(v);
+        u15.Looped = true;
         u10.tracks[v.Name] = u15;
         u10.speeds[v.Name] = v:GetAttribute("Speed");
 
@@ -101,11 +102,11 @@ function u1.LoadAnimations(u10) -- Line: 56
 end;
 
 function u1.Stop(p20) -- Line: 93
-    if p20.playingAnimation then
-        p20.playingAnimation:Stop();
-        p20.playingAnimation = nil;
+    for _, v in p20.tracks do
+        v:Stop();
     end;
 
+    p20.playingAnimation = nil;
     p20.playingAnimationName = nil;
 end;
 
@@ -127,64 +128,64 @@ function u1.ChangeAnimation(p21, p22, p23) -- Line: 101
         return;
     end;
 
-    if p21.tracks[p22] then
-        if p21.playingAnimationName == p22 and p21.playingAnimation then
-            p21.playingAnimation:AdjustSpeed(v24);
+    local v27 = p21.tracks[p22];
 
-            return p21.playingAnimation;
+    if v27 then
+        if p21.playingAnimationName == p22 and p21.playingAnimation == v27 then
+            v27:AdjustSpeed(v24);
+
+            return v27;
         end;
 
-        if p21.playingAnimation then
-            if p21.playingAnimation.Name == p22 then
-                p21.playingAnimation:AdjustSpeed(v24);
-
-                return p21.playingAnimation;
+        for _, v in p21.tracks do
+            if v ~= v27 then
+                v:Stop();
             end;
-
-            p21.playingAnimation:Stop();
-            p21.playingAnimation = nil;
         end;
 
-        p21.tracks[p22]:Play();
-        p21.playingAnimation = p21.tracks[p22];
-        p21.playingAnimation:AdjustSpeed(v24);
+        if not v27.IsPlaying then
+            v27:Play();
+        end;
+
+        v27:AdjustSpeed(v24);
+        p21.playingAnimation = v27;
         p21.playingAnimationName = p22;
 
-        return p21.playingAnimation;
+        return v27;
     end;
 end;
 
-function u1.Play(p27, p28, p29) -- Line: 134
-    local v30 = p27.speeds[p28] or (p29 or 1);
-    local model = p27.model;
-    local v31 = model and model:GetAttribute("Mutations") or "";
-    local v32;
+function u1.Play(p28, p29, p30) -- Line: 132
+    local v31 = p28.speeds[p29] or (p30 or 1);
+    local model = p28.model;
+    local v32 = model and model:GetAttribute("Mutations") or "";
+    local v33;
 
-    if type(v31) == "string" and v31 ~= "" then
-        v32 = table.find(string.split(v31, "_"), "Frozen") ~= nil;
+    if type(v32) == "string" and v32 ~= "" then
+        v33 = table.find(string.split(v32, "_"), "Frozen") ~= nil;
     else
-        v32 = false;
+        v33 = false;
     end;
 
-    if v32 then
+    if v33 then
         return;
     end;
 
-    if p27.tracks[p28] then
-        local v33 = p27.tracks[p28];
-        v33:Play();
-        v33:AdjustSpeed(v30);
+    if p28.tracks[p29] then
+        local v34 = p28.tracks[p29];
+        v34:Play();
+        v34:AdjustSpeed(v31);
 
-        return v33;
+        return v34;
     end;
 end;
 
-function u1.Destroy(p34) -- Line: 151
-    for _, v in next, p34.connections do
+function u1.Destroy(p35) -- Line: 149
+    for _, v in next, p35.connections do
         v:Disconnect();
     end;
 
-    for _, v in next, p34.tracks do
+    for _, v in next, p35.tracks do
         v:Stop();
         v:Destroy();
     end;

@@ -1,480 +1,500 @@
-[00:11:16][INFO] =================================================
-[00:11:16][INFO] DUMPER v7.0  [ADVANCED EDITION]
-[00:11:16][INFO] Game: Roll_A_Gnome (117539213094671)
-[00:11:16][INFO] Executor: Potassium v2.4.2
-[00:11:16][INFO] Time: Thu Aug 20 00:11:16 2026
-[00:11:16][INFO] API PROBE:
-[00:11:16][INFO]   + cloneref
-[00:11:16][INFO]   + decompile
-[00:11:16][INFO]   + getconstants
-[00:11:16][INFO]   + getfunctionhash
-[00:11:16][INFO]   + getscriptbytecode
-[00:11:16][INFO]   + getscriptclosure
-[00:11:16][INFO]   + getscripthash
-[00:11:16][INFO]   + getupvalues
-[00:11:16][INFO]   + isfile
-[00:11:16][INFO]   + makefolder
-[00:11:16][INFO]   + queue_on_teleport
-[00:11:16][INFO]   + readfile
-[00:11:16][INFO]   + setclipboard
-[00:11:16][INFO]   + writefile
-[00:11:16][INFO] =================================================
-[00:11:16][INFO] Pre-counting scripts per service...
-[00:11:17][INFO]   Workspace → 2 scripts estimated
-[00:11:17][INFO]   ReplicatedStorage → 262 scripts estimated
-[00:11:17][INFO]   ReplicatedFirst → 0 scripts estimated
-[00:11:17][INFO]   StarterGui → 23 scripts estimated
-[00:11:17][INFO]   StarterPack → 0 scripts estimated
-[00:11:17][INFO]   StarterPlayer → 132 scripts estimated
-[00:11:17][INFO]   Lighting → 0 scripts estimated
-[00:11:17][INFO]   PlayerGui → 22 scripts estimated
-[00:11:17][INFO]   Backpack → 0 scripts estimated
-[00:11:17][SCAN] → Workspace
-[00:11:23][SCRIPT] [LocalScript][decompile][true] game.Workspace.Characters.Palukalima37806.Animate
-[00:11:23][SCRIPT] [LocalScript][cached][true] game.Workspace.Characters.kimzalovemom12.Animate
-[00:11:23][SCAN] → ReplicatedStorage
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Numbers
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Numbers.Data
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Products
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Find
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.ButtonPlus
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Haptics
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.loadHeadshot
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Badges
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Controller
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Settings
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Beam
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Bezier
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Commands
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Sounds
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Fling
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.OpenUtil
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Sizes
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.GrowPlants
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.TypeWriter
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.TimedShop
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Levels
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Refresh
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.UsernameColor
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Plants
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Farmers
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Farmer RNG
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Expand
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Mutations
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Crops
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Rarities
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Upgrade Tree
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Floors
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.GnomeUtil
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ItemShop
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Sprinklers
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Fertilizer
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.GnomeItems
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Boosts
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Night RNG
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Rebirths
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.WateringCans
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.Utility
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.Brainrot
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.Mutation
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.Zone
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.LuckyBlock
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.WheelType
-[00:11:23][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.EventCurrency
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.WeatherEvents
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.WeeklyDeal
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Assets
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Behavior
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Types
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Ant
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Bee
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Bunny
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Cat
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Chicken
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Cow
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Dog
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Frog
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Hornet
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Mutant Ant
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Owl
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Pig
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Raccoon
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Turtle
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Mutant Bee
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pet RNG
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.PetsUtil
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Mouse
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Signal
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Network
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Network.Callback
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Ragdoll
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.ViewportModel
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Promise
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Trove
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.CameraShaker
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.CameraShaker.CameraShakeInstance
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.CameraShaker.CameraShakePresets
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observePlayer
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeAttribute
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeCharacters
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeProperty
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeTag
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeTagNoAncestry
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeChildren
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeDescendants
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeCharacter
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Dropshadow
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Gradient
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Bubblegum
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.ChromeStroke
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.GhostStroke
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Gold
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.GoldStroke
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Lava
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.LavaStroke
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.OceanicStroke
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Rainbow
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.RainbowStroke
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Silver
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.SilverStroke
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Zebra
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Ghost
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.RainbowOutline
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.DeathStroke
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.IceStroke
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.FireStroke
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Matrix
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.GreenOutline
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Shine
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.WaveStroke
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.ShineOutline
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Stroke
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Bubblegum
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Chrome
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Ghost
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Gold
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Lava
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Oceanic
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Rainbow
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Silver
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Zebra
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Death
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Ice
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Fire
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Matrix
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Green
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.wally
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.lib
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages.conch
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages.ui
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.action
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.apply
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.batch
-[00:11:24][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.bind
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.changed
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.cleanup
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.context
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.create
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.defaults
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.derive
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.effect
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.flags
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.graph
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.maps
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.mount
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.read
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.root
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.show
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.source
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.spring
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.switch
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.throw
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.untrack
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_vm.0.2.1.conch_vm.src.lib
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_vm.0.2.1.conch_vm.roblox_packages.types
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.app
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.lib
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.state
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.theme
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.stories.app.story
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.stories.suggestion.story
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.background
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.container
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.corner
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.flex
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.gap
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.loading
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.padding
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.screen
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.stroke
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.suggestion
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.text
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.textbox
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.ast
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.conch
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.vide
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_types.0.2.1.conch_types.src.lib
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_compiler.0.2.2.conch_compiler.src.lib
-[00:11:25][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_compiler.0.2.2.conch_compiler.roblox_packages.types
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ast.0.2.1-rc.2.conch_ast.src.lib
-[00:11:25][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ast.0.2.1-rc.2.conch_ast.roblox_packages.types
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.src.lib
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.src.optional_ast
-[00:11:25][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.roblox_packages.types
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.arguments
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.bootstrap
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.client
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.console
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.constants
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.context
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.lib
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.net
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.signal
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.state
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.types
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.user
-[00:11:25][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.ast
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.compiler
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.intel
-[00:11:25][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.types
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.vm
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.SimpleTween
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Attribute
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Reference
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.VERSION
-[00:11:25][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Utility
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Packages.GoodSignal
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Packages.Janitor
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Gamepad
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Overflow
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Themes
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Themes.Classic
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Themes.Default
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Caption
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Container
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Dropdown
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Indicator
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Menu
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Selection
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Widget
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Notice
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.SimplePath
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Replication
-[00:11:26][SCRIPT] [Script[Client]][decompile][true] game.ReplicatedStorage.SatchelLoader
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages.satchel
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages.topbarplus
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Attribute
-[00:11:26][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Reference
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Types
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Utility
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.VERSION
-[00:11:26][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Packages.GoodSignal
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Packages.Janitor
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Gamepad
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Overflow
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Themes
-[00:11:26][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Themes.Classic
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Themes.Default
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Caption
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Container
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Dropdown
-[00:11:26][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Indicator
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Menu
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Notice
-[00:11:26][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Selection
-[00:11:26][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Widget
-[00:11:27][SCAN] → ReplicatedFirst
-[00:11:27][SCAN] → StarterGui
-[00:11:27][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Tabs.Shop.Menu.Frame.List.VIP.Back.LocalScript
-[00:11:27][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Tabs.Shop.Menu.Frame.List.Server Luck.ImageLabel.LocalScript
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.LocalScript
-[00:11:28][SCRIPT] [LocalScript][cached][true] game.StarterGui.Display.Right.Frame.Shop.Frame.LightRay.LocalScript
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Right.Frame.Upgrade.Frame.OUTLINE.Handler
-[00:11:28][SCRIPT] [LocalScript][cached][true] game.StarterGui.Display.Right.Products.WeeklyDeal.Frame.LightRay.LocalScript
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Frame.ServerLuck.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Frame.VIP.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Frame.2x Money.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Frame.2x Luck.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Frame.4x Luck.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Frame.2x Grow Speed.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Friends.Friends.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Notifications.Frame.OnboardingMessage.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Notifications.Frame.SanityDroppingMessage.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Notifications.Frame.InstabilityEvent.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Notifications.Frame.OnboardingBridgeMessage.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Notifications.BottomFrame.SanityDroppingMessage.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.UpgradeTree.Close.ClosePointer.LocalScript
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.UpgradeTree.Indicators.Money.Label.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui.TutorialMessages.Messages.Handler
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterGui._loading_.Handler
-[00:11:28][SCAN] → StarterPack
-[00:11:28][SCAN] → StarterPlayer
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Camera
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.UIStrokeAdjuster
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Received
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Main
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Upgrade Tree
-[00:11:28][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Upgrade Tree.TutorialPointer.LocalScript
-[00:11:28][SCRIPT] [LocalScript][cached][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Upgrade Tree.TutorialPointer2.LocalScript
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.TopButtons
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Notifications
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Place
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Currency
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Backpack
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Settings
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Index
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Are You Sure
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.ItemShop
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.ActiveGnomes
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Shop
-[00:11:28][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Gift
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.AutoRoll
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Rebirth
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.WeeklyDeal
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.ActivePets
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Loading
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Clock
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Auto Sell
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Products
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.CollectionEffect
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.UIScale
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Mutation Images
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Plant Handler
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Upgrades Handler
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Sell
-[00:11:29][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Sell.ClosePointer.LocalScript
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Expand Plot
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Opening Effect
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.RNG Handler
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GrowPlants
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Gnome Handler
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Gnome Handler.Animations
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Placement
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Effects Controller
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Effects Controller.Bounce
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Effects Controller.Spin
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Chat
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Buttons
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Tutorial
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Plot Sign
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Products Client
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.ItemShop
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Sprinkler Handler
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Fertilizer Handler
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Plot Products
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Rainbow
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.ChatTags
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Free Gnome
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Active Luck
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Night Gnomes
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.LightingController
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Event Noti
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.SystemMessages
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.WeatherIcon
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.Toxic
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.LightningStorm
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.Blizzard
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.Cursed
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Lightning Strike
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Glitch
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Weather Board
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Give Item
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets.Actions.CarryFruit
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets.Actions.Dig
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets.Actions.Pollinate
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets Handler
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets Handler.Animations
-[00:11:29][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Debug
-[00:11:29][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Device Detector
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Device Detector.StartMode
-[00:11:29][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.ProximityPromptScript
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.ClassicCamera
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraUtils
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRBaseCamera
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.BaseOcclusion
-[00:11:29][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.Invisicam
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRVehicleCameraDeprecated
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraToggleStateController
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCameraTeleportDetector
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCamera
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.Poppercam
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VehicleCamera
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VehicleCamera.VehicleCameraConfig
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VehicleCamera.VehicleCameraCore
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.TransparencyController
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.ZoomController
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.ZoomController.Popper
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRVehicleCamera
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraUI
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.OrbitalCamera
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.LegacyCamera
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.MouseLockController
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCameraTeleportDetector.spec
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.BaseCamera
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraInput
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.TouchJump
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.Keyboard
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.AvatarAbilitiesInterface
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.TouchThumbstick
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.VehicleController
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.ClickToMoveDisplay
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.ClickToMoveController
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.PathDisplay
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.BaseCharacterController
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.Gamepad
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.VRNavigation
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.DynamicThumbstick
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CameraWrapper.spec
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CharacterUtil
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.ConnectionUtil
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.FlagUtil
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.ConnectionUtil.spec
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CameraWrapper
-[00:11:30][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.RbxCharacterSounds
-[00:11:30][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.RbxCharacterSounds.AtomicBinding
-[00:11:30][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerScriptsLoader
-[00:11:30][SCAN] → Lighting
-[00:11:30][SCAN] → PlayerGui
-[00:11:30][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Tabs.Shop.Menu.Frame.List.VIP.Back.LocalScript
-[00:11:30][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Tabs.Shop.Menu.Frame.List.Server Luck.ImageLabel.LocalScript
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.LocalScript
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Right.Frame.Shop.Frame.LightRay.LocalScript
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Right.Frame.Upgrade.Frame.OUTLINE.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Right.Products.WeeklyDeal.Frame.LightRay.LocalScript
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.ServerLuck.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.VIP.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.2x Money.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.2x Luck.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.4x Luck.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.2x Grow Speed.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Friends.Friends.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Notifications.Frame.OnboardingMessage.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Notifications.Frame.SanityDroppingMessage.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Notifications.Frame.InstabilityEvent.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Notifications.Frame.OnboardingBridgeMessage.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Notifications.BottomFrame.SanityDroppingMessage.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.UpgradeTree.Close.ClosePointer.LocalScript
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.UpgradeTree.Indicators.Money.Label.Handler
-[00:11:31][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.TutorialMessages.Messages.Handler
-[00:11:31][SCAN] → Backpack
-[00:11:31][INFO] Writing reports...
+[23:42:47][INFO] =================================================
+[23:42:47][INFO] DUMPER v7.0  [ADVANCED EDITION]
+[23:42:47][INFO] Game: Roll_A_Gnome (117539213094671)
+[23:42:47][INFO] Executor: Potassium v2.4.3
+[23:42:47][INFO] Time: Thu Aug 20 23:42:47 2026
+[23:42:47][INFO] API PROBE:
+[23:42:47][INFO]   + cloneref
+[23:42:47][INFO]   + decompile
+[23:42:47][INFO]   + getconstants
+[23:42:47][INFO]   + getfunctionhash
+[23:42:47][INFO]   + getscriptbytecode
+[23:42:47][INFO]   + getscriptclosure
+[23:42:47][INFO]   + getscripthash
+[23:42:47][INFO]   + getupvalues
+[23:42:47][INFO]   + isfile
+[23:42:47][INFO]   + makefolder
+[23:42:47][INFO]   + queue_on_teleport
+[23:42:47][INFO]   + readfile
+[23:42:47][INFO]   + setclipboard
+[23:42:47][INFO]   + writefile
+[23:42:47][INFO] =================================================
+[23:42:47][INFO] Pre-counting scripts per service...
+[23:42:48][INFO]   Workspace → 2 scripts estimated
+[23:42:48][INFO]   ReplicatedStorage → 262 scripts estimated
+[23:42:48][INFO]   ReplicatedFirst → 0 scripts estimated
+[23:42:48][INFO]   StarterGui → 23 scripts estimated
+[23:42:48][INFO]   StarterPack → 0 scripts estimated
+[23:42:48][INFO]   StarterPlayer → 132 scripts estimated
+[23:42:48][INFO]   Lighting → 0 scripts estimated
+[23:42:48][INFO]   PlayerGui → 22 scripts estimated
+[23:42:48][INFO]   Backpack → 20 scripts estimated
+[23:42:48][SCAN] → Workspace
+[23:42:59][SCRIPT] [LocalScript][decompile][true] game.Workspace.Characters.kimzalovemom12.Animate
+[23:42:59][SCRIPT] [LocalScript][cached][true] game.Workspace.Characters.Palukalima37806.Animate
+[23:42:59][SCAN] → ReplicatedStorage
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Numbers
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Numbers.Data
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Products
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Find
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.ButtonPlus
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Haptics
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.loadHeadshot
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Badges
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Controller
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Settings
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Beam
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Bezier
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Commands
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Sounds
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Fling
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.OpenUtil
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Sizes
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.GrowPlants
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.TypeWriter
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.TimedShop
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Levels
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Refresh
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.UsernameColor
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Mouse
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Signal
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Network
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Network.Callback
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Ragdoll
+[23:42:59][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.ViewportModel
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Promise
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Trove
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.CameraShaker
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.CameraShaker.CameraShakeInstance
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.CameraShaker.CameraShakePresets
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observePlayer
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeAttribute
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeCharacters
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeProperty
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeTag
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeTagNoAncestry
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeChildren
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeDescendants
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Observers.observeCharacter
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Dropshadow
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Gradient
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Bubblegum
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.ChromeStroke
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.GhostStroke
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Gold
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.GoldStroke
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Lava
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.LavaStroke
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.OceanicStroke
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Rainbow
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.RainbowStroke
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Silver
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.SilverStroke
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Zebra
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Ghost
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.RainbowOutline
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.DeathStroke
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.IceStroke
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.FireStroke
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Matrix
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.GreenOutline
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.Shine
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.WaveStroke
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Presets.ShineOutline
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.Stroke
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Bubblegum
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Chrome
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Ghost
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Gold
+[23:43:00][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Lava
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Oceanic
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Rainbow
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Silver
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Zebra
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Death
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Ice
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Fire
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Matrix
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.GradientTemplates.Green
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.EasyVisuals.wally
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.lib
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages.conch
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages.ui
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.ast
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.compiler
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.intel
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.types
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.roblox_packages.vm
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.arguments
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.bootstrap
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.client
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.console
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.constants
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.context
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.lib
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.net
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.signal
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.state
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.types
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch.0.2.5-rc.2.conch.src.user
+[23:43:01][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.roblox_packages.types
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.src.lib
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.src.optional_ast
+[23:43:01][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ast.0.2.1-rc.2.conch_ast.roblox_packages.types
+[23:43:01][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ast.0.2.1-rc.2.conch_ast.src.lib
+[23:43:01][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_compiler.0.2.2.conch_compiler.roblox_packages.types
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_compiler.0.2.2.conch_compiler.src.lib
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_types.0.2.1.conch_types.src.lib
+[23:43:02][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.ast
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.conch
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.roblox_packages.vide
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.app
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.lib
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.state
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.theme
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.background
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.container
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.corner
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.flex
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.gap
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.loading
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.padding
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.screen
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.stroke
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.suggestion
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.text
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.components.textbox
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.stories.app.story
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_ui.0.2.5-rc.1.conch_ui.src.stories.suggestion.story
+[23:43:02][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_vm.0.2.1.conch_vm.roblox_packages.types
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_vm.0.2.1.conch_vm.src.lib
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.action
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.apply
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.batch
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.bind
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.changed
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.cleanup
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.context
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.create
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.defaults
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.derive
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.effect
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.flags
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.graph
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.maps
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.mount
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.read
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.root
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.show
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.source
+[23:43:02][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.spring
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.switch
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.throw
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.centau_vide@0.3.1.vide.untrack
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.SimpleTween
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Attribute
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Reference
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.VERSION
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Utility
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Caption
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Container
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Dropdown
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Indicator
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Menu
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Selection
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Widget
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Notice
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Gamepad
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Overflow
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Themes
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Themes.Classic
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Themes.Default
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Packages.GoodSignal
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.TopbarPlus.Packages.Janitor
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Imported.SimplePath
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Plants
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Farmers
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Farmer RNG
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Expand
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Mutations
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Crops
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Rarities
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Upgrade Tree
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Floors
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.GnomeUtil
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ItemShop
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Sprinklers
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Fertilizer
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.GnomeItems
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Boosts
+[23:43:03][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Night RNG
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Rebirths
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.WateringCans
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.Utility
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.Brainrot
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.Mutation
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.Zone
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.LuckyBlock
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.WheelType
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.ConchTypes.EventCurrency
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.WeatherEvents
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.WeeklyDeal
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Assets
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Behavior
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Types
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Ant
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Bee
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Bunny
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Cat
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Chicken
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Cow
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Dog
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Frog
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Hornet
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Mutant Ant
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Owl
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Pig
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Raccoon
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Turtle
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Mutant Bee
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.Pet RNG
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Library.Configs.PetsUtil
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.Replication
+[23:43:04][SCRIPT] [Script[Client]][decompile][true] game.ReplicatedStorage.SatchelLoader
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages.satchel
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages.topbarplus
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Attribute
+[23:43:04][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Reference
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Types
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Utility
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.VERSION
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Caption
+[23:43:04][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Container
+[23:43:05][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Dropdown
+[23:43:05][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Indicator
+[23:43:05][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Menu
+[23:43:05][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Notice
+[23:43:05][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Selection
+[23:43:05][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Widget
+[23:43:05][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Gamepad
+[23:43:05][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Overflow
+[23:43:05][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Themes
+[23:43:05][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Themes.Classic
+[23:43:05][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Themes.Default
+[23:43:05][SCRIPT] [ModuleScript][cached][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Packages.GoodSignal
+[23:43:05][SCRIPT] [ModuleScript][decompile][true] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Packages.Janitor
+[23:43:06][SCAN] → ReplicatedFirst
+[23:43:06][SCAN] → StarterGui
+[23:43:06][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Tabs.Shop.Menu.Frame.List.VIP.Back.LocalScript
+[23:43:06][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Tabs.Shop.Menu.Frame.List.Server Luck.ImageLabel.LocalScript
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.LocalScript
+[23:43:07][SCRIPT] [LocalScript][cached][true] game.StarterGui.Display.Right.Frame.Shop.Frame.LightRay.LocalScript
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Right.Frame.Upgrade.Frame.OUTLINE.Handler
+[23:43:07][SCRIPT] [LocalScript][cached][true] game.StarterGui.Display.Right.Products.WeeklyDeal.Frame.LightRay.LocalScript
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Frame.ServerLuck.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Frame.VIP.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Frame.2x Money.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Frame.2x Luck.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Frame.4x Luck.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Frame.2x Grow Speed.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Display.Boosts.Friends.Friends.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Notifications.Frame.OnboardingMessage.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Notifications.Frame.SanityDroppingMessage.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Notifications.Frame.InstabilityEvent.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Notifications.Frame.OnboardingBridgeMessage.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.Notifications.BottomFrame.SanityDroppingMessage.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.UpgradeTree.Close.ClosePointer.LocalScript
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.UpgradeTree.Indicators.Money.Label.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui.TutorialMessages.Messages.Handler
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterGui._loading_.Handler
+[23:43:07][SCAN] → StarterPack
+[23:43:07][SCAN] → StarterPlayer
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Camera
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client
+[23:43:07][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.UIStrokeAdjuster
+[23:43:07][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface
+[23:43:07][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Received
+[23:43:07][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Main
+[23:43:07][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Upgrade Tree
+[23:43:07][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Upgrade Tree.TutorialPointer.LocalScript
+[23:43:07][SCRIPT] [LocalScript][cached][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Upgrade Tree.TutorialPointer2.LocalScript
+[23:43:07][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.TopButtons
+[23:43:07][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Notifications
+[23:43:07][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Place
+[23:43:07][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Currency
+[23:43:07][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Backpack
+[23:43:07][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Settings
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Index
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Are You Sure
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.ItemShop
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.ActiveGnomes
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Shop
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Gift
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.AutoRoll
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.Rebirth
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.WeeklyDeal
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Tabs.ActivePets
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Loading
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Clock
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Auto Sell
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Interface.Products
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.CollectionEffect
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.UIScale
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Mutation Images
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Plant Handler
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Upgrades Handler
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Sell
+[23:43:08][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Sell.ClosePointer.LocalScript
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Expand Plot
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Opening Effect
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.RNG Handler
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GrowPlants
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Gnome Handler
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Gnome Handler.Animations
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Placement
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Effects Controller
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Effects Controller.Bounce
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Effects Controller.Spin
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Chat
+[23:43:08][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Buttons
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Tutorial
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Plot Sign
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Products Client
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.ItemShop
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Sprinkler Handler
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Fertilizer Handler
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Plot Products
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Rainbow
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.ChatTags
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Free Gnome
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Active Luck
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Night Gnomes
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.LightingController
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Event Noti
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.SystemMessages
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.WeatherIcon
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.Toxic
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.LightningStorm
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.Blizzard
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.Cursed
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Lightning Strike
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Glitch
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Weather Board
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Give Item
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets.Actions.CarryFruit
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets.Actions.Dig
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets.Actions.Pollinate
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets Handler
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Pets Handler.Animations
+[23:43:09][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Debug
+[23:43:09][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Device Detector
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.Device Detector.StartMode
+[23:43:09][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.ProximityPromptScript
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.ClassicCamera
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraUtils
+[23:43:09][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRBaseCamera
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.BaseOcclusion
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.Invisicam
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRVehicleCameraDeprecated
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraToggleStateController
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCameraTeleportDetector
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCamera
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.Poppercam
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VehicleCamera
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VehicleCamera.VehicleCameraConfig
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VehicleCamera.VehicleCameraCore
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.TransparencyController
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.ZoomController
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.ZoomController.Popper
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRVehicleCamera
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraUI
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.OrbitalCamera
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.LegacyCamera
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.MouseLockController
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCameraTeleportDetector.spec
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.BaseCamera
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraInput
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.TouchJump
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.Keyboard
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.AvatarAbilitiesInterface
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.TouchThumbstick
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.VehicleController
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.ClickToMoveDisplay
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.ClickToMoveController
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.PathDisplay
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.BaseCharacterController
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.Gamepad
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.VRNavigation
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.DynamicThumbstick
+[23:43:10][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CameraWrapper.spec
+[23:43:11][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CharacterUtil
+[23:43:11][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.ConnectionUtil
+[23:43:11][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.FlagUtil
+[23:43:11][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.ConnectionUtil.spec
+[23:43:11][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CameraWrapper
+[23:43:11][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.RbxCharacterSounds
+[23:43:11][SCRIPT] [ModuleScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.RbxCharacterSounds.AtomicBinding
+[23:43:11][SCRIPT] [LocalScript][decompile][true] game.StarterPlayer.StarterPlayerScripts.PlayerScriptsLoader
+[23:43:11][SCAN] → Lighting
+[23:43:11][SCAN] → PlayerGui
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Tabs.Shop.Menu.Frame.List.VIP.Back.LocalScript
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Tabs.Shop.Menu.Frame.List.Server Luck.ImageLabel.LocalScript
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.LocalScript
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Right.Frame.Shop.Frame.LightRay.LocalScript
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Right.Frame.Upgrade.Frame.OUTLINE.Handler
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Right.Products.WeeklyDeal.Frame.LightRay.LocalScript
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.ServerLuck.Handler
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.VIP.Handler
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.2x Money.Handler
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.2x Luck.Handler
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.4x Luck.Handler
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Frame.2x Grow Speed.Handler
+[23:43:11][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Display.Boosts.Friends.Friends.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Notifications.Frame.OnboardingMessage.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Notifications.Frame.SanityDroppingMessage.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Notifications.Frame.InstabilityEvent.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Notifications.Frame.OnboardingBridgeMessage.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.Notifications.BottomFrame.SanityDroppingMessage.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.UpgradeTree.Close.ClosePointer.LocalScript
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.UpgradeTree.Indicators.Money.Label.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.PlayerGui.TutorialMessages.Messages.Handler
+[23:43:12][SCAN] → Backpack
+[23:43:12][SCRIPT] [LocalScript][decompile][true] game.Players.Palukalima37806.Backpack.Pineapple Gnome.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Dragonfruit Gnome.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Peach Gnome.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Peach Gnome.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Pineapple Gnome.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Avocado Gnome.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Mango Gnome.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Pepper Gnome.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Apple Gnome.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Avocado Gnome.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Blueberry Gnome.Handler
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Kiwi Gnome.Handler
+[23:43:12][SCRIPT] [LocalScript][decompile][true] game.Players.Palukalima37806.Backpack.Lightning Fruit.LocalScript
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Lightning Fruit.LocalScript
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Lightning Fruit.LocalScript
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Lightning Fruit.LocalScript
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Rainbow Mango.LocalScript
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Rainbow Mango.LocalScript
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Rainbow Mango.LocalScript
+[23:43:12][SCRIPT] [LocalScript][cached][true] game.Players.Palukalima37806.Backpack.Rainbow Mango.LocalScript
+[23:43:12][INFO] Writing reports...

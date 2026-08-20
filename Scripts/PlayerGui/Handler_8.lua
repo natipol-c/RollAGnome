@@ -5,9 +5,9 @@
   Path:     game.Players.Palukalima37806.PlayerGui.Display.Boosts.Friends.Friends.Handler
   Service:  PlayerGui
   Success:  true
-  Executor: Potassium v2.4.2
+  Executor: Potassium v2.4.3
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Thu Aug 20 00:11:31 2026
+  Time:     Thu Aug 20 23:43:11 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.

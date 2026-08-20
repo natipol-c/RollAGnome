@@ -38,9 +38,7 @@ if type(math.round) ~= "function" then
         return math.floor(v + 0.5)
     end
 end
-if type(typeof) ~= "function" then
-    typeof = type
-end
+local robloxTypeof = type(typeof) == "function" and typeof or type
 
 if not game:IsLoaded() then
     local start = os.clock()
@@ -54,16 +52,20 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local VirtualUser = game:GetService("VirtualUser")
 local TeleportService = game:GetService("TeleportService")
-local GuiService = game:GetService("GuiService")
 local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
+local Replication
 if not LocalPlayer then
     local startWait = os.clock()
     while not LocalPlayer and os.clock() - startWait < 5 do
         task.wait(0.1)
         LocalPlayer = Players.LocalPlayer
     end
+end
+if not LocalPlayer then
+    warn("[Roll A Gnome Hub] LocalPlayer was not available")
+    return
 end
 
 local function getPlayerMoney()
@@ -140,7 +142,7 @@ Runtime.ClearActionReservation = function(owner)
 end
 
 -- Automation actions share a few player/game resources. Acquire every needed
--- group atomically so two loops can never equip, teleport, mutate a gnome, or
+-- group atomically so two loops can never equip, mutate a gnome, or
 -- spend money over one another. Rebirth is exclusive because it rebuilds plot
 -- state underneath all other systems.
 Runtime.BeginAction = function(owner, groups)
@@ -240,12 +242,16 @@ if Library and type(Library.get) == "function" then
         Network = Library.get("Network")
     end)
 end
-local Replication
 local okRep, rep = pcall(function()
     return require(ReplicatedStorage:WaitForChild("Replication", 10))
 end)
 if okRep and rep then
     Replication = rep
+end
+if type(Replication) ~= "table" then
+    Replication = { Data = {} }
+elseif type(Replication.Data) ~= "table" then
+    Replication.Data = {}
 end
 
 local function getConfig(name, fallback)
@@ -266,6 +272,7 @@ local FarmersConfig = getConfig("Farmers")
 local PlantsConfig = getConfig("Plants")
 local CropsUtil = getConfig("Crops")
 local LevelsUtil = getConfig("Levels")
+local MutationsConfig = getConfig("Mutations")
 local SprinklersConfig = getConfig("Sprinklers")
 Runtime.FertilizersConfig = getConfig("Fertilizer")
 Runtime.WateringCansConfig = getConfig("WateringCans")
@@ -294,8 +301,9 @@ local Defaults = {
     AutoBuyRebirthGnomes = false,
     PauseRollUntilAffordable = true,
     RollPriority = "TargetFirst",
-    AutomationStrategy = "Balanced",
-    MovementPriority = "SmartTimeShare",
+    -- Fresh installs have not selected a preset yet. Showing Balanced here
+    -- while every automation toggle is still off made the UI misleading.
+    AutomationStrategy = "Custom",
     MoneyReservePercent = 0,
     InventoryOverflowPolicy = "FlushAll",
     AutoBest30 = false,
@@ -305,8 +313,11 @@ local Defaults = {
     PlaceGnomeTargets = {},
     PlaceMutationTargets = {},
     PlaceRarityTargets = {},
+    GnomeTargetTraits = {},
+    GnomeKeepTraits = {},
     ProtectHighTier = true,
     GnomeSellPolicy = "BelowBest",
+    TargetLogicVersion = 3,
     AutoCollect = false,
     AutoSellProduce = false,
     AutoBuyShop = false,
@@ -332,27 +343,9 @@ local Defaults = {
     SellRarityTargets = {},
     MutationTargets = {},
     KeepMutationTargets = {},
-    SellProduceMutationTargets = { Normal = true },
-    UseItemTargets = {
-        ["Mutation Mister"] = true,
-        ["Gold Watering Can"] = true,
-        ["Good Fertilizer"] = true,
-        ["Gnome Coffee"] = true,
-        ["Fertilizer"] = true,
-        ["Golden Sprinkler"] = true,
-        ["Basic Watering Can"] = true,
-        ["Basic Sprinkler"] = true,
-    },
-    ShopTargets = {
-        ["Mutation Mister"] = true,
-        ["Gold Watering Can"] = true,
-        ["Good Fertilizer"] = true,
-        ["Gnome Coffee"] = true,
-        ["Fertilizer"] = true,
-        ["Golden Sprinkler"] = true,
-        ["Basic Watering Can"] = true,
-        ["Basic Sprinkler"] = true,
-    },
+    SellProduceMutationTargets = {},
+    UseItemTargets = {},
+    ShopTargets = {},
     GivePlayers = {},
     ReceivePlayers = {},
 }
@@ -380,6 +373,13 @@ local MasterAutomationKeySet = {}
 for _, key in ipairs(MasterAutomationKeys) do
     MasterAutomationKeySet[key] = true
 end
+local PresetControlledKeySet = {
+    AutoRoll = true, AutoBuyTarget = true, AutoBuyRebirthGnomes = true,
+    PauseRollUntilAffordable = true, AutoBest30 = true, ProtectHighTier = true,
+    AutoCollect = true, AutoSellProduce = true, AutoBuyShop = true,
+    AutoUseItems = true, AutoBuyMutation = true, AutoUpgrade = true,
+    AutoBuyExpansion = true, AutoRebirth = true,
+}
 
 local State = Environment.RollAGnomeSettings
 local ThaiText = {
@@ -392,45 +392,36 @@ local ThaiText = {
     ["Config"] = "โปรไฟล์",
     ["Logs"] = "บันทึก",
 
-    -- Strategy Presets
+    -- Strategy Presets (Gnomes Page)
     ["Strategy & Modes"] = "กลยุทธ์การเล่นอัตโนมัติ",
     ["Automation Strategy"] = "กลยุทธ์การเล่น",
     ["Choose how the automation prioritizes progression vs money vs hunting"] = "เลือกลำดับความสำคัญระหว่างการฟาร์มเงิน ล่าโนม หรือการเกิดใหม่",
+    ["Balanced"] = "สมดุล",
     ["Max Progression"] = "เน้นเกิดใหม่",
     ["Rebirth Rush"] = "เน้นเกิดใหม่",
     ["Gnome Hunter"] = "เน้นล่าโนม",
     ["Money Machine"] = "เน้นฟาร์มเงิน",
-    ["Balanced"] = "สมดุล",
     ["Custom"] = "กำหนดเอง",
 
-    -- Auto Roll & Buy
+    -- Auto Roll & Buy (Gnomes Page)
     ["Auto Roll"] = "ระบบสุ่มและซื้อโนม",
-    ["Auto Roll Gnomes"] = "สุ่มโนมอัตโนมัติ",
     ["Roll continuously and wait for every result"] = "หมุนตู้สุ่มโนมต่อเนื่องและรอผลลัพธ์ทุกรอบ",
-    ["Roll gnomes continuously when near roll station"] = "สุ่มหาโนมอย่างต่อเนื่องเมื่อยืนอยู่ในระยะ",
     ["Auto Buy Rolled Gnomes"] = "ซื้อโนมตามเป้าหมาย",
-    ["Auto Buy Matched Gnomes"] = "ซื้อโนมเป้าหมายอัตโนมัติ",
     ["Buy rolled gnomes that match your selected rarity, mutation, or rebirth targets"] = "ซื้อโนมที่สุ่มได้ทันทีหากตรงกับระดับ ความหายาก หรือมิวเทชั่นที่เลือก",
-    ["Buy gnomes matching your target names, rarities, or mutations"] = "ซื้อโนมที่ตรงกับชื่อ ความหายาก หรือมิวเทชั่นเป้าหมาย",
-    ["Auto Buy Rebirth Quests"] = "ซื้อโนมเควสต์เกิดใหม่อัตโนมัติ",
-    ["Automatically buy gnomes required for next rebirth tier"] = "ซื้อโนมที่จำเป็นต้องใช้สำหรับการเกิดใหม่รอบถัดไป",
-    ["Pause Roll Until Affordable"] = "หยุดสุ่มรอจนกว่าเงินจะพอซื้อ",
+    ["Buy only when every active name, rarity, and mutation target category matches"] = "ซื้อเฉพาะเมื่อชื่อ ระดับ และมิวเทชั่นตรงกับทุกหมวดเป้าหมายที่เลือกไว้",
+    ["Auto Buy Rebirth Gnomes"] = "ซื้อโนมที่ใช้เกิดใหม่อัตโนมัติ",
+    ["Buy missing gnomes required by the next rebirth even when normal targets do not match"] = "ซื้อโนมที่ยังขาดสำหรับการเกิดใหม่รอบถัดไป แม้ไม่ตรงเป้าหมายทั่วไป",
+    ["Pause Roll Until Affordable"] = "หยุดรอเงินซื้อโนม",
     ["Hold a wanted result until enough money is available to buy it"] = "หากสุ่มเจอโนมเป้าหมายแต่เงินไม่พอ จะหยุดรอจนกว่าเงินจะพอซื้อ",
-    ["Wait for money instead of skipping high-value rolled targets"] = "หยุดรอเก็บเงินเมื่อสุ่มได้ตัวเทพ แทนที่จะกดข้าม",
-    ["Roll Priority"] = "ลำดับความสำคัญเมื่อสุ่ม",
     ["Roll vs Rebirth Priority"] = "ลำดับความสำคัญ (สุ่ม vs เกิดใหม่)",
     ["Choose what wins when a wanted roll appears before rebirth"] = "เลือกว่าจะเน้นซื้อโนมที่ต้องการก่อน หรือจะกดเกิดใหม่ก่อน",
     ["Target First"] = "ซื้อเป้าหมายก่อน",
     ["Rebirth First"] = "ซื้อเควสต์เกิดใหม่ก่อน",
 
-    -- Smart Gnome Placement
+    -- Smart Gnome Placement (Gnomes Page)
     ["Smart Gnome Placement"] = "ระบบจัดวางโนมลงแปลง",
     ["Auto Place Gnomes"] = "จัดวางโนมลงแปลงอัตโนมัติ",
-    ["Auto Best Gnomes"] = "คัดโนมตัวท็อป",
-    ["Auto Manage Best Gnomes"] = "วางโนมที่ดีที่สุดอัตโนมัติ",
-    ["Automatically place, swap, and manage active gnomes on your plot"] = "นำโนมลงแปลง สลับตัวที่ดีกว่า และจัดสรรแปลงให้อัตโนมัติ",
     ["Automatically place, protect, and manage gnomes on your plot"] = "นำโนมลงแปลง สลับตัวที่ดีกว่า และจัดสรรแปลงให้อัตโนมัติ",
-    ["Protect and place the strongest gnomes using the selected limit"] = "ล็อกและวางโนมที่รายได้สูงสุดลงแปลงตามจำนวนที่กำหนด",
     ["Placement Strategy"] = "กลยุทธ์การวางโนม",
     ["Choose how gnomes are prioritized for placement on your farm"] = "เลือกลำดับความสำคัญในการวางโนมลงแปลงฟาร์ม",
     ["Best Overall"] = "ตัวท็อปอัตโนมัติ",
@@ -440,136 +431,136 @@ local ThaiText = {
     ["Auto fill all available farm slots or set a custom limit"] = "วางให้เต็มแปลงอัตโนมัติ หรือระบุจำนวนตัวที่ต้องการวาง",
     ["Auto Fill All Slots"] = "วางเต็มแปลง",
     ["Custom Limit"] = "กำหนดจำนวนตัว",
-    ["Best Gnome Amount"] = "จำนวนโนมที่ต้องการวาง",
-    ["Enter an amount from 1 to 100"] = "ระบุจำนวนโนมที่ต้องการวาง (1 ถึง 100 ตัว)",
     ["Protect High-Tier Gnomes"] = "ล็อกโนมระดับสูงห้ามขาย",
-    ["Never sell Godly, Mythic, Huge, Diamond, or Event gnomes"] = "ล็อกห้ามขายโนมระดับ Godly, Mythic, Huge, Diamond หรือกิจกรรมเด็ดขาด",
+    ["Protect the best live rarity and mutation tiers plus Huge gnomes"] = "ล็อกระดับและมิวเทชั่นกลุ่มดีที่สุดจากข้อมูลเกม รวมถึงโนม Huge",
 
-    -- Unified Targets & Legacy Target keys
+    -- Unified Targets & Protection (Gnomes Page)
     ["Gnome Targets & Protection"] = "เป้าหมายโนมและระบบล็อก",
-    ["Targets & Protection"] = "เป้าหมายโนมและระบบล็อก",
+    ["Wanted Gnomes"] = "เป้าหมายโนม",
+    ["One list: [R] rarity and [M] mutation; different categories must both match"] = "รวมในรายการเดียว: [R] ระดับ และ [M] มิวเทชั่น โดยคนละหมวดต้องตรงพร้อมกัน",
+    ["Extra Protection"] = "ล็อกเพิ่มเติม",
+    ["Kept without buying; choosing a trait here removes it from Wanted Gnomes"] = "ล็อกไว้โดยไม่ซื้อ และหากเลือกซ้ำจะย้ายออกจากรายการเป้าหมายโนม",
     ["Target Gnome Names"] = "เลือกชื่อโนมเป้าหมาย",
     ["Gnomes prioritized for auto-buying and plot placement, and protected from selling"] = "เลือกชื่อโนมสำหรับสุ่มซื้อ วางลงแปลง และล็อกห้ามขายอัตโนมัติ",
+    ["Selected names must also match every active rarity and mutation category"] = "ชื่อที่เลือกต้องตรงกับหมวดระดับและมิวเทชั่นที่เปิดเลือกไว้ทั้งหมดด้วย",
     ["Target Mutations"] = "เลือกมิวเทชั่นเป้าหมาย",
     ["Mutations prioritized for auto-buying and plot placement, and protected from selling"] = "เลือกมิวเทชั่นสำหรับสุ่มซื้อ วางลงแปลง และล็อกห้ามขายอัตโนมัติ",
+    ["Any checked mutation may match, but all other active target categories must also match"] = "ตรงกับมิวเทชั่นที่ติ๊กไว้อันใดอันหนึ่งได้ แต่ต้องตรงกับหมวดเป้าหมายอื่นที่เลือกไว้ทั้งหมดด้วย",
     ["Target Rarities"] = "เลือกระดับความหายากเป้าหมาย",
     ["Rarity levels prioritized for auto-buying and plot placement, and protected from selling"] = "เลือกระดับความหายากสำหรับสุ่มซื้อ วางลงแปลง และล็อกห้ามขายอัตโนมัติ",
-    ["Place Gnome Targets"] = "เลือกชื่อโนมเป้าหมาย",
-    ["Place Mutation Targets"] = "เลือกมิวเทชั่นเป้าหมาย",
-    ["Place Rarity Targets"] = "เลือกระดับความหายากเป้าหมาย",
-    ["Buy Rarity Targets"] = "เลือกระดับความหายากเป้าหมาย",
-    ["Buy Mutation Targets"] = "เลือกมิวเทชั่นเป้าหมาย",
-    ["Keep Rarity Targets"] = "เลือกระดับความหายากเป้าหมาย",
-    ["Keep Mutation Targets"] = "เลือกมิวเทชั่นเป้าหมาย",
+    ["Any checked rarity may match, but all other active target categories must also match"] = "ตรงกับระดับที่ติ๊กไว้อันใดอันหนึ่งได้ แต่ต้องตรงกับหมวดเป้าหมายอื่นที่เลือกไว้ทั้งหมดด้วย",
+    ["Extra Gnome Protection"] = "ล็อกโนมเพิ่มเติม",
+    ["Keep Rarities"] = "ระดับโนมที่ห้ามขาย",
+    ["Additional rarity levels that are always protected from selling"] = "ระดับโนมเพิ่มเติมที่จะล็อกไว้และไม่ขาย",
+    ["Keep Mutations"] = "มิวเทชั่นโนมที่ห้ามขาย",
+    ["Additional mutations that are always protected from selling"] = "มิวเทชั่นเพิ่มเติมที่จะล็อกไว้และไม่ขาย",
+    ["Surplus Gnome Selling"] = "การขายโนมส่วนเกิน",
+    ["Sell Policy"] = "นโยบายการขายโนม",
+    ["Choose how gnomes outside the protected best set are handled"] = "เลือกวิธีจัดการโนมที่อยู่นอกกลุ่มตัวที่ดีที่สุดและไม่ได้ล็อกไว้",
+    ["Sell Below Best"] = "ขายตัวที่ต่ำกว่ากลุ่มดีที่สุด",
+    ["Sell Checked Rarities"] = "ขายเฉพาะระดับที่เลือก",
+    ["Keep All Extras"] = "เก็บตัวส่วนเกินทั้งหมด",
+    ["Rarities to Sell"] = "ระดับโนมที่จะขาย",
+    ["Used only by Sell Checked Rarities mode"] = "ใช้เฉพาะเมื่อเลือกโหมดขายระดับที่ติ๊กไว้",
+    ["Checked means sell; protected targets still always win"] = "ติ๊กหมายถึงขาย โดยโนมที่ล็อกไว้จะไม่ถูกขายเสมอ",
 
-    -- Farm Page
+    -- Harvest & Market (Farm Page)
     ["Harvest & Market"] = "การเก็บเกี่ยวและตลาด",
-    ["Auto Collect"] = "เก็บเกี่ยวผลผลิตอัตโนมัติ",
     ["Auto Collect Crops"] = "เก็บเกี่ยวผลผลิตอัตโนมัติ",
-    ["Collect all ready crops directly from distance"] = "เก็บเกี่ยวผลผลิตที่สุกแล้วในแปลงทั้งหมดจากระยะไกล",
-    ["Auto Sell Produce"] = "ขายผลผลิตอัตโนมัติ",
+    ["Collect every ready crop through the game remote without moving your character"] = "เก็บผลผลิตที่สุกทั้งหมดผ่านรีโมตของเกมโดยไม่เคลื่อนย้ายตัวละคร",
     ["Auto Sell Crops"] = "ขายผลผลิตอัตโนมัติ",
     ["Remotely sell harvested crops matching selected mutations"] = "ขายผลผลิตในตัวอัตโนมัติเฉพาะมิวเทชั่นที่เลือกไว้",
     ["Sell Produce Mutations"] = "เลือกมิวเทชั่นผลผลิตที่จะขาย",
-    ["Produce Mutation Targets"] = "เลือกมิวเทชั่นผลผลิตที่จะขาย",
     ["Select mutations allowed for sale; keep Normal for basic crops"] = "เลือกมิวเทชั่นที่อนุญาตให้ขาย (เลือก Normal สำหรับผลผลิตธรรมดา)",
-    ["Ticked mutations will be sold; choose Normal for produce without a mutation"] = "เลือกมิวเทชั่นที่อนุญาตให้ขาย (เลือก Normal สำหรับผลผลิตธรรมดา)",
 
-    -- Farm Care & Buffs
+    -- Farm Care & Buffs (Farm Page)
     ["Farm Care & Buffs"] = "การดูแลแปลงและไอเทมบัฟ",
-    ["Auto Use Items"] = "ใช้งานไอเทมฟาร์มและบัฟอัตโนมัติ",
     ["Auto Use Farm Items"] = "ใช้งานไอเทมฟาร์มและบัฟอัตโนมัติ",
     ["Use selected sprinklers, fertilizers, watering cans, and gnome items"] = "เปิดใช้งานสปริงเกอร์ ปุ๋ย บัวรดน้ำ และป้อนกาแฟโนมให้อัตโนมัติ",
     ["Allowed Use Items"] = "เลือกประเภทไอเทมที่จะใช้งาน",
-    ["Use Item Targets"] = "เลือกประเภทไอเทมที่จะใช้งาน",
     ["Only selected item types will be used automatically"] = "ใช้งานเฉพาะประเภทไอเทมที่เลือกไว้",
-    ["Area items cover valuable crops, watering cans target growing crops, and coffee targets the strongest unboosted gnome."] = "สปริงเกอร์/ปุ๋ยจะวางคลุมพืชราคาแพง, บัวรดน้ำจะรดพืชที่กำลังโต, และกาแฟจะใช้กับโนมที่เก่งที่สุดในแปลง",
+    ["Area items cover valuable crops, watering cans target growing crops, and coffee targets the strongest unboosted gnome."] = "ไอเทมพื้นที่จะครอบคลุมผลผลิตมูลค่าสูง บัวรดน้ำจะเลือกต้นที่กำลังโต และกาแฟจะป้อนโนมที่แข็งแกร่งที่สุดซึ่งยังไม่มีบัฟ",
 
-    -- Item Shop
+    -- Item Shop (Farm Page)
     ["Item Shop Automation"] = "ร้านค้าไอเทมอัตโนมัติ",
     ["Auto Buy Item Shop"] = "ซื้อไอเทมร้านค้าอัตโนมัติ",
     ["Buy selected items whenever they are in stock"] = "ซื้อไอเทมจากร้านค้าตามรายการที่เลือกไว้เมื่อมีเงินพอ",
     ["Shop Items to Buy"] = "เลือกไอเทมที่จะซื้อจากร้านค้า",
-    ["Shop Targets"] = "เลือกไอเทมที่จะซื้อจากร้านค้า",
     ["Items allowed for Auto Buy Item Shop"] = "เลือกรายการไอเทมที่อนุญาตให้บอทซื้อ",
+    ["Full Inventory Policy"] = "วิธีจัดการเมื่อกระเป๋าเต็ม",
+    ["Choose what automation may sell when inventory has fewer than three free slots"] = "เลือกสิ่งที่ระบบอนุญาตให้ขายเมื่อกระเป๋าเหลือพื้นที่น้อยกว่า 3 ช่อง",
+    ["Sell Selected Produce"] = "ขายผลผลิตที่เลือกเท่านั้น",
+    ["Sell Produce + Extra Gnomes"] = "ขายผลผลิตและโนมส่วนเกิน",
+    ["Pause When Full"] = "หยุดเมื่อกระเป๋าเต็ม",
 
-    -- Upgrade & Rebirth
-    ["Upgrade"] = "อัปเกรด",
+    -- Upgrades & Rebirth (Upgrade Page)
     ["Plot & Skill Upgrades"] = "อัปเกรดแปลงและสกิล",
     ["Auto Upgrade Trees"] = "อัปเกรดแปลงและสกิลต้นไม้อัตโนมัติ",
     ["Unlock eligible upgrade tree nodes using available money and points"] = "ซื้ออัปเกรดแปลงเพาะปลูกและปลดล็อกสกิลต้นไม้อัตโนมัติ",
-    ["Auto Buy Expansion"] = "ซื้อขยายพื้นที่ฟาร์มอัตโนมัติ",
     ["Auto Buy Land Expansion"] = "ซื้อขยายพื้นที่ฟาร์มอัตโนมัติ",
     ["Buy affordable plot expansions in order"] = "ซื้อขยายพื้นที่แปลงที่ดินฟาร์มให้อัตโนมัติ",
+    ["Upgrade order\n1. Affordable plot upgrades\n2. Eligible Upgrade Tree nodes\nServer validation prevents invalid or maxed purchases."] = "ลำดับการอัปเกรด\n1. อัปเกรดแปลงที่ซื้อไหว\n2. ปลดล็อกโหนดต้นไม้อัปเกรดที่ผ่านเงื่อนไข\nเซิร์ฟเวอร์จะตรวจสอบรายการที่ไม่ถูกต้องหรือเต็มขั้นแล้ว",
     ["Rebirth Automation"] = "เกิดใหม่อัตโนมัติ",
     ["Auto Rebirth"] = "เกิดใหม่อัตโนมัติ",
     ["Rebirth as soon as requirements are fulfilled"] = "กดเกิดใหม่อัตโนมัติทันทีเมื่อผ่านเงื่อนไขครบถ้วน",
-    ["Upgrade order\n1. Affordable plot upgrades\n2. Eligible Upgrade Tree nodes\nServer validation prevents invalid or maxed purchases."] = "ลำดับการอัปเกรด:\n1. อัปเกรดแปลงที่เงินพอซื้อ\n2. อัปเกรดสกิลต้นไม้ที่ปลดล็อกแล้ว\nระบบป้องกันการซื้อเกินหรือคำสั่งไม่ถูกต้องอัตโนมัติ",
 
-    -- Social
-    ["Social"] = "ระบบเพื่อนและส่งของ",
+    -- Social & Gifting (Social Page)
     ["Auto Give"] = "ส่งของขวัญอัตโนมัติ",
-    ["Offer held tradeable fruits or gnomes to the selected player"] = "ส่งผลผลิตหรือโนมที่ถืออยู่ให้เพื่อนที่เลือกไว้",
+    ["Offer held tradeable produce or gnomes to the selected player"] = "ส่งผลผลิตหรือโนมที่ถืออยู่ให้เพื่อนที่เลือกไว้",
+    ["Give To Players"] = "เลือกเพื่อนที่จะส่งของให้",
+    ["Selected online recipient; the first available name is used"] = "เลือกรายชื่อเพื่อนออนไลน์สำหรับส่งของขวัญให้",
     ["Auto Receive Gift"] = "รับของขวัญอัตโนมัติ",
     ["Accept incoming gifts only from trusted friends in the list"] = "ยอมรับของขวัญอัตโนมัติเฉพาะจากเพื่อนที่อยู่ในรายชื่อ",
-    ["Give To Players"] = "เลือกผู้เล่นที่จะส่งของขวัญให้",
-    ["Selected online recipient; the first available name is used"] = "เลือกรายชื่อเพื่อนออนไลน์สำหรับส่งของขวัญให้",
-    ["Accept From Players"] = "เลือกผู้เล่นที่เชื่อถือได้สำหรับรับของ",
+    ["Accept From Players"] = "เลือกเพื่อนที่จะรับของ",
     ["Only these senders are trusted for automatic acceptance"] = "ยอมรับของขวัญอัตโนมัติเฉพาะจากผู้เล่นที่เลือกไว้",
 
-    -- System & Config
+    -- System & Performance (System Page)
+    ["Performance"] = "ประสิทธิภาพ & ประหยัดพลังงาน",
     ["Anti AFK"] = "ระบบป้องกันหลุด AFK",
     ["Simulate input when Roblox reports the player idle"] = "ขยับตัวอัตโนมัติเพื่อป้องกันเกมตัดการเชื่อมต่อ",
     ["Auto Rejoin"] = "เชื่อมต่อเกมใหม่อัตโนมัติ",
     ["Rejoin this place after a disconnect/error prompt"] = "เข้าเกมใหม่ทันทีเมื่อเกิดข้อผิดพลาดหรือหลุดการเชื่อมต่อ",
-    ["Low Ping Mode"] = "โหมดประหยัดเน็ต / ปิงต่ำ",
-    ["Reduce remote bursts; server distance still determines real ping"] = "ลดความถี่การส่งข้อมูลเพื่อลดการแล็ก",
-    ["Potato Graphics"] = "โหมดลดกราฟิกภาพกาก (ลื่นขึ้น)",
+    ["Low Ping Mode"] = "โหมดประหยัดเน็ต / ลดปิง",
+    ["Reduce remote bursts to lower network and frame-time spikes"] = "ลดการส่งรีโมตถี่เกินไปเพื่อลดปิงและอาการเฟรมกระตุก",
+    ["Potato Graphics"] = "โหมดภาพเบาพิเศษ (Potato)",
     ["Disable expensive local effects and use the lowest graphics quality"] = "ปิดเอฟเฟกต์และลดกราฟิกลงต่ำสุดเพื่อเพิ่ม FPS",
     ["Screen Sleep"] = "โหมดพักหน้าจอประหยัดพลังงาน",
     ["Keep automation running with 3D rendering disabled and a 10 FPS cap"] = "บอททำงานต่อเนื่องโดยปิดการเรนเดอร์ภาพ 3D และจำกัด 10 FPS",
-    ["SLEEP SCREEN"] = "พักหน้าจอ",
-    ["TAP TO WAKE\nAutomation continues in low-power mode"] = "แตะหน้าจอเพื่อปลุก\nบอทกำลังทำงานต่อเนื่องในโหมดประหยัดพลังงาน",
     ["Text Size"] = "ขนาดตัวอักษร UI",
     ["Adjust all interface text from 70% to 160%"] = "ปรับขนาดตัวอักษรทั้งหมดในเมนูตั้งแต่ 70% ถึง 160%",
 
-    -- Config Profile
+    -- Config Profile (Config Page)
+    ["Profile Management"] = "จัดการโปรไฟล์",
+    ["Profile Name"] = "ชื่อโปรไฟล์",
     ["Save Profile"] = "บันทึกโปรไฟล์",
     ["Load Profile"] = "โหลดโปรไฟล์",
     ["Auto Load Profile"] = "โหลดโปรไฟล์อัตโนมัติ",
-    ["Auto Load on Start"] = "โหลดอัตโนมัติเมื่อเปิดสคริปต์",
-    ["Save current settings to a named profile"] = "บันทึกการตั้งค่าปัจจุบันลงโปรไฟล์",
-    ["Load settings from a saved profile"] = "โหลดการตั้งค่าจากโปรไฟล์ที่บันทึกไว้",
-    ["Automatically load the selected profile on startup"] = "โหลดการตั้งค่าจากโปรไฟล์นี้อัตโนมัติเมื่อเปิดใช้งาน",
     ["Load this profile automatically on the next execution"] = "โหลดการตั้งค่าจากโปรไฟล์นี้อัตโนมัติเมื่อเปิดใช้งาน",
-    ["Profile Name"] = "ชื่อโปรไฟล์",
 
-    -- MultiSelect Controls
+    -- Common MultiSelect & Controls
     ["Select All"] = "เลือกทั้งหมด",
     ["Clear"] = "ล้าง",
     ["Search..."] = "ค้นหา...",
+    ["PAUSE"] = "หยุดชั่วคราว",
+    ["RESUME"] = "ทำงานต่อ",
+    ["SLEEP SCREEN"] = "พักหน้าจอ",
+    ["TAP TO WAKE\nAutomation continues in low-power mode"] = "แตะหน้าจอเพื่อปลุก\nบอทกำลังทำงานต่อเนื่องในโหมดประหยัดพลังงาน",
 
-    -- Activity Logs & Filters
+    -- Activity Logs & Dashboard (Logs Page)
     ["Activity Logs"] = "บันทึกกิจกรรมการทำงาน",
     ["Harvested"] = "เก็บเกี่ยวแล้ว",
     ["Total Sold"] = "ขายผลผลิตแล้ว",
     ["Target Rolls"] = "สุ่มได้เป้าหมาย",
     ["Crops"] = "ต้น",
-    ["Items"] = "ชิ้น",
-    ["Clear Logs"] = "ล้างบันทึก",
-    ["Auto Scroll"] = "เลื่อนอัตโนมัติ",
     ["All"] = "ทั้งหมด",
     ["Important"] = "สำคัญ",
     ["Roll"] = "สุ่ม",
     ["Harvest"] = "เก็บผัก",
     ["Sell"] = "ขาย",
     ["Shop"] = "ร้านค้า",
-    ["Upgrade"] = "อัปเกรด",
     ["Buff"] = "บัฟ",
+    ["Auto Scroll"] = "เลื่อนอัตโนมัติ",
     ["No logs recorded yet"] = "ยังไม่มีประวัติกิจกรรม",
-    ["entries"] = "รายการ",
-    ["PAUSE"] = "หยุดชั่วคราว",
-    ["RESUME"] = "ทำงานต่อ",
     ["Ctrl + Alt  |  Show / hide UI\nPAUSE stops all automation. RESUME restores the previous toggles.\nSettings stay active when the UI is minimized."] = "Ctrl + Alt  |  เปิด / ซ่อนหน้าต่าง UI\nPAUSE เพื่อหยุดบอททั้งหมด, RESUME เพื่อให้ทำงานต่อตามเดิม\nระบบยังคงทำงานต่อเนื่องเมื่อย่อหน้าต่าง",
 }
 local LanguageBindings = {}
@@ -622,10 +613,33 @@ if type(State) ~= "table" then
     State = {}
     Environment.RollAGnomeSettings = State
 end
+local previousTargetLogicVersion = tonumber(State.TargetLogicVersion) or 0
+local TraitPrefix = { Gnome = "[G] ", Rarity = "[R] ", Mutation = "[M] " }
+Runtime.SelectShopItemsByType = function(selection, itemType)
+    local found = false
+    for name, data in pairs(ItemShop.Items or {}) do
+        if type(data) == "table" and tostring(data.type) == tostring(itemType) then
+            selection[name] = true
+            found = true
+        end
+    end
+    return found
+end
+Runtime.GetShopItemNameByType = function(itemType)
+    local bestName, bestOrder
+    for name, data in pairs(ItemShop.Items or {}) do
+        if type(data) == "table" and tostring(data.type) == tostring(itemType) then
+            local order = tonumber(data.order) or tonumber(data.price) or 0
+            if bestOrder == nil or order > bestOrder then bestName, bestOrder = name, order end
+        end
+    end
+    return bestName
+end
 Runtime.HadAutoUseItems = State.AutoUseItems ~= nil
 Runtime.LegacyAutoUseItems = State.AutoPlaceSprinklers == true or State.AutoGnomeCoffee == true
 Runtime.LegacyUseItemTargets = type(State.SprinklerTargets) == "table" and State.SprinklerTargets or {}
 Runtime.LegacySellProduceTargets = type(State.SellFruitMutationTargets) == "table" and State.SellFruitMutationTargets or {}
+Runtime.HadLegacySellProduceTargets = State.SellFruitMutationTargets ~= nil
 Runtime.LegacyAutoPlaceGnome = State.AutoPlaceGnome == true
 Runtime.LegacyAutoSellTarget = State.AutoSellTarget == true
 Runtime.HadGnomeSellPolicy = type(State.GnomeSellPolicy) == "string"
@@ -634,16 +648,82 @@ for key, value in pairs(Defaults) do
         State[key] = type(value) == "table" and table.clone(value) or value
     end
 end
+local function migrateTargetLogic(version)
+    version = tonumber(version) or 0
+    local function exactly(selection, expected)
+        if type(selection) ~= "table" then return false end
+        local count = 0
+        for name, enabled in pairs(selection) do
+            if enabled == true then
+                count = count + 1
+                if not expected[name] then return false end
+            end
+        end
+        local expectedCount = 0
+        for _ in pairs(expected) do expectedCount = expectedCount + 1 end
+        return count == expectedCount
+    end
+    if version < 2 then
+        -- Older presets copied target values into Keep lists, changing an AND
+        -- target into broad OR protection. Remove only those exact generated sets.
+        if exactly(State.KeepMutationTargets, {
+            Shiny = true, Diamond = true, Cursed = true, Toxic = true,
+            Golden = true, Night = true,
+        }) then
+            table.clear(State.KeepMutationTargets)
+        end
+        if exactly(State.KeepRarityTargets, { IMPOSSIBLE = true, Godly = true })
+            or exactly(State.KeepRarityTargets, { IMPOSSIBLE = true, Godly = true, Mythic = true })
+        then
+            table.clear(State.KeepRarityTargets)
+        end
+        if State.AutoBest30 == true then State.GnomeCapacityMode = "Custom" end
+    end
+    if version < 3 then
+        local function mergeTraits(destination, prefix, ...)
+            for index = 1, select("#", ...) do
+                local source = select(index, ...)
+                for name, enabled in pairs(type(source) == "table" and source or {}) do
+                    if enabled == true and type(name) == "string" and name ~= "" then
+                        destination[prefix .. name] = true
+                    end
+                end
+            end
+        end
+        mergeTraits(State.GnomeTargetTraits, TraitPrefix.Gnome, State.PlaceGnomeTargets, State.GnomeTargets)
+        mergeTraits(State.GnomeTargetTraits, TraitPrefix.Rarity,
+            State.BuyRarityTargets, State.PlaceRarityTargets, State.RarityTargets)
+        mergeTraits(State.GnomeTargetTraits, TraitPrefix.Mutation,
+            State.MutationTargets, State.PlaceMutationTargets)
+        mergeTraits(State.GnomeKeepTraits, TraitPrefix.Rarity, State.KeepRarityTargets)
+        mergeTraits(State.GnomeKeepTraits, TraitPrefix.Mutation, State.KeepMutationTargets)
+        -- A wanted trait is already protected; avoid showing the same choice
+        -- in both lists after migrating an old profile.
+        for option, enabled in pairs(State.GnomeTargetTraits) do
+            if enabled == true then State.GnomeKeepTraits[option] = nil end
+        end
+        for _, legacy in ipairs({
+            State.PlaceGnomeTargets, State.BuyRarityTargets, State.MutationTargets,
+            State.PlaceMutationTargets, State.PlaceRarityTargets,
+            State.KeepMutationTargets, State.KeepRarityTargets,
+            State.GnomeTargets, State.RarityTargets,
+        }) do
+            if type(legacy) == "table" then table.clear(legacy) end
+        end
+    end
+    State.TargetLogicVersion = 3
+end
+migrateTargetLogic(previousTargetLogicVersion)
 if not Runtime.HadAutoUseItems then
     State.AutoUseItems = Runtime.LegacyAutoUseItems
     for name, enabled in pairs(Runtime.LegacyUseItemTargets) do
         State.UseItemTargets[name] = enabled
     end
     if State.AutoGnomeCoffee == true then
-        State.UseItemTargets["Gnome Coffee"] = true
+        Runtime.SelectShopItemsByType(State.UseItemTargets, "GnomeItem")
     end
 end
-if next(State.SellProduceMutationTargets) == nil then
+if Runtime.HadLegacySellProduceTargets and next(State.SellProduceMutationTargets) == nil then
     for name, enabled in pairs(Runtime.LegacySellProduceTargets) do
         if type(name) == "number" and type(enabled) == "string" then
             State.SellProduceMutationTargets[enabled] = true
@@ -670,33 +750,16 @@ State.AutoSellTarget = nil
 State.Language = string.upper(tostring(State.Language or "EN")) == "TH" and "TH" or "EN"
 State.TextScale = math.clamp(tonumber(State.TextScale) or 1, 0.7, 1.6)
 
-Runtime.MovementLease = nil
-Runtime.AcquireMovementLease = function(owner, duration)
-    duration = math.clamp(tonumber(duration) or 2, 0.5, 4)
-    local now = os.clock()
-    local lease = Runtime.MovementLease
-    if lease and lease.Owner ~= owner and now < lease.Until then
-        return false, "LEASE ACTIVE BY " .. tostring(lease.Owner)
-    end
-    Runtime.MovementLease = {
-        Owner = owner,
-        Until = now + duration,
-    }
-    return true
-end
-
-Runtime.ReleaseMovementLease = function(owner)
-    if Runtime.MovementLease and (not owner or Runtime.MovementLease.Owner == owner) then
-        Runtime.MovementLease = nil
-    end
-end
-
 Runtime.GetBackpackItemCount = function()
     local backpack = LocalPlayer and LocalPlayer:FindFirstChild("Backpack")
     local character = LocalPlayer and LocalPlayer.Character
     local count = 0
     if backpack then
-        count = count + #backpack:GetChildren()
+        for _, child in ipairs(backpack:GetChildren()) do
+            if child:IsA("Tool") then
+                count = count + 1
+            end
+        end
     end
     if character then
         for _, child in ipairs(character:GetChildren()) do
@@ -708,19 +771,34 @@ Runtime.GetBackpackItemCount = function()
     return count
 end
 
-Runtime.IsBackpackNearFull = function()
+Runtime.GetBackpackCapacity = function()
+    local data = type(Replication) == "table" and type(Replication.Data) == "table" and Replication.Data or {}
+    local capacity = tonumber(data.max_inventory)
+        or tonumber(LocalPlayer and (LocalPlayer:GetAttribute("MaxInventory")
+            or LocalPlayer:GetAttribute("max_inventory")))
+        or 100
+    return math.max(1, math.floor(capacity))
+end
+
+Runtime.IsBackpackNearFull = function(minFreeSlots)
     local count = Runtime.GetBackpackItemCount()
-    return count >= 40
+    local capacity = Runtime.GetBackpackCapacity()
+    minFreeSlots = math.clamp(math.floor(tonumber(minFreeSlots) or 3), 1, math.max(1, capacity))
+    return count > math.max(0, capacity - minFreeSlots)
 end
 
 Runtime.EnsureBackpackSpace = function(minFreeSlots)
-    minFreeSlots = math.clamp(tonumber(minFreeSlots) or 1, 1, 5)
+    local capacity = Runtime.GetBackpackCapacity()
+    minFreeSlots = math.clamp(math.floor(tonumber(minFreeSlots) or 1), 1, math.max(1, capacity))
     local count = Runtime.GetBackpackItemCount()
-    if count < 40 then
+    if count < capacity - minFreeSlots + 1 then
         return true
     end
-    -- Trigger immediate purge if backpack is getting crammed
-    return Runtime.PurgeInventoryOverflow()
+    if State.InventoryOverflowPolicy == "PauseAndAlert" then
+        return false
+    end
+    local purged = Runtime.PurgeInventoryOverflow()
+    return purged == true and Runtime.GetBackpackItemCount() <= capacity - minFreeSlots
 end
 
 
@@ -778,108 +856,288 @@ Runtime.EnsureEmptyHands = function(timeout)
 end
 
 
-local RarityOrder = {
-    IMPOSSIBLE = 10,
-    Godly = 9,
-    Mythic = 8,
-    Legendary = 7,
-    Epic = 6,
-    Rare = 5,
-    Uncommon = 4,
-    Common = 3,
-}
-
-local DefaultRarities = {
-    "IMPOSSIBLE", "Godly", "Mythic", "Legendary", "Epic", "Rare", "Uncommon", "Common"
-}
-
-local GnomePriority = {
-    ["Farmer of Infinity"] = 1000,
-    ["Transcendent Farmer"] = 900,
-    ["Universal Harvester"] = 800,
-    ["Farmer of the Cosmos"] = 700,
-    ["Grandmaster Farmer"] = 600,
-    ["King Gnome"] = 550,
-    ["Santa Gnome"] = 540,
-    ["Wizard Gnome"] = 530,
-    ["Master Farmer"] = 500,
-    ["Expert Farmer"] = 400,
-    ["Experienced Farmer"] = 300,
-    ["Knight Gnome"] = 250,
-    ["Chef Gnome"] = 240,
-    ["Alien Gnome"] = 230,
-    ["Apprentice Farmer"] = 200,
-    ["Novice Farmer"] = 100,
-}
-
-local DefaultGnomes = {
-    "Farmer of Infinity", "Transcendent Farmer", "Universal Harvester", "Farmer of the Cosmos",
-    "Grandmaster Farmer", "King Gnome", "Santa Gnome", "Wizard Gnome", "Master Farmer",
-    "Expert Farmer", "Experienced Farmer", "Knight Gnome", "Chef Gnome", "Alien Gnome",
-    "Apprentice Farmer", "Novice Farmer"
-}
-
-local ItemPriority = {
-    ["Mutation Mister"] = 80,
-    ["Good Fertilizer"] = 70,
-    ["Gold Watering Can"] = 60,
-    ["Gnome Coffee"] = 50,
-    ["Fertilizer"] = 40,
-    ["Golden Sprinkler"] = 30,
-    ["Basic Watering Can"] = 20,
-    ["Basic Sprinkler"] = 10,
-}
-
-local DefaultShopItems = {
-    "Mutation Mister", "Good Fertilizer", "Gold Watering Can", "Gnome Coffee",
-    "Fertilizer", "Golden Sprinkler", "Basic Watering Can", "Basic Sprinkler"
-}
-
-Runtime.GetShopItemNames = function()
-    local result = {}
-    for name, data in pairs(ItemShop.Items or {}) do
-        if type(data) == "table" and not data.ignore then
-            table.insert(result, tostring(name))
+local function includeSelectedNames(target, ...)
+    for index = 1, select("#", ...) do
+        local selection = select(index, ...)
+        for name, enabled in pairs(type(selection) == "table" and selection or {}) do
+            if enabled == true and type(name) == "string" and name ~= "" then
+                target[name] = true
+            end
         end
     end
-    if #result == 0 then
-        result = { "Basic Sprinkler", "Advanced Sprinkler", "Godly Sprinkler", "Master Sprinkler", "Basic Fertilizer", "Advanced Fertilizer", "Godly Fertilizer", "Master Fertilizer", "Watering Can", "Gnome Coffee" }
+end
+
+local function includeTraitNames(target, prefix, ...)
+    for index = 1, select("#", ...) do
+        local selection = select(index, ...)
+        for option, enabled in pairs(type(selection) == "table" and selection or {}) do
+            if enabled == true and type(option) == "string" and string.sub(option, 1, #prefix) == prefix then
+                local name = string.sub(option, #prefix + 1)
+                if name ~= "" then target[name] = true end
+            end
+        end
+    end
+end
+
+Runtime.HasTraitSelection = function(selection, prefix)
+    for option, enabled in pairs(type(selection) == "table" and selection or {}) do
+        if enabled == true and type(option) == "string" and string.sub(option, 1, #prefix) == prefix then
+            return true
+        end
+    end
+    return false
+end
+
+local function namesFromSet(set)
+    local result = {}
+    for name in pairs(set) do table.insert(result, name) end
+    return result
+end
+
+Runtime.DynamicCatalogCache = {}
+local function readCatalogCache(key)
+    local cached = Runtime.DynamicCatalogCache[key]
+    if cached and cached.Until > os.clock() and cached.Version == Runtime.SelectionVersion then
+        return cached
+    end
+    return nil
+end
+local function writeCatalogCache(key, records, extra)
+    local cached = { Records = records, Until = os.clock() + 2, Version = Runtime.SelectionVersion }
+    if type(extra) == "table" then
+        for name, value in pairs(extra) do cached[name] = value end
+    end
+    Runtime.DynamicCatalogCache[key] = cached
+    return records
+end
+
+Runtime.GetRarityOptions = function()
+    local cached = readCatalogCache("Rarity")
+    if cached then
+        Runtime.RarityScores = cached.Scores or {}
+        return cached.Records
+    end
+    FarmersConfig = getConfig("Farmers", FarmersConfig)
+    local unique, scores = {}, {}
+    for _, data in pairs(FarmersConfig or {}) do
+        if type(data) == "table" and type(data.real_rarity) == "string" and data.real_rarity ~= "" then
+            local rarity = data.real_rarity
+            unique[rarity] = true
+            scores[rarity] = math.max(scores[rarity] or -math.huge, tonumber(data.order) or 0)
+        end
+    end
+    includeSelectedNames(unique, State.SellRarityTargets)
+    includeTraitNames(unique, TraitPrefix.Rarity, State.GnomeTargetTraits, State.GnomeKeepTraits)
+    local result = namesFromSet(unique)
+    table.sort(result, function(a, b)
+        local scoreA, scoreB = scores[a] or -math.huge, scores[b] or -math.huge
+        return scoreA ~= scoreB and scoreA > scoreB or scoreA == scoreB and string.lower(a) < string.lower(b)
+    end)
+    Runtime.RarityScores = scores
+    return writeCatalogCache("Rarity", result, { Scores = scores })
+end
+
+Runtime.GetShopItemNames = function()
+    local cached = readCatalogCache("Shop")
+    if cached then return cached.Records end
+    ItemShop = getConfig("ItemShop", ItemShop)
+    local unique = {}
+    for name, data in pairs(ItemShop.Items or {}) do
+        if type(name) == "string" and name ~= "" and type(data) == "table" and not data.ignore then
+            unique[name] = true
+        end
+    end
+    includeSelectedNames(unique, State.ShopTargets)
+    local result = namesFromSet(unique)
+    table.sort(result, function(a, b)
+        local dataA, dataB = ItemShop.Items[a] or {}, ItemShop.Items[b] or {}
+        local scoreA = tonumber(dataA.order) or tonumber(dataA.price) or -math.huge
+        local scoreB = tonumber(dataB.order) or tonumber(dataB.price) or -math.huge
+        return scoreA ~= scoreB and scoreA > scoreB or scoreA == scoreB and string.lower(a) < string.lower(b)
+    end)
+    return writeCatalogCache("Shop", result)
+end
+
+Runtime.GetUsableItemNames = function()
+    local cached = readCatalogCache("UsableItem")
+    if cached then return cached.Records end
+    ItemShop = getConfig("ItemShop", ItemShop)
+    SprinklersConfig = getConfig("Sprinklers", SprinklersConfig)
+    Runtime.FertilizersConfig = getConfig("Fertilizer", Runtime.FertilizersConfig)
+    Runtime.WateringCansConfig = getConfig("WateringCans", Runtime.WateringCansConfig)
+    Runtime.GnomeItemsConfig = getConfig("GnomeItems", Runtime.GnomeItemsConfig)
+    local unique, scores = {}, {}
+    local sources = {
+        ItemShop.Items, SprinklersConfig, Runtime.FertilizersConfig,
+        Runtime.WateringCansConfig, Runtime.GnomeItemsConfig,
+    }
+    for _, source in ipairs(sources) do
+        for name, data in pairs(type(source) == "table" and source or {}) do
+            if type(name) == "string" and name ~= "" and type(data) == "table" and not data.ignore then
+                unique[name] = true
+                scores[name] = math.max(scores[name] or -math.huge,
+                    tonumber(data.order) or tonumber(data.price) or 0)
+            end
+        end
+    end
+    includeSelectedNames(unique, State.UseItemTargets)
+    local result = namesFromSet(unique)
+    table.sort(result, function(a, b)
+        local scoreA, scoreB = scores[a] or -math.huge, scores[b] or -math.huge
+        return scoreA ~= scoreB and scoreA > scoreB or scoreA == scoreB and string.lower(a) < string.lower(b)
+    end)
+    return writeCatalogCache("UsableItem", result)
+end
+
+Runtime.GetMutationMultiplier = function(name)
+    if name == nil or name == "" or string.lower(tostring(name)) == "normal" then return 1 end
+    Runtime.MutationMultiplierCache = Runtime.MutationMultiplierCache or {}
+    local cacheKey = string.lower(tostring(name))
+    if Runtime.MutationMultiplierCache[cacheKey] ~= nil then
+        return Runtime.MutationMultiplierCache[cacheKey]
+    end
+    local multiplier = 1
+    if type(MutationsConfig) == "table" and type(MutationsConfig.buffStat) == "function" then
+        local ok, value = pcall(function() return MutationsConfig:buffStat(100, { tostring(name) }) end)
+        if ok and tonumber(value) then multiplier = math.max(0, tonumber(value) / 100) end
+    end
+    Runtime.MutationMultiplierCache[cacheKey] = multiplier
+    return multiplier
+end
+
+Runtime.GetMutationOptions = function()
+    local cached = readCatalogCache("Mutation")
+    if cached then return cached.Records end
+    local latestMutations = getConfig("Mutations", MutationsConfig)
+    if latestMutations ~= MutationsConfig then
+        MutationsConfig = latestMutations
+        Runtime.MutationMultiplierCache = {}
+    end
+    local unique = { Normal = true }
+    local latestIndex = getConfig("Index", IndexConfig)
+    for key, value in pairs(latestIndex.MUTATIONS or {}) do
+        local name = type(value) == "string" and value or type(key) == "string" and key or nil
+        if name and name ~= "" then unique[name] = true end
+    end
+    local labels = ReplicatedStorage:FindFirstChild("Assets")
+    labels = labels and labels:FindFirstChild("Billboards")
+    labels = labels and labels:FindFirstChild("MutationLabels")
+    if labels then
+        for _, label in ipairs(labels:GetChildren()) do
+            if label:IsA("GuiObject") then
+                local name = string.gsub(label.Name, "Icon$", "")
+                if name ~= "" and name ~= "Plus" then unique[name] = true end
+            end
+        end
+    end
+    local plot = type(Runtime.GetPlot) == "function" and Runtime.GetPlot() or nil
+    local rng = plot and plot:FindFirstChild("RNG")
+    local containers = {
+        rng and rng:FindFirstChild("Preview"),
+        plot and plot:FindFirstChild("Workers"),
+        LocalPlayer and LocalPlayer:FindFirstChild("Backpack"),
+        LocalPlayer and LocalPlayer.Character,
+    }
+    for _, container in ipairs(containers) do
+        if container then
+            for _, item in ipairs(container:GetChildren()) do
+                local mutations = item:GetAttribute("Mutations") or item:GetAttribute("Mutation") or ""
+                for _, mutation in ipairs(string.split(tostring(mutations), "_")) do
+                    if mutation ~= "" then unique[mutation] = true end
+                end
+            end
+        end
+    end
+    includeSelectedNames(unique, State.SellProduceMutationTargets)
+    includeTraitNames(unique, TraitPrefix.Mutation, State.GnomeTargetTraits, State.GnomeKeepTraits)
+    local result = namesFromSet(unique)
+    table.sort(result, function(a, b)
+        local scoreA, scoreB = Runtime.GetMutationMultiplier(a), Runtime.GetMutationMultiplier(b)
+        return scoreA ~= scoreB and scoreA > scoreB or scoreA == scoreB and string.lower(a) < string.lower(b)
+    end)
+    return writeCatalogCache("Mutation", result)
+end
+
+Runtime.GetGnomeTraitOptions = function()
+    local result, seen = {}, {}
+    local function add(option)
+        if not seen[option] then
+            seen[option] = true
+            table.insert(result, option)
+        end
+    end
+    for _, rarity in ipairs(Runtime.GetRarityOptions()) do
+        add(TraitPrefix.Rarity .. rarity)
+    end
+    for _, mutation in ipairs(Runtime.GetMutationOptions()) do
+        add(TraitPrefix.Mutation .. mutation)
+    end
+    -- Exact-name targets from old profiles remain editable, but the simplified
+    -- UI no longer floods new users with every configured gnome name.
+    for _, selection in ipairs({ State.GnomeTargetTraits, State.GnomeKeepTraits }) do
+        for option, enabled in pairs(selection) do
+            if enabled == true then add(option) end
+        end
     end
     return result
+end
+
+local function isInBestFraction(name, options, fraction, excludeNormal)
+    if type(name) ~= "string" or name == "" then return false end
+    local eligible = {}
+    for _, option in ipairs(options) do
+        if not excludeNormal or string.lower(option) ~= "normal" then table.insert(eligible, option) end
+    end
+    local count = math.min(#eligible, math.max(#eligible > 0 and 1 or 0, math.ceil(#eligible * fraction)))
+    for index = 1, count do
+        if string.lower(eligible[index]) == string.lower(name) then return true end
+    end
+    return false
+end
+
+Runtime.IsHighTierRarity = function(rarity)
+    local name = tostring(rarity or "")
+    local options = Runtime.GetRarityOptions()
+    return Runtime.RarityScores[name] ~= nil and isInBestFraction(name, options, 0.25, false)
+end
+
+Runtime.HasHighTierMutation = function(value)
+    local options = Runtime.GetMutationOptions()
+    for _, mutation in ipairs(string.split(tostring(value or ""), "_")) do
+        if Runtime.GetMutationMultiplier(mutation) > 1
+            and isInBestFraction(mutation, options, 0.25, true)
+        then
+            return true
+        end
+    end
+    return false
+end
+
+local function fillBestFraction(selection, options, fraction, excludeNormal, prefix)
+    local eligible = {}
+    for _, name in ipairs(options) do
+        if not excludeNormal or string.lower(name) ~= "normal" then table.insert(eligible, name) end
+    end
+    local count = math.min(#eligible, math.max(#eligible > 0 and 1 or 0, math.ceil(#eligible * fraction)))
+    for index = 1, count do selection[(prefix or "") .. eligible[index]] = true end
 end
 
 -- Ensure target tables have sensible defaults for each preset so features work
 -- out of the box. Only fills empty tables; never overwrites user selections.
 local function ensurePresetTargets(preset)
-    -- 1. UseItemTargets: เลือกไอเทมฟาร์มจริงทั้งหมด 8 ชนิด
+    -- Use the live shop catalog so newly-added items appear without a script update.
     if not Runtime.HasAnySelection(State.UseItemTargets) then
-        for _, name in ipairs(DefaultShopItems) do
-            State.UseItemTargets[name] = true
-        end
-        for name in pairs(ItemShop and ItemShop.Items or {}) do
-            State.UseItemTargets[name] = true
-        end
+        for _, name in ipairs(Runtime.GetUsableItemNames()) do State.UseItemTargets[name] = true end
     end
 
-    -- 2. ShopTargets: เลือกซื้อไอเทมร้านค้าจริงทั้งหมด 8 ชนิด
-    if not Runtime.HasAnySelection(State.ShopTargets) then
-        for _, name in ipairs(DefaultShopItems) do
-            State.ShopTargets[name] = true
-        end
-        for name in pairs(ItemShop and ItemShop.Items or {}) do
-            State.ShopTargets[name] = true
-        end
+    -- Shop targets use the same authoritative catalog as item usage.
+    if State.AutoBuyShop and not Runtime.HasAnySelection(State.ShopTargets) then
+        for _, name in ipairs(Runtime.GetShopItemNames()) do State.ShopTargets[name] = true end
     end
 
-    -- 3. ProduceMutationTargets: ขายทั้งหมดทุกโหมด (Normal + ทุก mutation)
-    if not Runtime.HasAnySelection(State.SellProduceMutationTargets)
-        or (State.SellProduceMutationTargets["Normal"] and not next(State.SellProduceMutationTargets, "Normal"))
-    then
-        State.SellProduceMutationTargets["Normal"] = true
-        local allMutations = { "Normal", "Golden", "Diamond", "Shiny", "Fire", "Night", "Toxic", "Charged", "Frozen", "Cursed" }
-        for _, mut in ipairs(allMutations) do
-            State.SellProduceMutationTargets[mut] = true
-        end
+    -- Sell every mutation currently advertised by the game/config/UI.
+    if not Runtime.HasAnySelection(State.SellProduceMutationTargets) then
+        for _, mutation in ipairs(Runtime.GetMutationOptions()) do State.SellProduceMutationTargets[mutation] = true end
     end
 
     -- 4. Mode-specific Target configurations:
@@ -891,59 +1149,21 @@ local function ensurePresetTargets(preset)
         -- Keep Rarity: ไม่เลือก
 
     elseif preset == "GnomeHunter" then
-        -- Gnome Hunter: ล่าตัวท็อป IMPOSSIBLE / Godly + 6 มิวเตชั่นที่ดีที่สุด
-        if not Runtime.HasAnySelection(State.BuyRarityTargets) then
-            State.BuyRarityTargets["IMPOSSIBLE"] = true
-            State.BuyRarityTargets["Godly"] = true
+        -- Gnome Hunter dynamically targets the best quarter of rarity tiers.
+        if not Runtime.HasTraitSelection(State.GnomeTargetTraits, TraitPrefix.Rarity) then
+            fillBestFraction(State.GnomeTargetTraits, Runtime.GetRarityOptions(), 0.25, false, TraitPrefix.Rarity)
         end
-        if not Runtime.HasAnySelection(State.MutationTargets) then
-            State.MutationTargets["Shiny"] = true
-            State.MutationTargets["Diamond"] = true
-            State.MutationTargets["Cursed"] = true
-            State.MutationTargets["Toxic"] = true
-            State.MutationTargets["Golden"] = true
-            State.MutationTargets["Night"] = true
-        end
-        if not Runtime.HasAnySelection(State.KeepMutationTargets) then
-            State.KeepMutationTargets["Shiny"] = true
-            State.KeepMutationTargets["Diamond"] = true
-            State.KeepMutationTargets["Cursed"] = true
-            State.KeepMutationTargets["Toxic"] = true
-            State.KeepMutationTargets["Golden"] = true
-            State.KeepMutationTargets["Night"] = true
-        end
-        if not Runtime.HasAnySelection(State.KeepRarityTargets) then
-            State.KeepRarityTargets["IMPOSSIBLE"] = true
-            State.KeepRarityTargets["Godly"] = true
+        if not Runtime.HasTraitSelection(State.GnomeTargetTraits, TraitPrefix.Mutation) then
+            fillBestFraction(State.GnomeTargetTraits, Runtime.GetMutationOptions(), 2 / 3, true, TraitPrefix.Mutation)
         end
 
     elseif preset == "Balanced" then
-        -- Balanced: สมดุลครบวงจร IMPOSSIBLE / Godly / Mythic + 6 มิวเตชั่นที่ดีที่สุด
-        if not Runtime.HasAnySelection(State.BuyRarityTargets) then
-            State.BuyRarityTargets["IMPOSSIBLE"] = true
-            State.BuyRarityTargets["Godly"] = true
-            State.BuyRarityTargets["Mythic"] = true
+        -- Balanced dynamically targets the best three-eighths of rarity tiers.
+        if not Runtime.HasTraitSelection(State.GnomeTargetTraits, TraitPrefix.Rarity) then
+            fillBestFraction(State.GnomeTargetTraits, Runtime.GetRarityOptions(), 3 / 8, false, TraitPrefix.Rarity)
         end
-        if not Runtime.HasAnySelection(State.MutationTargets) then
-            State.MutationTargets["Shiny"] = true
-            State.MutationTargets["Diamond"] = true
-            State.MutationTargets["Cursed"] = true
-            State.MutationTargets["Toxic"] = true
-            State.MutationTargets["Golden"] = true
-            State.MutationTargets["Night"] = true
-        end
-        if not Runtime.HasAnySelection(State.KeepMutationTargets) then
-            State.KeepMutationTargets["Shiny"] = true
-            State.KeepMutationTargets["Diamond"] = true
-            State.KeepMutationTargets["Cursed"] = true
-            State.KeepMutationTargets["Toxic"] = true
-            State.KeepMutationTargets["Golden"] = true
-            State.KeepMutationTargets["Night"] = true
-        end
-        if not Runtime.HasAnySelection(State.KeepRarityTargets) then
-            State.KeepRarityTargets["IMPOSSIBLE"] = true
-            State.KeepRarityTargets["Godly"] = true
-            State.KeepRarityTargets["Mythic"] = true
+        if not Runtime.HasTraitSelection(State.GnomeTargetTraits, TraitPrefix.Mutation) then
+            fillBestFraction(State.GnomeTargetTraits, Runtime.GetMutationOptions(), 2 / 3, true, TraitPrefix.Mutation)
         end
 
     elseif preset == "MaxProgression" then
@@ -982,13 +1202,13 @@ Runtime.ApplyStrategyPreset = function(preset)
         State.RollPriority = "RebirthFirst"
         State.AutoBest30 = true
         State.GnomePlacementMode = "TargetsFirst"
-        State.GnomeCapacityMode = "Auto"
+        State.GnomeCapacityMode = "Custom"
         State.ProtectHighTier = true
+        State.GnomeSellPolicy = "BelowBest"
+        State.InventoryOverflowPolicy = "FlushAll"
+        State.MoneyReservePercent = 0
         State.AutoCollect = true
         State.AutoSellProduce = true
-        if next(State.SellProduceMutationTargets) == nil then
-            State.SellProduceMutationTargets["Normal"] = true
-        end
         State.AutoUseItems = true
         State.AutoBuyShop = true
         State.AutoBuyExpansion = true
@@ -1003,15 +1223,16 @@ Runtime.ApplyStrategyPreset = function(preset)
         State.RollPriority = "TargetFirst"
         State.AutoBest30 = true
         State.GnomePlacementMode = "TargetsFirst"
-        State.GnomeCapacityMode = "Auto"
+        State.GnomeCapacityMode = "Custom"
         State.ProtectHighTier = true
+        State.GnomeSellPolicy = "BelowBest"
+        State.InventoryOverflowPolicy = "FlushAll"
+        State.MoneyReservePercent = 0
         State.AutoCollect = true
         State.AutoSellProduce = true
-        if next(State.SellProduceMutationTargets) == nil then
-            State.SellProduceMutationTargets["Normal"] = true
-        end
         State.AutoUseItems = true
-        State.AutoBuyShop = true
+        -- Keep cash available for a wanted roll instead of spending it on stock.
+        State.AutoBuyShop = false
         State.AutoBuyExpansion = false
         State.AutoUpgrade = false
         State.AutoRebirth = false
@@ -1024,17 +1245,19 @@ Runtime.ApplyStrategyPreset = function(preset)
         State.RollPriority = "TargetFirst"
         State.AutoBest30 = true
         State.GnomePlacementMode = "BestOverall"
-        State.GnomeCapacityMode = "Auto"
+        State.GnomeCapacityMode = "Custom"
         State.ProtectHighTier = true
+        State.GnomeSellPolicy = "BelowBest"
+        State.InventoryOverflowPolicy = "FlushAll"
+        State.MoneyReservePercent = 0
         State.AutoCollect = true
         State.AutoSellProduce = true
-        if next(State.SellProduceMutationTargets) == nil then
-            State.SellProduceMutationTargets["Normal"] = true
-        end
         State.AutoUseItems = true
+        -- Farm income mode reinvests in selected farm buffs because better
+        -- growth/size/mutations increase the value produced by the plot.
         State.AutoBuyShop = true
-        State.AutoBuyExpansion = true
-        State.AutoUpgrade = true
+        State.AutoBuyExpansion = false
+        State.AutoUpgrade = false
         State.AutoRebirth = false
         Runtime.PendingPurchase = nil
         Runtime.WaitingForMoney = false
@@ -1048,13 +1271,13 @@ Runtime.ApplyStrategyPreset = function(preset)
         State.RollPriority = "TargetFirst"
         State.AutoBest30 = true
         State.GnomePlacementMode = "TargetsFirst"
-        State.GnomeCapacityMode = "Auto"
+        State.GnomeCapacityMode = "Custom"
         State.ProtectHighTier = true
+        State.GnomeSellPolicy = "BelowBest"
+        State.InventoryOverflowPolicy = "FlushAll"
+        State.MoneyReservePercent = 0
         State.AutoCollect = true
         State.AutoSellProduce = true
-        if next(State.SellProduceMutationTargets) == nil then
-            State.SellProduceMutationTargets["Normal"] = true
-        end
         State.AutoBuyShop = true
         State.AutoUseItems = true
         State.AutoUpgrade = true
@@ -1065,18 +1288,31 @@ Runtime.ApplyStrategyPreset = function(preset)
     end
 
     if preset ~= "Custom" then
-        table.clear(State.BuyRarityTargets)
-        table.clear(State.MutationTargets)
-        table.clear(State.PlaceGnomeTargets)
-        table.clear(State.PlaceMutationTargets)
-        table.clear(State.PlaceRarityTargets)
-        table.clear(State.KeepMutationTargets)
-        table.clear(State.KeepRarityTargets)
+        -- A held preview/reservation belongs to the old strategy. Leaving it
+        -- alive can keep the new mode waiting for money or block its remotes.
+        Runtime.PendingPurchase = nil
+        Runtime.WaitingForMoney = false
+        Runtime.PendingPurchasePrice = 0
+        Runtime.ClearActionReservation()
+        Runtime.RankedGnomeCache = nil
+        table.clear(State.GnomeTargetTraits)
+        table.clear(State.GnomeKeepTraits)
+        table.clear(State.SellRarityTargets)
         table.clear(State.SellProduceMutationTargets)
         table.clear(State.UseItemTargets)
         table.clear(State.ShopTargets)
         Runtime.SelectionVersion = Runtime.SelectionVersion + 1
         ensurePresetTargets(preset)
+        -- If the master pause is active, store the new preset as the state to
+        -- restore on Resume while keeping all automation stopped right now.
+        if Runtime.Paused then
+            for key in pairs(PresetControlledKeySet) do
+                if MasterAutomationKeySet[key] then
+                    Runtime.PauseSnapshot[key] = State[key] == true
+                    State[key] = false
+                end
+            end
+        end
     end
 
     if type(Runtime.ToggleRefreshers) == "table" then
@@ -1096,6 +1332,9 @@ Runtime.ApplyStrategyPreset = function(preset)
     if type(Runtime.RefreshGnomePolicyUI) == "function" then
         pcall(Runtime.RefreshGnomePolicyUI)
     end
+    if type(Runtime.RefreshOverflowPolicyUI) == "function" then
+        pcall(Runtime.RefreshOverflowPolicyUI)
+    end
     if type(Runtime.RefreshStrategyUI) == "function" then
         pcall(Runtime.RefreshStrategyUI)
     end
@@ -1106,11 +1345,16 @@ end
 
 
 local SelectionStateKeys = {
+    "GnomeTargetTraits",
+    "GnomeKeepTraits",
     "BuyRarityTargets",
     "KeepRarityTargets",
     "SellRarityTargets",
     "MutationTargets",
     "KeepMutationTargets",
+    "PlaceGnomeTargets",
+    "PlaceMutationTargets",
+    "PlaceRarityTargets",
     "SellProduceMutationTargets",
     "UseItemTargets",
     "ShopTargets",
@@ -1156,9 +1400,16 @@ end
 
 Runtime.NormalizeAutomation = function(preferred)
     Runtime.NormalizeSelections()
+    -- AutoBuyMutation was an older hidden toggle. Keep one authoritative UI
+    -- switch so disabling Auto Buy Rolled Gnomes cannot leave mutation buying on.
+    State.AutoBuyMutation = State.AutoBuyTarget == true
     local validPolicies = { BelowBest = true, SelectedRarities = true, KeepExtras = true }
     if not validPolicies[State.GnomeSellPolicy] then
         State.GnomeSellPolicy = "BelowBest"
+    end
+    local validOverflowPolicies = { FlushAll = true, SellProduceOnly = true, PauseAndAlert = true }
+    if not validOverflowPolicies[State.InventoryOverflowPolicy] then
+        State.InventoryOverflowPolicy = "FlushAll"
     end
     if State.RollPriority ~= "TargetFirst" and State.RollPriority ~= "RebirthFirst" then
         State.RollPriority = "TargetFirst"
@@ -1246,8 +1497,20 @@ local function loadProfile(name)
             else
                 State[key] = value
             end
+        else
+            if type(defaultValue) == "table" then
+                local target = type(State[key]) == "table" and State[key] or {}
+                table.clear(target)
+                for nestedKey, nestedValue in pairs(defaultValue) do
+                    target[nestedKey] = nestedValue
+                end
+                State[key] = target
+            else
+                State[key] = defaultValue
+            end
         end
     end
+    migrateTargetLogic(decoded.TargetLogicVersion)
     if decoded.AutoUseItems == nil then
         State.AutoUseItems = decoded.AutoPlaceSprinklers == true or decoded.AutoGnomeCoffee == true
         table.clear(State.UseItemTargets)
@@ -1257,7 +1520,7 @@ local function loadProfile(name)
             end
         end
         if decoded.AutoGnomeCoffee == true then
-            State.UseItemTargets["Gnome Coffee"] = true
+            Runtime.SelectShopItemsByType(State.UseItemTargets, "GnomeItem")
         end
     end
     if decoded.GnomeSellPolicy == nil then
@@ -1280,16 +1543,9 @@ local function loadProfile(name)
             end
         end
     end
-    if decoded.KeepRarityTargets == nil and type(decoded.SellRarityTargets) == "table" then
-        table.clear(State.KeepRarityTargets)
-        for rarity, enabled in pairs(decoded.SellRarityTargets) do
-            if type(rarity) == "number" and type(enabled) == "string" then
-                State.KeepRarityTargets[enabled] = true
-            elseif enabled == true then
-                State.KeepRarityTargets[rarity] = true
-            end
-        end
-    end
+    -- SellRarityTargets has always meant "checked = sell". Never migrate it
+    -- into KeepRarityTargets or the same checked rarity becomes protected and
+    -- can no longer be sold.
     State.ConfigProfile = name
     Environment.RollAGnomeProfile = name
     Runtime.NormalizeAutomation()
@@ -1317,6 +1573,7 @@ local function getPlot()
     end
     return plotObject and plotObject.Value or nil
 end
+Runtime.GetPlot = getPlot
 
 local function isHashString(str)
     if type(str) ~= "string" or #str < 10 then return false end
@@ -1369,13 +1626,13 @@ local function getCleanToolName(tool, itemType)
 
     if not name or isHashString(name) then
         if itemType == "WateringCan" then
-            name = "Watering Can"
+            name = Runtime.GetShopItemNameByType(itemType) or "Watering Can"
         elseif itemType == "GnomeItem" then
-            name = "Gnome Coffee"
+            name = Runtime.GetShopItemNameByType(itemType) or "Gnome Item"
         elseif itemType == "Sprinkler" then
-            name = "Sprinkler"
+            name = Runtime.GetShopItemNameByType(itemType) or "Sprinkler"
         elseif itemType == "Fertilizer" then
-            name = "Fertilizer"
+            name = Runtime.GetShopItemNameByType(itemType) or "Fertilizer"
         elseif itemType == "Farmer" then
             name = "Gnome"
         elseif itemType == "Plant" then
@@ -1402,6 +1659,15 @@ local function getFarmerName(instance)
         local fData = Replication.Data.farmers[instance.Name]
         if type(fData) == "table" and type(fData.name) == "string" then
             name = fData.name
+        end
+    end
+
+    if not name and Replication and Replication.Data and Replication.Data.inventory then
+        local inventory = Replication.Data.inventory
+        local identifier = instance:GetAttribute("Id") or instance.Name
+        local itemData = inventory[identifier] or inventory[instance.Name]
+        if type(itemData) == "table" and type(itemData.name) == "string" then
+            name = itemData.name
         end
     end
 
@@ -1455,6 +1721,21 @@ Runtime.HasAnySelection = function(selection)
     return false
 end
 
+Runtime.ResolveGnomeTraitConflicts = function(preferred)
+    local other = preferred == State.GnomeTargetTraits and State.GnomeKeepTraits
+        or preferred == State.GnomeKeepTraits and State.GnomeTargetTraits
+        or nil
+    if not other then return end
+    for option, enabled in pairs(preferred) do
+        if enabled == true then
+            local lowered = string.lower(tostring(option))
+            for otherOption in pairs(other) do
+                if string.lower(tostring(otherOption)) == lowered then other[otherOption] = nil end
+            end
+        end
+    end
+end
+
 Runtime.SetSelection = function(selection, name, enabled)
     if type(selection) ~= "table" then
         return false
@@ -1471,11 +1752,14 @@ Runtime.SetSelection = function(selection, name, enabled)
     if enabled == true then
         selection[name] = true
         changed = true
+        Runtime.ResolveGnomeTraitConflicts(selection)
     end
     if changed then
         Runtime.SelectionVersion = Runtime.SelectionVersion + 1
         Runtime.GiftRecipientCache = nil
-        if type(Runtime.MarkCustomStrategy) == "function" then
+        if selection ~= State.GivePlayers and selection ~= State.ReceivePlayers
+            and type(Runtime.MarkCustomStrategy) == "function"
+        then
             Runtime.MarkCustomStrategy()
         end
     end
@@ -1486,6 +1770,11 @@ Runtime.ToggleSelection = function(selection, name)
     Runtime.NormalizeSelection(selection)
     local enabled = not isSelected(selection, name)
     Runtime.SetSelection(selection, name, enabled)
+    if selection == State.GnomeTargetTraits or selection == State.GnomeKeepTraits then
+        task.defer(function()
+            if Runtime.RefreshVisibleLists then Runtime.RefreshVisibleLists(true) end
+        end)
+    end
     if enabled and selection == State.SellRarityTargets then
         State.GnomeSellPolicy = "SelectedRarities"
         if Runtime.RefreshGnomePolicyUI then
@@ -1583,7 +1872,7 @@ Runtime.IsGiftReserved = function(tool)
         return false
     end
     local itemType = string.lower(tostring(tool:GetAttribute("type") or tool:GetAttribute("Type") or ""))
-    return type(tool:GetAttribute("Id")) == "string"
+    return tool:GetAttribute("Id") ~= nil
         and (itemType == "plant" or itemType == "fruit" or itemType == "farmer" or itemType == "gnome")
 end
 
@@ -1599,6 +1888,9 @@ local function invoke(remoteName, ...)
             task.wait(delay)
         end
         Runtime.LastRemoteAt[remoteName] = os.clock()
+    end
+    if not Network or type(Network.InvokeServer) ~= "function" then
+        return false, "network unavailable"
     end
     return safeCall(Network.InvokeServer, Network, remoteName, ...)
 end
@@ -1616,6 +1908,9 @@ local function fire(remoteName, ...)
         end
         Runtime.LastRemoteAt[remoteName] = os.clock()
     end
+    if not Network or type(Network.FireServer) ~= "function" then
+        return false, "network unavailable"
+    end
     return safeCall(Network.FireServer, Network, remoteName, ...)
 end
 
@@ -1623,8 +1918,9 @@ end
 
 local collectRarityOptions
 local collectShopOptions
+local collectUseItemOptions
 local collectMutationOptions
-local collectGnomeOptions
+local collectGnomeTraitOptions
 local collectPlayerOptions
 
 -- UI -----------------------------------------------------------------------
@@ -1674,25 +1970,22 @@ end
 
 local ScreenGui
 do
-local playerGui = LocalPlayer and (LocalPlayer:FindFirstChildOfClass("PlayerGui") or LocalPlayer:FindFirstChild("PlayerGui"))
-local coreGui
-pcall(function()
-    coreGui = game:GetService("CoreGui")
-end)
+local playerGui = LocalPlayer and (LocalPlayer:FindFirstChildOfClass("PlayerGui")
+    or LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui", 5))
 local hui
 if type(gethui) == "function" then
     pcall(function()
         local h = gethui()
-        if typeof(h) == "Instance" then
+        if robloxTypeof(h) == "Instance" then
             hui = h
         end
     end)
 end
 
 local uiParents = {}
-if coreGui then table.insert(uiParents, coreGui) end
-if hui then table.insert(uiParents, hui) end
 if playerGui then table.insert(uiParents, playerGui) end
+if hui and hui ~= playerGui then table.insert(uiParents, hui) end
+Runtime.UIHost = hui
 
 -- Destroy previous UI instances if any
 for _, container in ipairs(uiParents) do
@@ -2339,7 +2632,6 @@ local UpgradePage = addPage("Upgrade")
 local SocialPage = addPage("Social")
 local SystemPage = addPage("System")
 local LogsPage = addPage("Logs")
-local ShopPage = FarmPage
 local ConfigPage = SystemPage
 
 local function addGroupLabel(parent, title)
@@ -2360,7 +2652,7 @@ local function addGroupLabel(parent, title)
         Parent = row,
     })
     bindLanguage(label, "Text", title)
-    local line = create("Frame", {
+    create("Frame", {
         Size = UDim2.new(1, -220, 0, 1),
         Position = UDim2.new(0, 220, 0.5, 0),
         BackgroundColor3 = Color3.fromRGB(45, 52, 65),
@@ -2439,7 +2731,7 @@ local function addToggle(parent, title, description, key)
             end
         end
         refresh()
-        if MasterAutomationKeySet[key] and State.AutomationStrategy ~= "Custom" then
+        if PresetControlledKeySet[key] and State.AutomationStrategy ~= "Custom" then
             State.AutomationStrategy = "Custom"
             if type(Runtime.RefreshStrategyUI) == "function" then
                 pcall(Runtime.RefreshStrategyUI)
@@ -2489,179 +2781,23 @@ end
 
 
 collectRarityOptions = function()
-    if Runtime.RarityOptions and #Runtime.RarityOptions > 0 then
-        return Runtime.RarityOptions
-    end
-    local unique = {}
-    for _, r in ipairs(DefaultRarities) do
-        unique[r] = true
-    end
-    for _, config in pairs(FarmersConfig or {}) do
-        if type(config) == "table" and type(config.real_rarity) == "string" then
-            unique[config.real_rarity] = true
-        end
-    end
-    local result = {}
-    for rarity in pairs(unique) do
-        table.insert(result, rarity)
-    end
-    table.sort(result, function(a, b)
-        local orderA = RarityOrder[a] or 0
-        local orderB = RarityOrder[b] or 0
-        if orderA ~= orderB then
-            return orderA > orderB
-        end
-        return string.lower(a) < string.lower(b)
-    end)
-    Runtime.RarityOptions = result
-    return result
-end
-
-collectGnomeOptions = function()
-    if Runtime.GnomeOptions and #Runtime.GnomeOptions > 0 then
-        return Runtime.GnomeOptions
-    end
-    local result = {}
-    local seen = {}
-    for _, name in ipairs(DefaultGnomes) do
-        if not seen[name] then
-            seen[name] = true
-            table.insert(result, name)
-        end
-    end
-    for name, data in pairs(FarmersConfig or {}) do
-        if type(name) == "string" and name ~= "" and not seen[name] then
-            seen[name] = true
-            table.insert(result, name)
-        end
-    end
-    table.sort(result, function(a, b)
-        local scoreA = GnomePriority[a] or (FarmersConfig and FarmersConfig[a] and (FarmersConfig[a].order or 0) * 10) or 0
-        local scoreB = GnomePriority[b] or (FarmersConfig and FarmersConfig[b] and (FarmersConfig[b].order or 0) * 10) or 0
-        if scoreA ~= scoreB then
-            return scoreA > scoreB
-        end
-        return string.lower(a) < string.lower(b)
-    end)
-    Runtime.GnomeOptions = result
-    return result
+    return Runtime.GetRarityOptions()
 end
 
 collectShopOptions = function()
-    if Runtime.ShopOptions and #Runtime.ShopOptions > 0 then
-        return Runtime.ShopOptions
-    end
-    local result = {}
-    local seen = {}
-    for _, name in ipairs(DefaultShopItems) do
-        if not seen[name] then
-            seen[name] = true
-            table.insert(result, name)
-        end
-    end
-    for name, data in pairs(ItemShop and ItemShop.Items or {}) do
-        if type(name) == "string" and name ~= "" and not seen[name] and not (type(data) == "table" and data.ignore) then
-            seen[name] = true
-            table.insert(result, tostring(name))
-        end
-    end
-    table.sort(result, function(a, b)
-        local dataA = (ItemShop and ItemShop.Items and ItemShop.Items[a]) or {}
-        local dataB = (ItemShop and ItemShop.Items and ItemShop.Items[b]) or {}
-        local scoreA = ItemPriority[a] or tonumber(dataA.order) or tonumber(dataA.price) or 0
-        local scoreB = ItemPriority[b] or tonumber(dataB.order) or tonumber(dataB.price) or 0
-        if scoreA ~= scoreB then
-            return scoreA > scoreB
-        end
-        return string.lower(a) < string.lower(b)
-    end)
-    Runtime.ShopOptions = result
-    return result
+    return Runtime.GetShopItemNames()
+end
+
+collectUseItemOptions = function()
+    return Runtime.GetUsableItemNames()
 end
 
 collectMutationOptions = function()
-    local cached = Runtime.MutationOptionsCache
-    if cached and cached.Until > os.clock() then
-        return cached.Records
-    end
-    local unique = {
-        Shiny = true,
-        Diamond = true,
-        Cursed = true,
-        Toxic = true,
-        Golden = true,
-        Fire = true,
-        Night = true,
-        Frozen = true,
-        Charged = true,
-        Normal = true,
-    }
-    local latestIndex = getConfig("Index", IndexConfig)
-    for key, value in pairs(latestIndex.MUTATIONS or {}) do
-        if type(value) == "string" and value ~= "" then
-            unique[value] = true
-        elseif type(key) == "string" and value then
-            unique[key] = true
-        end
-    end
+    return Runtime.GetMutationOptions()
+end
 
-    local mutationLabels = ReplicatedStorage:FindFirstChild("Assets")
-    mutationLabels = mutationLabels and mutationLabels:FindFirstChild("Billboards")
-    mutationLabels = mutationLabels and mutationLabels:FindFirstChild("MutationLabels")
-    if mutationLabels then
-        for _, label in ipairs(mutationLabels:GetChildren()) do
-            if label:IsA("GuiObject") then
-                local name = string.gsub(label.Name, "Icon$", "")
-                if name ~= "" and name ~= "Plus" then
-                    unique[name] = true
-                end
-            end
-        end
-    end
-    local plot = getPlot()
-    local rng = plot and plot:FindFirstChild("RNG")
-    local preview = rng and rng:FindFirstChild("Preview")
-    local workers = plot and plot:FindFirstChild("Workers")
-    local backpack = LocalPlayer:FindFirstChild("Backpack")
-    local character = LocalPlayer.Character
-    for _, container in ipairs({ preview, workers, backpack, character }) do
-        if container then
-            for _, item in ipairs(container:GetChildren()) do
-                local mutations = item:GetAttribute("Mutations") or ""
-                for _, mutation in ipairs(string.split(tostring(mutations), "_")) do
-                    if mutation ~= "" then
-                        unique[mutation] = true
-                    end
-                end
-            end
-        end
-    end
-    local result = {}
-    for name in pairs(unique) do
-        table.insert(result, name)
-    end
-    local priority = {
-        Shiny = 100,
-        Diamond = 90,
-        Cursed = 80,
-        Toxic = 70,
-        Golden = 60,
-        Fire = 50,
-        Night = 40,
-        Frozen = 30,
-        Charged = 20,
-        Normal = 10,
-    }
-    table.sort(result, function(a, b)
-        local scoreA = priority[a] or 1
-        local scoreB = priority[b] or 1
-        if scoreA ~= scoreB then
-            return scoreA > scoreB
-        end
-        return string.lower(a) < string.lower(b)
-    end)
-    Runtime.MutationOptionsCache = { Until = os.clock() + 3, Records = result }
-    return result
+collectGnomeTraitOptions = function()
+    return Runtime.GetGnomeTraitOptions()
 end
 
 collectPlayerOptions = function()
@@ -2763,9 +2899,9 @@ local function addMultiSelect(parent, title, detail, selection, optionProvider, 
             end
         end
         if State.Language == "TH" then
-            subtitle.Text = string.format("%s  |  เลือก %d  |  แสดง %d", translated(detail), selectedCount, visibleCount or #currentOptionsList)
+            subtitle.Text = string.format("%s  |  เลือก %d  |  แสดง %d", tostring(translated(detail)), selectedCount, tonumber(visibleCount) or #currentOptionsList)
         else
-            subtitle.Text = string.format("%s  |  selected %d  |  showing %d", translated(detail), selectedCount, visibleCount or #currentOptionsList)
+            subtitle.Text = string.format("%s  |  selected %d  |  showing %d", tostring(translated(detail)), selectedCount, tonumber(visibleCount) or #currentOptionsList)
         end
     end
 
@@ -2786,13 +2922,31 @@ local function addMultiSelect(parent, title, detail, selection, optionProvider, 
         for _, opt in ipairs(options) do
             selection[opt] = true
         end
+        Runtime.ResolveGnomeTraitConflicts(selection)
+        if selection == State.SellRarityTargets then
+            State.GnomeSellPolicy = "SelectedRarities"
+            if Runtime.RefreshGnomePolicyUI then
+                Runtime.RefreshGnomePolicyUI()
+            end
+        end
         Runtime.SelectionVersion = Runtime.SelectionVersion + 1
+        if selection ~= State.GivePlayers and selection ~= State.ReceivePlayers then
+            Runtime.MarkCustomStrategy()
+        end
         updateButtonVisuals()
+        if selection == State.GnomeTargetTraits or selection == State.GnomeKeepTraits then
+            task.defer(function()
+                if Runtime.RefreshVisibleLists then Runtime.RefreshVisibleLists(true) end
+            end)
+        end
     end)
 
     connect(clearAllBtn.Activated, function()
         table.clear(selection)
         Runtime.SelectionVersion = Runtime.SelectionVersion + 1
+        if selection ~= State.GivePlayers and selection ~= State.ReceivePlayers then
+            Runtime.MarkCustomStrategy()
+        end
         updateButtonVisuals()
     end)
 
@@ -2980,7 +3134,8 @@ end
 
 addGroupLabel(GnomesPage, "Auto Roll")
 addToggle(GnomesPage, "Auto Roll", "Roll continuously and wait for every result", "AutoRoll")
-addToggle(GnomesPage, "Auto Buy Rolled Gnomes", "Buy rolled gnomes that match your selected rarity, mutation, or rebirth targets", "AutoBuyTarget")
+addToggle(GnomesPage, "Auto Buy Rolled Gnomes", "Buy only when every active name, rarity, and mutation target category matches", "AutoBuyTarget")
+addToggle(GnomesPage, "Auto Buy Rebirth Gnomes", "Buy missing gnomes required by the next rebirth even when normal targets do not match", "AutoBuyRebirthGnomes")
 addToggle(GnomesPage, "Pause Roll Until Affordable", "Hold a wanted result until enough money is available to buy it", "PauseRollUntilAffordable")
 do
 local function addRollPriorityControl(parent)
@@ -3048,6 +3203,7 @@ for _, option in ipairs({
     RollPriorityButtons[option.Key] = button
     connect(button.Activated, function()
         State.RollPriority = option.Key
+        Runtime.MarkCustomStrategy()
         if option.Key == "RebirthFirst" then
             Runtime.PendingPurchase = nil
             Runtime.WaitingForMoney = false
@@ -3073,6 +3229,90 @@ refreshRollPriorityUI()
 end
 addRollPriorityControl(GnomesPage)
 end
+
+local function addSegmentedSetting(parent, titleText, detailText, stateKey, options, runtimeRefreshKey)
+    local row = create("Frame", {
+        Size = UDim2.new(1, 0, 0, 96),
+        BackgroundColor3 = Theme.Surface,
+        BorderSizePixel = 0,
+        Parent = parent,
+    })
+    create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = row })
+    local title = create("TextLabel", {
+        Size = UDim2.new(1, -32, 0, 22),
+        Position = UDim2.fromOffset(16, 12),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.GothamMedium,
+        Text = translated(titleText),
+        TextColor3 = Theme.Text,
+        TextSize = 13,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = row,
+    })
+    bindLanguage(title, "Text", titleText)
+    local detail = create("TextLabel", {
+        Size = UDim2.new(1, -32, 0, 18),
+        Position = UDim2.fromOffset(16, 33),
+        BackgroundTransparency = 1,
+        Font = Enum.Font.Gotham,
+        Text = translated(detailText),
+        TextColor3 = Theme.Muted,
+        TextSize = 11,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = row,
+    })
+    bindLanguage(detail, "Text", detailText)
+    local bar = create("Frame", {
+        Size = UDim2.new(1, -32, 0, 32),
+        Position = UDim2.fromOffset(16, 54),
+        BackgroundTransparency = 1,
+        Parent = row,
+    })
+    create("UIGridLayout", {
+        CellSize = UDim2.new(1 / #options, -4, 1, 0),
+        CellPadding = UDim2.fromOffset(5, 0),
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Parent = bar,
+    })
+    local buttons = {}
+    local function refresh()
+        for key, button in pairs(buttons) do
+            local selected = State[stateKey] == key
+            button.BackgroundColor3 = selected and Theme.AccentDark or Theme.Background
+            button.TextColor3 = selected and Theme.Text or Theme.Muted
+        end
+        local changed = Runtime[runtimeRefreshKey .. "Changed"]
+        if type(changed) == "function" then pcall(changed, State[stateKey]) end
+    end
+    for order, option in ipairs(options) do
+        local button = create("TextButton", {
+            Name = option.Key,
+            LayoutOrder = order,
+            BackgroundColor3 = Theme.Background,
+            BorderSizePixel = 0,
+            Font = Enum.Font.GothamMedium,
+            Text = translated(option.Label),
+            TextColor3 = Theme.Muted,
+            TextSize = 9,
+            TextWrapped = true,
+            AutoButtonColor = false,
+            Parent = bar,
+        })
+        create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = button })
+        bindLanguage(button, "Text", option.Label)
+        buttons[option.Key] = button
+        connect(button.Activated, function()
+            State[stateKey] = option.Key
+            Runtime.MarkCustomStrategy()
+            refresh()
+        end)
+    end
+    Runtime[runtimeRefreshKey] = refresh
+    table.insert(LanguageRefreshers, refresh)
+    refresh()
+    return row
+end
+
 addGroupLabel(GnomesPage, "Smart Gnome Placement")
 addToggle(GnomesPage, "Auto Place Gnomes", "Automatically place, protect, and manage gnomes on your plot", "AutoBest30")
 
@@ -3147,6 +3387,7 @@ do
         strategyButtons[opt.Key] = btn
         connect(btn.Activated, function()
             State.GnomePlacementMode = opt.Key
+            Runtime.MarkCustomStrategy()
             Runtime.RankedGnomeCache = nil
             for k, b in pairs(strategyButtons) do
                 local sel = State.GnomePlacementMode == k
@@ -3230,7 +3471,7 @@ do
         Font = Enum.Font.GothamBold,
         PlaceholderText = "30",
         PlaceholderColor3 = Theme.Muted,
-        Text = tostring(math.clamp(math.floor(tonumber(State.BestGnomeLimit) or 30), 1, 100)),
+        Text = tostring(math.max(1, math.floor(tonumber(State.BestGnomeLimit) or 30))),
         TextColor3 = Theme.Text,
         TextSize = 11,
         TextXAlignment = Enum.TextXAlignment.Center,
@@ -3240,8 +3481,11 @@ do
     create("UICorner", { CornerRadius = UDim.new(0, 6), Parent = BestLimitInput })
     create("UIStroke", { Color = Color3.fromRGB(49, 55, 68), Thickness = 1, Parent = BestLimitInput })
     connect(BestLimitInput.FocusLost, function()
-        local value = math.clamp(math.floor(tonumber(BestLimitInput.Text) or tonumber(State.BestGnomeLimit) or 30), 1, 100)
+        local value = math.max(1, math.floor(tonumber(BestLimitInput.Text) or tonumber(State.BestGnomeLimit) or 30))
+        local ceiling = type(Runtime.GetExplicitPlotCapacity) == "function" and Runtime.GetExplicitPlotCapacity() or nil
+        if ceiling then value = math.min(value, ceiling) end
         State.BestGnomeLimit = value
+        Runtime.MarkCustomStrategy()
         BestLimitInput.Text = tostring(value)
         Runtime.RankedGnomeCache = nil
     end)
@@ -3264,6 +3508,7 @@ do
         capButtons[opt.Key] = btn
         connect(btn.Activated, function()
             State.GnomeCapacityMode = opt.Key
+            Runtime.MarkCustomStrategy()
             BestLimitInput.Visible = opt.Key == "Custom"
             Runtime.PlotCapacityCache = nil
             Runtime.RankedGnomeCache = nil
@@ -3277,7 +3522,7 @@ do
     local function refreshGnomeCapacityUI()
         if BestLimitInput then
             BestLimitInput.Visible = State.GnomeCapacityMode == "Custom"
-            BestLimitInput.Text = tostring(math.clamp(math.floor(tonumber(State.BestGnomeLimit) or 30), 1, 100))
+            BestLimitInput.Text = tostring(math.max(1, math.floor(tonumber(State.BestGnomeLimit) or 30)))
         end
         for k, b in pairs(capButtons) do
             local sel = State.GnomeCapacityMode == k
@@ -3290,21 +3535,31 @@ do
     refreshGnomeCapacityUI()
 end
 
-addToggle(GnomesPage, "Protect High-Tier Gnomes", "Never sell Godly, Mythic, Huge, Diamond, or Event gnomes", "ProtectHighTier")
+addToggle(GnomesPage, "Protect High-Tier Gnomes", "Protect the best live rarity and mutation tiers plus Huge gnomes", "ProtectHighTier")
 
 addGroupLabel(GnomesPage, "Gnome Targets & Protection")
-addMultiSelect(GnomesPage, "Target Gnome Names", "Gnomes prioritized for auto-buying and plot placement, and protected from selling", State.PlaceGnomeTargets, collectGnomeOptions)
-addMultiSelect(GnomesPage, "Target Mutations", "Mutations prioritized for auto-buying and plot placement, and protected from selling", State.MutationTargets, collectMutationOptions, true)
-addMultiSelect(GnomesPage, "Target Rarities", "Rarity levels prioritized for auto-buying and plot placement, and protected from selling", State.BuyRarityTargets, collectRarityOptions, true)
+addMultiSelect(GnomesPage, "Wanted Gnomes", "One list: [R] rarity and [M] mutation; different categories must both match", State.GnomeTargetTraits, collectGnomeTraitOptions, true)
+addMultiSelect(GnomesPage, "Extra Protection", "Kept without buying; choosing a trait here removes it from Wanted Gnomes", State.GnomeKeepTraits, collectGnomeTraitOptions, true)
+addGroupLabel(GnomesPage, "Surplus Gnome Selling")
+addSegmentedSetting(GnomesPage, "Sell Policy", "Choose how gnomes outside the protected best set are handled", "GnomeSellPolicy", {
+    { Key = "BelowBest", Label = "Sell Below Best" },
+    { Key = "SelectedRarities", Label = "Sell Checked Rarities" },
+    { Key = "KeepExtras", Label = "Keep All Extras" },
+}, "RefreshGnomePolicyUI")
+local SellRarityTargetBox = addMultiSelect(GnomesPage, "Rarities to Sell", "Used only by Sell Checked Rarities mode", State.SellRarityTargets, collectRarityOptions, true)
+Runtime.RefreshGnomePolicyUIChanged = function(policy)
+    SellRarityTargetBox.Visible = policy == "SelectedRarities"
+end
+Runtime.RefreshGnomePolicyUIChanged(State.GnomeSellPolicy)
 
 addGroupLabel(FarmPage, "Harvest & Market")
-addToggle(FarmPage, "Auto Collect Crops", "Collect all ready crops directly from distance", "AutoCollect")
+addToggle(FarmPage, "Auto Collect Crops", "Collect every ready crop through the game remote without moving your character", "AutoCollect")
 addToggle(FarmPage, "Auto Sell Crops", "Remotely sell harvested crops matching selected mutations", "AutoSellProduce")
 addMultiSelect(FarmPage, "Sell Produce Mutations", "Select mutations allowed for sale; keep Normal for basic crops", State.SellProduceMutationTargets, collectMutationOptions, true)
 
 addGroupLabel(FarmPage, "Farm Care & Buffs")
 addToggle(FarmPage, "Auto Use Farm Items", "Use selected sprinklers, fertilizers, watering cans, and gnome items", "AutoUseItems")
-addMultiSelect(FarmPage, "Allowed Use Items", "Only selected item types will be used automatically", State.UseItemTargets, collectShopOptions, true)
+addMultiSelect(FarmPage, "Allowed Use Items", "Only selected item types will be used automatically", State.UseItemTargets, collectUseItemOptions, true)
 Runtime.UseItemStatusLabel = create("TextLabel", {
     Size = UDim2.new(1, -4, 0, 38),
     BackgroundColor3 = Theme.Surface,
@@ -3372,7 +3627,7 @@ Runtime.SetShopStatus = function(message, positive)
 end
 
 addGroupLabel(SocialPage, "Social")
-addToggle(SocialPage, "Auto Give", "Offer held tradeable fruits or gnomes to the selected player", "AutoGive")
+addToggle(SocialPage, "Auto Give", "Offer held tradeable produce or gnomes to the selected player", "AutoGive")
 addToggle(SocialPage, "Auto Receive Gift", "Accept incoming gifts only from trusted friends in the list", "AutoReceiveGift")
 addMultiSelect(SocialPage, "Give To Players", "Selected online recipient; the first available name is used", State.GivePlayers, collectPlayerOptions)
 addMultiSelect(SocialPage, "Accept From Players", "Only these senders are trusted for automatic acceptance", State.ReceivePlayers, collectPlayerOptions)
@@ -3405,8 +3660,13 @@ create("UIPadding", {
 addGroupLabel(SystemPage, "System")
 addToggle(SystemPage, "Anti AFK", "Simulate input when Roblox reports the player idle", "AntiAFK")
 addToggle(SystemPage, "Auto Rejoin", "Rejoin this place after a disconnect/error prompt", "AutoRejoin")
-addToggle(SystemPage, "Low Ping Mode", "Reduce remote bursts; server distance still determines real ping", "LowPingMode")
+addToggle(SystemPage, "Low Ping Mode", "Reduce remote bursts to lower network and frame-time spikes", "LowPingMode")
 addToggle(SystemPage, "Potato Graphics", "Disable expensive local effects and use the lowest graphics quality", "PotatoGraphics")
+addSegmentedSetting(SystemPage, "Full Inventory Policy", "Choose what automation may sell when inventory has fewer than three free slots", "InventoryOverflowPolicy", {
+    { Key = "SellProduceOnly", Label = "Sell Selected Produce" },
+    { Key = "FlushAll", Label = "Sell Produce + Extra Gnomes" },
+    { Key = "PauseAndAlert", Label = "Pause When Full" },
+}, "RefreshOverflowPolicyUI")
 Runtime.SleepRow = create("Frame", {
     Size = UDim2.new(1, -4, 0, 88),
     BackgroundColor3 = Theme.Surface,
@@ -3662,7 +3922,7 @@ end
 local function isImportantLog(entry)
     if not entry then return false end
     local cat = string.upper(tostring(entry.Category))
-    if cat == "ROLL" and (string.find(entry.MessageEN, "Bought") or string.find(entry.MessageEN, "Godly") or string.find(entry.MessageEN, "Mythic") or string.find(entry.MessageEN, "IMPOSSIBLE")) then
+    if cat == "ROLL" and string.find(entry.MessageEN, "Bought") then
         return true
     elseif cat == "SELL" and (string.find(entry.MessageEN, "batch") or string.find(entry.MessageEN, "SellAll") or string.find(entry.MessageEN, "+")) then
         return true
@@ -3807,7 +4067,7 @@ local function refreshLogsUI()
         logEmptyLabel.Visible = visibleCount == 0
     end
     if logsCountLabel then
-        logsCountLabel.Text = string.format("%d %s", visibleCount, translated("entries"))
+        logsCountLabel.Text = string.format("%d %s", tonumber(visibleCount) or 0, tostring(translated("entries")))
     end
 
     if Runtime.LogAutoScroll and logsContainer.Parent and logsContainer.Parent:IsA("ScrollingFrame") then
@@ -3905,7 +4165,7 @@ local statsGrid = create("Frame", {
     BackgroundTransparency = 1,
     Parent = LogsPage,
 })
-local statsLayout = create("UIGridLayout", {
+create("UIGridLayout", {
     CellSize = UDim2.new(0.32, -4, 1, 0),
     CellPadding = UDim2.new(0.02, 0, 0, 0),
     SortOrder = Enum.SortOrder.LayoutOrder,
@@ -4148,7 +4408,7 @@ local function refreshConfigUI()
     for _, refresh in pairs(toggleRefreshers) do
         pcall(refresh)
     end
-    BestLimitInput.Text = tostring(math.clamp(math.floor(tonumber(State.BestGnomeLimit) or 30), 1, 100))
+    BestLimitInput.Text = tostring(math.max(1, math.floor(tonumber(State.BestGnomeLimit) or 30)))
     Runtime.Viewport = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Runtime.Viewport
     Window.S = Vector2.new(
         math.clamp(tonumber(State.UIWidth) or Window.D.X, Window.N.X, math.max(Window.N.X, Runtime.Viewport.X - 8)),
@@ -4639,6 +4899,23 @@ local function getInstancePivot(instance)
     elseif instance:IsA("BasePart") then
         return instance.CFrame
     end
+    return nil
+end
+
+Runtime.IsCharacterOnOwnPlot = function()
+    local plot = getPlot()
+    local boundary = plot and plot:FindFirstChild("PLOTBOUNDARY", true)
+    local character = LocalPlayer.Character
+    local root = character and (character.PrimaryPart or character:FindFirstChild("HumanoidRootPart"))
+    if not boundary or not root then
+        return false
+    end
+    local params = RaycastParams.new()
+    params.FilterType = Enum.RaycastFilterType.Include
+    params.FilterDescendantsInstances = { boundary }
+    params.IgnoreWater = true
+    local hit = workspace:Raycast(root.Position, Vector3.new(0, -100, 0), params)
+    return hit ~= nil and (hit.Instance == boundary or hit.Instance:IsDescendantOf(boundary))
 end
 
 local function getFloorId(hitInstance, ground)
@@ -4749,21 +5026,6 @@ end
 local function getBackpack()
     return LocalPlayer:FindFirstChildOfClass("Backpack") or LocalPlayer:FindFirstChild("Backpack")
 end
-Runtime.GetSellPointCFrame = function()
-    local plot = getPlot()
-    local points = plot and plot:FindFirstChild("Points")
-    local sell = points and points:FindFirstChild("Sell")
-    if not sell then
-        return nil
-    end
-    if sell:IsA("BasePart") then
-        return sell.CFrame
-    elseif sell:IsA("Model") then
-        return sell:GetPivot()
-    end
-    local part = sell:FindFirstChildWhichIsA("BasePart", true)
-    return part and part.CFrame or nil
-end
 Runtime.EquipToolConfirmed = function(tool, force)
     local character = LocalPlayer.Character
     local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -4780,7 +5042,7 @@ Runtime.EquipToolConfirmed = function(tool, force)
             humanoid:EquipTool(tool)
         end)
     end
-    local deadline = os.clock() + 0.3
+    local deadline = os.clock() + (Runtime.Mobile and 0.3 or 0.18)
     local confirmed = false
     repeat
         if tool.Parent == character then
@@ -4817,6 +5079,18 @@ Runtime.FindSelectedProduceBatch = function(limit)
     end
     return result
 end
+Runtime.AllProduceMutationsSelected = function()
+    local options = type(collectMutationOptions) == "function" and collectMutationOptions() or {}
+    if #options == 0 then
+        return false
+    end
+    for _, mutation in ipairs(options) do
+        if not isSelected(State.SellProduceMutationTargets, mutation) then
+            return false
+        end
+    end
+    return true
+end
 local autoPlacePending = setmetatable({}, { __mode = "k" })
 local autoPlaceRetryAt = setmetatable({}, { __mode = "k" })
 local best30Selling = setmetatable({}, { __mode = "k" })
@@ -4843,6 +5117,7 @@ local function tryAutoPlace(tool)
         or autoPlacePending[tool]
         or best30Selling[tool]
         or (autoPlaceRetryAt[tool] or 0) > os.clock()
+        or (Runtime.HasGnomePlacementRoom and not Runtime.HasGnomePlacementRoom())
     then
         return false
     end
@@ -4857,179 +5132,151 @@ local function tryAutoPlace(tool)
             return
         end
         local attemptedPlacement = false
+        local equippedPlacementAttempted = false
         local actionOk, placed = Runtime.WithAction("PlaceGnome", { "Equipment", "Gnome" }, function()
-            for _ = 1, 3 do
-                if not Runtime.Alive or not placementEnabled() or not tool.Parent then
-                    break
+            if not Runtime.Alive or not placementEnabled() or not tool.Parent
+                or (Runtime.HasGnomePlacementRoom and not Runtime.HasGnomePlacementRoom())
+            then
+                return false
+            end
+            local placeCFrame, floorId = findGnomePlacement()
+            if not placeCFrame then
+                return false
+            end
+
+            local farmerName = tool.Name
+            attemptedPlacement = fire("Place", "Farmer", farmerName, placeCFrame, floorId or "1") == true
+            local directDeadline = os.clock() + (State.LowPingMode and 0.4 or 0.22)
+            repeat
+                task.wait(0.02)
+            until not tool.Parent or os.clock() >= directDeadline or not Runtime.Alive
+
+            -- Never lift a gnome into the player's hand while they are away
+            -- from their own plot. Direct remote placement is still attempted
+            -- first, so executors/servers that accept it remain fully remote.
+            if tool.Parent and Runtime.IsCharacterOnOwnPlot() then
+                local character = LocalPlayer.Character
+                local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+                local previouslyEquipped = character and character:FindFirstChildWhichIsA("Tool")
+                if previouslyEquipped == tool then
+                    previouslyEquipped = nil
                 end
-                local placeCFrame, floorId = findGnomePlacement()
-                if placeCFrame then
-                    local character = LocalPlayer.Character
-                    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-                    local previouslyEquipped
-                    if character then
-                        for _, child in ipairs(character:GetChildren()) do
-                            if child:IsA("Tool") and child ~= tool then
-                                previouslyEquipped = child
-                                break
-                            end
-                        end
+                local equipped = Runtime.EquipToolConfirmed(tool)
+                if equipped then
+                    equippedPlacementAttempted = true
+                    task.wait(Runtime.Mobile and 0.16 or 0.07)
+                    attemptedPlacement = fire("Place", "Farmer", farmerName, placeCFrame, floorId or "1") == true
+                        or attemptedPlacement
+                    local equippedDeadline = os.clock() + (State.LowPingMode and 0.55 or 0.32)
+                    repeat
+                        task.wait(0.02)
+                    until not tool.Parent or os.clock() >= equippedDeadline or not Runtime.Alive
+                end
+                if humanoid and humanoid.Parent then
+                    if tool.Parent == character then
+                        pcall(function() humanoid:UnequipTools() end)
                     end
-
-                    if humanoid and character and tool.Parent ~= character then
-                        pcall(function()
-                            humanoid:EquipTool(tool)
-                        end)
-                        -- The Place remote validates that the tool is equipped.
-                        task.wait(0.2)
+                    if previouslyEquipped and previouslyEquipped.Parent == getBackpack() then
+                        pcall(function() humanoid:EquipTool(previouslyEquipped) end)
                     end
-
-                    if character and tool.Parent == character then
-                        local farmerName = tool:GetAttribute("FarmerName") or tool.Name
-                        local remoteOk = fire("Place", "Farmer", farmerName, placeCFrame, floorId or "1")
-                        attemptedPlacement = attemptedPlacement or remoteOk == true
-                        task.wait(0.65)
-                        if not tool.Parent then
-                            Runtime.Stats.Placed = Runtime.Stats.Placed + 1
-                            if type(Runtime.Log) == "function" then
-                                local msgEN = string.format("Placed Best Gnome: %s", tostring(farmerName))
-                                local msgTH = string.format("วางโนมตัวท็อป: %s", tostring(farmerName))
-                                Runtime.Log("PROTECT", msgEN, msgTH, "Auto Best Gnome Placed", "วางโนมที่ดีที่สุดลงแปลง")
-                            end
-                        end
-                    end
-
-                    if humanoid and humanoid.Parent then
-                        if tool.Parent == character then
-                            pcall(function()
-                                humanoid:UnequipTools()
-                            end)
-                        end
-                        if previouslyEquipped and previouslyEquipped.Parent == getBackpack() then
-                            pcall(function()
-                                humanoid:EquipTool(previouslyEquipped)
-                            end)
-                        end
-                    end
-
-                    if not tool.Parent then
-                        break
-                    end
-                else
-                    task.wait(0.5)
                 end
             end
-            return not tool.Parent
+
+            if not tool.Parent then
+                Runtime.Stats.Placed = Runtime.Stats.Placed + 1
+                if type(Runtime.Log) == "function" then
+                    Runtime.Log("PROTECT",
+                        string.format("Placed Best Gnome: %s", tostring(farmerName)),
+                        string.format("วางโนมตัวท็อป: %s", tostring(farmerName)),
+                        "Auto Best Gnome Placed", "วางโนมที่ดีที่สุดลงแปลง")
+                end
+                return true
+            end
+            return false
         end)
         autoPlacePending[tool] = nil
         if placed == true or not tool.Parent then
             Runtime.GnomePlaceBlockedUntil[tool] = nil
             autoPlaceRetryAt[tool] = nil
-        elseif actionOk and attemptedPlacement then
-            -- Three valid Place calls were rejected. Usually this means the
-            -- plot is full, so the manager may swap out a weaker active gnome.
+        elseif actionOk and attemptedPlacement and equippedPlacementAttempted then
+            -- A valid Place call was rejected. Usually this means the plot is
+            -- full, so the manager may swap out a weaker active gnome.
             Runtime.GnomePlaceBlockedUntil[tool] = os.clock() + 6
-            autoPlaceRetryAt[tool] = os.clock() + 0.5
+            autoPlaceRetryAt[tool] = os.clock() + (Runtime.IsCharacterOnOwnPlot() and 0.35 or 0.8)
         else
-            autoPlaceRetryAt[tool] = os.clock() + 0.25
+            autoPlaceRetryAt[tool] = os.clock() + (Runtime.IsCharacterOnOwnPlot() and 0.25 or 0.8)
         end
     end)
     return true
 end
 
-local MutationMultipliers = {
-    Golden = 1.5,
-    Diamond = 2,
-    Shiny = 3,
-    Fire = 1.5,
-    Night = 1.5,
-    Toxic = 1.85,
-    Charged = 1.25,
-    Frozen = 1.5,
-    Cursed = 2,
-}
-
 Runtime.PlotCapacityCache = nil
+Runtime.GetExplicitPlotCapacity = function()
+    local plot = getPlot()
+    local data = type(Replication) == "table" and type(Replication.Data) == "table" and Replication.Data or {}
+    local capacity = tonumber(data.max_gnomes or data.maxGnomes or data.max_farmers or data.maxFarmers)
+        or tonumber(plot and (plot:GetAttribute("MaxGnomes") or plot:GetAttribute("MaxFarmers")))
+        or tonumber(LocalPlayer and (LocalPlayer:GetAttribute("MaxGnomes") or LocalPlayer:GetAttribute("MaxFarmers")))
+    return capacity and math.max(1, math.floor(capacity)) or nil
+end
 Runtime.GetPlotCapacity = function()
     local cached = Runtime.PlotCapacityCache
     if cached and cached.Until > os.clock() then
         return cached.Capacity
     end
-
-    local plot = getPlot()
-    local ground = plot and plot:FindFirstChild("Ground")
-    local totalSpots = 0
-
-    if ground then
-        local groundParts = {}
-        if ground:IsA("BasePart") then table.insert(groundParts, ground) end
-        for _, desc in ipairs(ground:GetDescendants()) do
-            if desc:IsA("BasePart") and desc.CanQuery then
-                table.insert(groundParts, desc)
-            end
-        end
-        local spacing = 4
-        for _, gp in ipairs(groundParts) do
-            local halfX = math.max(0, math.floor((gp.Size.X - 3) / (spacing * 2)))
-            local halfZ = math.max(0, math.floor((gp.Size.Z - 3) / (spacing * 2)))
-            halfX = math.min(halfX, 10)
-            halfZ = math.min(halfZ, 10)
-            totalSpots = totalSpots + (2 * halfX + 1) * (2 * halfZ + 1)
-        end
-    end
-
-    local workers = plot and plot:FindFirstChild("Workers")
-    local workerCount = workers and #workers:GetChildren() or 0
-    if Replication and Replication.Data and Replication.Data.farmers then
-        local fCount = 0
-        for _ in pairs(Replication.Data.farmers) do fCount = fCount + 1 end
-        workerCount = math.max(workerCount, fCount)
-    end
-
-    local capacity = math.clamp(math.max(workerCount, totalSpots > 0 and totalSpots or 30), 5, 80)
+    -- Ground area is not the server's gnome capacity. Using its grid size made
+    -- large plots protect dozens of surplus gnomes and retry impossible Place
+    -- calls forever. Prefer an explicit replicated/attribute limit when one is
+    -- exposed; otherwise use the configured ceiling and let Place stay server-authoritative.
+    local capacity = Runtime.GetExplicitPlotCapacity() or tonumber(State.BestGnomeLimit) or 30
+    capacity = math.max(1, math.floor(capacity))
     Runtime.PlotCapacityCache = { Until = os.clock() + 5, Capacity = capacity }
     return capacity
 end
 
 local function getBestGnomeLimit()
     if State.GnomeCapacityMode == "Custom" then
-        local limit = math.clamp(math.floor(tonumber(State.BestGnomeLimit) or 30), 1, 100)
+        local limit = math.max(1, math.floor(tonumber(State.BestGnomeLimit) or 30))
+        local ceiling = Runtime.GetExplicitPlotCapacity()
+        if ceiling then limit = math.min(limit, ceiling) end
         State.BestGnomeLimit = limit
         return limit
     else
         return Runtime.GetPlotCapacity()
     end
 end
+Runtime.GetBestGnomeLimit = getBestGnomeLimit
+Runtime.HasGnomePlacementRoom = function()
+    local plot = getPlot()
+    local workers = plot and plot:FindFirstChild("Workers")
+    local placedCount = workers and #workers:GetChildren() or 0
+    return placedCount < getBestGnomeLimit()
+end
 
 local function hasPlaceGnomeName(instance)
     if not instance then return false end
-    local targets = State.PlaceGnomeTargets or State.GnomeTargets or {}
-    if not Runtime.HasAnySelection(targets) then return false end
-    return isSelected(targets, getFarmerName(instance))
+    local name = getFarmerName(instance)
+    return isSelected(State.GnomeTargetTraits, TraitPrefix.Gnome .. name)
 end
 
 local function hasPlaceRarity(instance)
     if not instance then return false end
-    local targets = (Runtime.HasAnySelection(State.BuyRarityTargets) and State.BuyRarityTargets)
-        or (Runtime.HasAnySelection(State.PlaceRarityTargets) and State.PlaceRarityTargets)
-        or (Runtime.HasAnySelection(State.RarityTargets) and State.RarityTargets) or {}
-    if not Runtime.HasAnySelection(targets) then return false end
-    return isSelected(targets, getFarmerRarity(instance))
+    local rarity = getFarmerRarity(instance)
+    return isSelected(State.GnomeTargetTraits, TraitPrefix.Rarity .. rarity)
 end
 
 local function hasPlaceMutation(instance)
     if not instance then return false end
-    local targets = (Runtime.HasAnySelection(State.MutationTargets) and State.MutationTargets)
-        or (Runtime.HasAnySelection(State.PlaceMutationTargets) and State.PlaceMutationTargets) or {}
-    if not Runtime.HasAnySelection(targets) then return false end
     local mutations = tostring(instance:GetAttribute("Mutations") or instance:GetAttribute("Mutation") or "")
     local cleaned = string.gsub(mutations, "%s*[,|+]%s*", "_")
     if cleaned == "" or string.lower(cleaned) == "none" or string.lower(cleaned) == "normal" then
-        return isSelected(targets, "Normal")
+        return isSelected(State.GnomeTargetTraits, TraitPrefix.Mutation .. "Normal")
     end
     for mutation in string.gmatch(cleaned, "[^_]+") do
         mutation = string.match(mutation, "^%s*(.-)%s*$")
-        if mutation and mutation ~= "" and isSelected(targets, mutation) then
+        if mutation and mutation ~= ""
+            and isSelected(State.GnomeTargetTraits, TraitPrefix.Mutation .. mutation)
+        then
             return true
         end
     end
@@ -5038,32 +5285,19 @@ end
 
 local function matchesPlaceTargets(instance)
     if not instance then return false end
-    local hasNameFilter = Runtime.HasAnySelection(State.PlaceGnomeTargets) or Runtime.HasAnySelection(State.GnomeTargets)
-    local hasRarityFilter = Runtime.HasAnySelection(State.BuyRarityTargets)
-        or Runtime.HasAnySelection(State.PlaceRarityTargets)
-        or Runtime.HasAnySelection(State.RarityTargets)
-    local hasMutationFilter = Runtime.HasAnySelection(State.MutationTargets)
-        or Runtime.HasAnySelection(State.PlaceMutationTargets)
+    local hasNameFilter = Runtime.HasTraitSelection(State.GnomeTargetTraits, TraitPrefix.Gnome)
+    local hasRarityFilter = Runtime.HasTraitSelection(State.GnomeTargetTraits, TraitPrefix.Rarity)
+    local hasMutationFilter = Runtime.HasTraitSelection(State.GnomeTargetTraits, TraitPrefix.Mutation)
 
-    if not hasNameFilter and not hasRarityFilter and not hasMutationFilter then
-        return false
-    end
-
-    if hasNameFilter and hasPlaceGnomeName(instance) then
-        return true
-    end
-    if hasRarityFilter and hasPlaceRarity(instance) then
-        return true
-    end
-    if hasMutationFilter and hasPlaceMutation(instance) then
-        return true
-    end
-
-    return false
+    local hasAnyFilter = hasNameFilter or hasRarityFilter or hasMutationFilter
+    return hasAnyFilter
+        and (not hasNameFilter or hasPlaceGnomeName(instance))
+        and (not hasRarityFilter or hasPlaceRarity(instance))
+        and (not hasMutationFilter or hasPlaceMutation(instance))
 end
 Runtime.MatchesPlaceTargets = matchesPlaceTargets
 
-local function getGnomePower(instance)
+local function getGnomePower(instance, ignorePlacementTargets)
     local farmerName = getFarmerName(instance)
     local config = FarmersConfig[farmerName]
     -- Unknown/event gnomes are protected instead of being sold accidentally.
@@ -5088,7 +5322,7 @@ local function getGnomePower(instance)
         or tonumber(config.order) or 0) * hugeMultiplier
     local mutationMultiplier = 1
     for mutation in string.gmatch(mutations, "[^_]+") do
-        mutationMultiplier = mutationMultiplier * (MutationMultipliers[mutation] or 1)
+        mutationMultiplier = mutationMultiplier * Runtime.GetMutationMultiplier(mutation)
     end
     if not usedExactCropPrice then
         baseValue = baseValue * mutationMultiplier
@@ -5107,17 +5341,17 @@ local function getGnomePower(instance)
     local productionRate = leveledValue / math.max(averageDuration, 0.1)
 
     -- Placement Strategy Scoring:
-    local mode = State.GnomePlacementMode or "TargetsFirst"
-    local isTarget = matchesPlaceTargets(instance)
+    if not ignorePlacementTargets then
+        local mode = State.GnomePlacementMode or "TargetsFirst"
+        local isTarget = matchesPlaceTargets(instance)
 
-    if mode == "CustomTargets" then
-        if isTarget then
-            productionRate = productionRate + 100000000
-        else
-            productionRate = -1
-        end
-    elseif mode == "TargetsFirst" then
-        if isTarget then
+        if mode == "CustomTargets" then
+            if isTarget then
+                productionRate = productionRate + 100000000
+            else
+                productionRate = -1
+            end
+        elseif mode == "TargetsFirst" and isTarget then
             productionRate = productionRate + 100000000
         end
     end
@@ -5150,6 +5384,7 @@ local function getRankedGnomes()
             RolledRarity = rolledRarity,
             Level = level,
             FarmerName = farmerName,
+            Eligible = power >= 0,
         })
     end
 
@@ -5186,48 +5421,41 @@ local function getRankedGnomes()
         return a.Instance.Name < b.Instance.Name
     end)
 
-    local validRecords = {}
-    for _, r in ipairs(records) do
-        if r.Power >= 0 then
-            table.insert(validRecords, r)
+    Runtime.RankedGnomeCache = { Until = os.clock() + 0.35, Records = records }
+    return records
+end
+
+local function getProtectedGnomeCount(records)
+    local eligible = 0
+    for _, record in ipairs(records) do
+        if record.Eligible ~= false then
+            eligible = eligible + 1
         end
     end
-    Runtime.RankedGnomeCache = { Until = os.clock() + 0.35, Records = validRecords }
-    return validRecords
+    return math.min(getBestGnomeLimit(), eligible)
 end
 
 local function hasKeepRarity(instance)
     if not instance then
         return false
     end
-    local targets = (Runtime.HasAnySelection(State.BuyRarityTargets) and State.BuyRarityTargets)
-        or (Runtime.HasAnySelection(State.KeepRarityTargets) and State.KeepRarityTargets)
-        or (Runtime.HasAnySelection(State.PlaceRarityTargets) and State.PlaceRarityTargets)
-        or (Runtime.HasAnySelection(State.RarityTargets) and State.RarityTargets) or {}
-    if not Runtime.HasAnySelection(targets) then
-        return false
-    end
-    return isSelected(targets, getFarmerRarity(instance))
+    return isSelected(State.GnomeKeepTraits, TraitPrefix.Rarity .. getFarmerRarity(instance))
 end
 
 local function hasKeepMutation(instance)
     if not instance then
         return false
     end
-    local targets = (Runtime.HasAnySelection(State.MutationTargets) and State.MutationTargets)
-        or (Runtime.HasAnySelection(State.KeepMutationTargets) and State.KeepMutationTargets)
-        or (Runtime.HasAnySelection(State.PlaceMutationTargets) and State.PlaceMutationTargets) or {}
-    if not Runtime.HasAnySelection(targets) then
-        return false
-    end
     local mutations = tostring(instance:GetAttribute("Mutations") or instance:GetAttribute("Mutation") or "")
     local cleaned = string.gsub(mutations, "%s*[,|+]%s*", "_")
     if cleaned == "" or string.lower(cleaned) == "none" or string.lower(cleaned) == "normal" then
-        return isSelected(targets, "Normal")
+        return isSelected(State.GnomeKeepTraits, TraitPrefix.Mutation .. "Normal")
     end
     for mutation in string.gmatch(cleaned, "[^_]+") do
         mutation = string.match(mutation, "^%s*(.-)%s*$")
-        if mutation and mutation ~= "" and isSelected(targets, mutation) then
+        if mutation and mutation ~= ""
+            and isSelected(State.GnomeKeepTraits, TraitPrefix.Mutation .. mutation)
+        then
             return true
         end
     end
@@ -5238,31 +5466,10 @@ local function matchesKeepTargets(instance)
     if not instance then
         return false
     end
-    local hasNameFilter = Runtime.HasAnySelection(State.PlaceGnomeTargets)
-        or Runtime.HasAnySelection(State.GnomeTargets)
-    local hasKeepRarityFilter = Runtime.HasAnySelection(State.BuyRarityTargets)
-        or Runtime.HasAnySelection(State.KeepRarityTargets)
-        or Runtime.HasAnySelection(State.PlaceRarityTargets)
-        or Runtime.HasAnySelection(State.RarityTargets)
-    local hasKeepMutationFilter = Runtime.HasAnySelection(State.MutationTargets)
-        or Runtime.HasAnySelection(State.KeepMutationTargets)
-        or Runtime.HasAnySelection(State.PlaceMutationTargets)
-
-    if not hasNameFilter and not hasKeepRarityFilter and not hasKeepMutationFilter then
-        return false
-    end
-
-    if hasNameFilter and hasPlaceGnomeName(instance) then
-        return true
-    end
-    if hasKeepRarityFilter and hasKeepRarity(instance) then
-        return true
-    end
-    if hasKeepMutationFilter and hasKeepMutation(instance) then
-        return true
-    end
-
-    return false
+    -- Protection traits are independent (OR); wanted target categories use AND.
+    return isSelected(State.GnomeKeepTraits, TraitPrefix.Gnome .. getFarmerName(instance))
+        or hasKeepRarity(instance)
+        or hasKeepMutation(instance)
 end
 Runtime.MatchesKeepTargets = matchesKeepTargets
 
@@ -5281,14 +5488,11 @@ local function isProtectedGnome(tool)
     if matchesPlaceTargets(tool) or matchesKeepTargets(tool) then
         return true
     end
-    -- Tier 4: Protect High-Tier (Godly, Mythic, Huge, Diamond, IMPOSSIBLE)
+    -- Tier 4: protect the top quarter of the live rarity/mutation catalogs.
     if State.ProtectHighTier then
-        local r = string.upper(tostring(getFarmerRarity(tool)))
-        if r == "GODLY" or r == "MYTHIC" or r == "IMPOSSIBLE" or r == "EVENT" or r == "SECRET" then
-            return true
-        end
-        local mut = string.lower(tostring(tool:GetAttribute("Mutations") or tool:GetAttribute("Mutation") or ""))
-        if string.find(mut, "huge") or string.find(mut, "diamond") or string.find(mut, "golden") then
+        if Runtime.IsHighTierRarity(getFarmerRarity(tool))
+            or Runtime.HasHighTierMutation(tool:GetAttribute("Mutations") or tool:GetAttribute("Mutation"))
+        then
             return true
         end
         if tool:GetAttribute("Huge") == true then
@@ -5297,7 +5501,7 @@ local function isProtectedGnome(tool)
     end
     -- Tier 1: Placed on plot or ranked in the Top-N set
     local ranked = getRankedGnomes()
-    local protectedCount = math.min(getBestGnomeLimit(), #ranked)
+    local protectedCount = getProtectedGnomeCount(ranked)
     for index, record in ipairs(ranked) do
         if index > protectedCount then
             break
@@ -5328,7 +5532,7 @@ local function sellInventoryGnomeBatch(tools)
         best30Selling[tool] = true
     end
     local soldCount = 0
-    local actionOk = Runtime.WithAction("SellInventoryGnome", { "Equipment", "Gnome" }, function()
+    Runtime.WithAction("SellInventoryGnome", { "Equipment", "Gnome" }, function()
         local character = LocalPlayer.Character
         local humanoid = character and character:FindFirstChildOfClass("Humanoid")
         local previouslyEquipped
@@ -5351,7 +5555,7 @@ local function sellInventoryGnomeBatch(tools)
                     if not ok or result == "Not Holding" then
                         ok, result = invoke("SellThis")
                     end
-                    local deadline = os.clock() + 0.85
+                    local deadline = os.clock() + (State.LowPingMode and 0.65 or 0.38)
                     repeat
                         task.wait(0.04)
                     until not tool.Parent or os.clock() >= deadline or not Runtime.Alive
@@ -5359,10 +5563,10 @@ local function sellInventoryGnomeBatch(tools)
                         soldCount = soldCount + 1
                         gnomeSellRetryAt[tool] = nil
                     else
-                        gnomeSellRetryAt[tool] = os.clock() + 1.5
+                        gnomeSellRetryAt[tool] = os.clock() + (State.LowPingMode and 1.2 or 0.55)
                     end
                 else
-                    gnomeSellRetryAt[tool] = os.clock() + 1.5
+                    gnomeSellRetryAt[tool] = os.clock() + (State.LowPingMode and 1.2 or 0.55)
                 end
             end
         end
@@ -5392,13 +5596,6 @@ local function sellInventoryGnomeBatch(tools)
     return soldCount
 end
 
-local function sellInventoryGnome(tool)
-    if not tool then
-        return false
-    end
-    return sellInventoryGnomeBatch({ tool }) > 0
-end
-
 local function policySellsGnome(record)
     if not record or not record.Instance then
         return false
@@ -5415,6 +5612,13 @@ local function policySellsGnome(record)
     if matchesPlaceTargets(record.Instance) or matchesKeepTargets(record.Instance) then
         return false
     end
+    local policy = State.GnomeSellPolicy or "BelowBest"
+    if policy == "KeepExtras" then
+        return false
+    end
+    if policy == "SelectedRarities" then
+        return isSelected(State.SellRarityTargets, getFarmerRarity(record.Instance))
+    end
     return true
 end
 
@@ -5423,17 +5627,26 @@ Runtime.PurgeInventoryOverflow = function()
         return false
     end
     local currentCount = Runtime.GetBackpackItemCount()
-    if currentCount < 35 then
+    local capacity = Runtime.GetBackpackCapacity()
+    local threshold = math.max(0, capacity - 3)
+    if currentCount <= threshold then
         return true
+    end
+    if State.InventoryOverflowPolicy == "PauseAndAlert" then
+        return false
     end
 
     local actionOk = Runtime.WithAction("EmergencyInventoryPurge", { "Farm", "Equipment", "Gnome" }, function()
         local character = LocalPlayer.Character
         local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 
-        -- 1. Sell eligible produce in backpack (Try SellAll fast-path first)
-        local okAll = invoke("SellAll")
-        local produceBatch = Runtime.FindSelectedProduceBatch(20)
+        -- 1. Sell only produce explicitly selected by the user. SellAll is
+        -- reserved for the true all-mutations case because the server remote
+        -- has no filter argument.
+        if Runtime.AllProduceMutationsSelected() then
+            invoke("SellAll")
+        end
+        local produceBatch = Runtime.FindSelectedProduceBatch(30)
         for _, produce in ipairs(produceBatch) do
             if produce.Parent and Runtime.IsProduceTool(produce) and Runtime.IsSelectedProduceMutation(produce) then
                 if Runtime.EquipToolConfirmed(produce) then
@@ -5446,10 +5659,9 @@ Runtime.PurgeInventoryOverflow = function()
         end
 
         -- 2. If still high, sell junk inventory gnomes (never Top 30 placed or keep targets)
-        if Runtime.GetBackpackItemCount() >= 35 then
+        if State.InventoryOverflowPolicy == "FlushAll" and Runtime.GetBackpackItemCount() > threshold then
             local ranked = getRankedGnomes()
-            local keepLimit = getBestGnomeLimit()
-            local protectedCount = math.min(keepLimit, #ranked)
+            local protectedCount = getProtectedGnomeCount(ranked)
             local junkGnomes = {}
             for index = #ranked, protectedCount + 1, -1 do
                 local record = ranked[index]
@@ -5524,17 +5736,16 @@ end
 -- the desired ceiling, so a missing/renamed capacity attribute cannot underfill.
 task.spawn(function()
     while Runtime.Alive do
-        if State.AutoBest30 or Runtime.IsBackpackNearFull() then
+        if State.AutoBest30 then
             local ranked = getRankedGnomes()
-            local keepLimit = getBestGnomeLimit()
-            local protectedCount = math.min(keepLimit, #ranked)
-            local activeLimit = keepLimit
+            local protectedCount = getProtectedGnomeCount(ranked)
+            local activeLimit = protectedCount
             local bestInventory, bestInventoryIndex
             local placedCount = 0
             for index, record in ipairs(ranked) do
                 if record.Kind == "Worker" then
                     placedCount = placedCount + 1
-                elseif index <= activeLimit and not bestInventory then
+                elseif record.Eligible ~= false and index <= activeLimit and not bestInventory then
                     bestInventory = record
                     bestInventoryIndex = index
                 end
@@ -5600,7 +5811,7 @@ task.spawn(function()
                 end
             end
         end
-        task.wait(State.AutoBest30 and 0.55 or 1.5)
+        task.wait(State.AutoBest30 and (State.LowPingMode and 0.55 or 0.25) or 1.5)
     end
 end)
 
@@ -5681,7 +5892,7 @@ local function getPlantRecord(plant)
     local score = tonumber(config.sell_price) or tonumber(config.order) or 0
     local mutations = tostring(plant:GetAttribute("Mutations") or "")
     for mutation in string.gmatch(mutations, "[^_]+") do
-        score = score * (MutationMultipliers[mutation] or 1)
+        score = score * Runtime.GetMutationMultiplier(mutation)
     end
     local ok, pivot = pcall(getInstancePivot, plant)
     if not ok or not pivot then
@@ -5926,25 +6137,59 @@ local function findWaterTarget()
             return record.Instance
         end
     end
+    return nil
 end
 
 local function findCoffeeTarget()
-    local ranked = getRankedGnomes()
-    local protectedCount = State.AutoBest30 and math.min(getBestGnomeLimit(), #ranked) or #ranked
-    for index, record in ipairs(ranked) do
-        if index <= protectedCount and record.Kind == "Worker"
-            and (Runtime.ItemTargetRetry[record.Instance] or 0) <= os.clock()
+    local plot = getPlot()
+    local workers = plot and plot:FindFirstChild("Workers")
+    local bestWorker, bestPower
+    for _, worker in ipairs(workers and workers:GetChildren() or {}) do
+        local root = worker:FindFirstChild("RootPart")
+            or (worker:IsA("Model") and worker.PrimaryPart or nil)
+        local hasCoffee = worker:GetAttribute("HasCoffee") == true
+            or worker:FindFirstChild("CoffeeTrail") ~= nil
+            or (root and root:FindFirstChild("CoffeeTrail") ~= nil)
+        local gnomeSpeed = tonumber(worker:GetAttribute("GnomeSpeed"))
+        if not hasCoffee and (not gnomeSpeed or gnomeSpeed <= 1)
+            and (Runtime.ItemTargetRetry[worker] or 0) <= os.clock()
         then
-            local worker = record.Instance
-            local hasCoffee = worker:GetAttribute("HasCoffee") == true
-                or worker:FindFirstChild("CoffeeTrail") ~= nil
-            local gnomeSpeed = tonumber(worker:GetAttribute("GnomeSpeed"))
-            local isBoosted = hasCoffee or (gnomeSpeed and gnomeSpeed > 1)
-            if not isBoosted then
-                return worker
+            -- Ignore placement-target bonuses here: coffee must go to the
+            -- genuinely highest-production active worker, not a backpack tool
+            -- or a weaker gnome merely promoted by the placement preset.
+            local power = getGnomePower(worker, true)
+            if bestPower == nil or power > bestPower then
+                bestWorker, bestPower = worker, power
             end
         end
     end
+    return bestWorker
+end
+
+Runtime.EnsureGnomeItemSignalCapture = function()
+    if Runtime.GnomeItemSignalConnection and Runtime.GnomeItemSignalConnection.Connected ~= false then
+        return true
+    end
+    local signalLibrary
+    local ok = pcall(function()
+        signalLibrary = Library and Library.get("Signal")
+    end)
+    if not ok or type(signalLibrary) ~= "table" or type(signalLibrary.GetSignal) ~= "function" then
+        return false
+    end
+    local giveSignal
+    pcall(function()
+        giveSignal = signalLibrary:GetSignal("GiveGnomeItem")
+    end)
+    if not giveSignal then
+        return false
+    end
+    Runtime.GnomeItemSignalConnection = connect(giveSignal, function(active, identifier)
+        if active == true and identifier ~= nil then
+            Runtime.EquippedGnomeItemIdentifier = identifier
+        end
+    end)
+    return Runtime.GnomeItemSignalConnection ~= nil
 end
 
 Runtime.GetUseTargetSignature = function(instance)
@@ -5999,7 +6244,8 @@ local function tryUseItem(tool)
     end
     if (itemType == "WateringCan" or itemType == "GnomeItem") and not target then
         itemRetryAt[tool] = os.clock() + 0.5
-        Runtime.SetUseItemStatus(itemName .. " | NO TARGET")
+        local reason = State.Language == "TH" and "ไม่มีเป้าหมาย" or "NO TARGET"
+        Runtime.SetUseItemStatus(itemName .. " | " .. reason)
         return false
     elseif (itemType == "Sprinkler" or itemType == "Fertilizer") and not placeCFrame then
         itemRetryAt[tool] = os.clock() + 1
@@ -6025,19 +6271,18 @@ local function tryUseItem(tool)
             end
             local character = LocalPlayer.Character
             local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-            local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-            local returnPivot = character and character:GetPivot()
             local previouslyEquipped = character and character:FindFirstChildWhichIsA("Tool")
+            if itemType == "GnomeItem" then
+                Runtime.EnsureGnomeItemSignalCapture()
+                Runtime.EquippedGnomeItemIdentifier = nil
+            end
             local equipped = Runtime.EquipToolConfirmed(tool)
             if equipped then
                 -- Give the tool's own Equipped LocalScript time to register its
-                -- placement/watering/coffee mode, especially on mobile clients.
-                task.wait(Runtime.Mobile and 0.25 or 0.1)
-            end
-            local actionCFrame = placeCFrame
-            if target and target.Parent then
-                local pivotOk, pivot = pcall(getInstancePivot, target)
-                actionCFrame = pivotOk and pivot or actionCFrame
+                -- mode and the server time to observe the equipped inventory
+                -- key. Coffee is validated against that equipped item.
+                task.wait(itemType == "GnomeItem" and (Runtime.Mobile and 0.3 or 0.18)
+                    or (Runtime.Mobile and 0.18 or 0.06))
             end
             local targetSignature = Runtime.GetUseTargetSignature(target)
             local placedBefore = Runtime.CountPlacedUseItems(itemType)
@@ -6052,60 +6297,33 @@ local function tryUseItem(tool)
                         and Runtime.GetUseTargetSignature(target) ~= targetSignature)
                     or Runtime.CountPlacedUseItems(itemType) > placedBefore
             end
-            local moved = false
             local didAttempt = false
             local wasConfirmed = false
             if equipped and character and tool.Parent == character and State.AutoUseItems then
                 if itemType == "WateringCan" and target and target.Parent then
                     didAttempt = fire("WaterPlant", target)
                 elseif itemType == "GnomeItem" and target and target.Parent then
-                    local itemId = Runtime.GetToolItemId(tool)
-                    local identifiers, seenIdentifiers = {}, {}
-                    local function addIdentifier(identifier)
-                        if identifier == nil then
-                            return
-                        end
-                        local key = typeof(identifier) == "Instance" and identifier or tostring(identifier)
-                        if key ~= "" and not seenIdentifiers[key] then
-                            seenIdentifiers[key] = true
-                            table.insert(identifiers, identifier)
-                        end
-                    end
-                    -- Inventory tools use a unique Id in some server versions,
-                    -- while older versions expect the canonical item name.
-                    addIdentifier(itemId)
-                    addIdentifier(tool:GetAttribute("ItemName"))
-                    addIdentifier(tool:GetAttribute("GnomeItemName"))
-                    addIdentifier(itemName)
-                    addIdentifier(tool.Name)
-                    addIdentifier(tool)
-                    for _, identifier in ipairs(identifiers) do
-                        local sent = fire("GiveFarmerItem", target, identifier)
-                        didAttempt = sent or didAttempt
-                        if sent then
-                            local attemptDeadline = os.clock() + 0.75
-                            repeat
-                                task.wait(0.1)
-                                wasConfirmed = useWasConfirmed()
-                            until wasConfirmed or os.clock() >= attemptDeadline
-                                or not Runtime.Alive or not tool.Parent
-                        end
-                        if wasConfirmed or not tool.Parent then
-                            break
-                        end
-                    end
+                    -- Capture the exact identifier emitted by the equipped
+                    -- tool's GiveGnomeItem signal. Tool.Name remains a fallback
+                    -- for executors where custom Signal inspection is blocked.
+                    local identifier = Runtime.EquippedGnomeItemIdentifier
+                        or (tool.Name ~= "" and tool.Name)
+                        or Runtime.GetToolItemId(tool)
+                    didAttempt = identifier ~= nil and fire("GiveFarmerItem", target, identifier) or false
                 elseif placeCFrame then
                     didAttempt = fire("Place", itemType, itemName, placeCFrame, floorId or "1")
                 end
             end
             if didAttempt and not wasConfirmed then
-                local deadline = os.clock() + (Runtime.Mobile and 1.8 or 1.3)
+                local deadline = os.clock() + (State.LowPingMode and 1.25
+                    or Runtime.Mobile and 0.9 or 0.65)
                 repeat
-                    task.wait(0.1)
+                    task.wait(State.LowPingMode and 0.1 or 0.03)
                     wasConfirmed = useWasConfirmed()
                 until wasConfirmed or os.clock() >= deadline or not Runtime.Alive
                 if target then
-                    Runtime.ItemTargetRetry[target] = os.clock() + (wasConfirmed and 5 or 2)
+                    Runtime.ItemTargetRetry[target] = os.clock() + (wasConfirmed and 5
+                        or State.LowPingMode and 1.5 or 0.6)
                 end
                 if wasConfirmed and (itemType == "Sprinkler" or itemType == "Fertilizer") then
                     Runtime.Stats.Placed = Runtime.Stats.Placed + 1
@@ -6160,7 +6378,8 @@ local function tryUseItem(tool)
                 end
                 Runtime.ItemPlacementRejected[tool] = rejected
             end
-            itemRetryAt[tool] = os.clock() + math.min(1 + failures * 0.5, 4)
+            itemRetryAt[tool] = os.clock() + math.min(0.3 + failures * 0.2,
+                State.LowPingMode and 2 or 1.2)
             Runtime.SetUseItemStatus(
                 itemName .. " | " .. (not actionOk and tostring(confirmed):upper()
                     or attempted and "SERVER REJECTED"
@@ -6181,9 +6400,9 @@ task.spawn(function()
         elseif not Runtime.HasAnySelection(State.UseItemTargets) then
             Runtime.SetUseItemStatus("SELECT AN ITEM", false)
         elseif not Runtime.ItemActionActive
-            or (Runtime.ItemActionActiveAt and os.clock() - Runtime.ItemActionActiveAt > 8)
+            or (Runtime.ItemActionActiveAt and os.clock() - Runtime.ItemActionActiveAt > 4)
         then
-            if Runtime.ItemActionActiveAt and os.clock() - Runtime.ItemActionActiveAt > 8 then
+            if Runtime.ItemActionActiveAt and os.clock() - Runtime.ItemActionActiveAt > 4 then
                 Runtime.ItemActionActive = false
                 Runtime.ItemActionActiveAt = nil
             end
@@ -6215,15 +6434,15 @@ task.spawn(function()
                 end
             end
         end
-        task.wait(State.AutoUseItems and 0.4 or 1.5)
+        task.wait(State.AutoUseItems and (State.LowPingMode and 0.4 or 0.15) or 1.5)
     end
 end)
 
 local function isGiftableTool(tool)
-    if not tool or not tool:IsA("Tool") or type(tool:GetAttribute("Id")) ~= "string" then
+    if not tool or not tool:IsA("Tool") or tool:GetAttribute("Id") == nil then
         return false
     end
-    local itemType = string.lower(tostring(tool:GetAttribute("type") or ""))
+    local itemType = string.lower(tostring(tool:GetAttribute("type") or tool:GetAttribute("Type") or ""))
     return itemType == "plant" or itemType == "fruit" or itemType == "farmer" or itemType == "gnome"
 end
 
@@ -6362,7 +6581,7 @@ task.spawn(function()
                 and not (State.AutoBest30 and isProtectedGnome(heldTool))
             then
                 local lastAttempt = lastGiftAttempt[heldTool] or 0
-                if os.clock() - lastAttempt >= 2 then
+                if os.clock() - lastAttempt >= 5 then
                     local actionToken = Runtime.BeginAction("Give", { "Equipment" })
                     if actionToken then
                         lastGiftAttempt[heldTool] = os.clock()
@@ -6389,38 +6608,6 @@ task.spawn(function()
 end)
 
 local boughtPreview = setmetatable({}, { __mode = "k" })
-Runtime.PreviewMutationCache = setmetatable({}, { __mode = "k" })
-local function hasSelectedMutation(instance)
-    local mutations = tostring(instance:GetAttribute("Mutations") or instance:GetAttribute("Mutation") or "")
-    local cached = Runtime.PreviewMutationCache[instance]
-    if cached and cached.Raw == mutations and cached.Version == Runtime.SelectionVersion then
-        return cached.Result
-    end
-    local result = false
-    -- Normalize separators (comma, pipe, plus) to underscore, matching
-    -- IsSelectedProduceMutation so both systems parse the same attribute
-    -- formats consistently.
-    local cleaned = string.gsub(mutations, "%s*[,|+]%s*", "_")
-    if cleaned == "" or string.lower(cleaned) == "none" or string.lower(cleaned) == "normal" then
-        -- Gnome has no mutation – treat it as "Normal" so users can opt-in
-        -- to buying unmutated gnomes via the Mutation Targets selector.
-        result = isSelected(State.MutationTargets, "Normal")
-    else
-        for mutation in string.gmatch(cleaned, "[^_]+") do
-            mutation = string.match(mutation, "^%s*(.-)%s*$")
-            if mutation and mutation ~= "" and isSelected(State.MutationTargets, mutation) then
-                result = true
-                break
-            end
-        end
-    end
-    Runtime.PreviewMutationCache[instance] = {
-        Raw = mutations,
-        Version = Runtime.SelectionVersion,
-        Result = result,
-    }
-    return result
-end
 
 Runtime.NeedsRebirthGnome = function(instance)
     if not State.AutoBuyRebirthGnomes and not State.AutoRebirth then
@@ -6450,32 +6637,10 @@ local function isWantedPreview(instance)
         return true
     end
 
-    if not State.AutoBuyTarget and not State.AutoBuyMutation then
+    if not State.AutoBuyTarget then
         return false
     end
-
-    local hasNameFilter = Runtime.HasAnySelection(State.PlaceGnomeTargets) or Runtime.HasAnySelection(State.GnomeTargets)
-    local hasRarityFilter = Runtime.HasAnySelection(State.BuyRarityTargets)
-        or Runtime.HasAnySelection(State.PlaceRarityTargets)
-        or Runtime.HasAnySelection(State.RarityTargets)
-    local hasMutationFilter = Runtime.HasAnySelection(State.MutationTargets)
-        or Runtime.HasAnySelection(State.PlaceMutationTargets)
-
-    if not hasNameFilter and not hasRarityFilter and not hasMutationFilter then
-        return false
-    end
-
-    if hasNameFilter and hasPlaceGnomeName(instance) then
-        return true
-    end
-    if hasRarityFilter and hasPlaceRarity(instance) then
-        return true
-    end
-    if hasMutationFilter and hasSelectedMutation(instance) then
-        return true
-    end
-
-    return false
+    return matchesPlaceTargets(instance)
 end
 Runtime.IsWantedPreview = isWantedPreview
 
@@ -6520,7 +6685,7 @@ local function getPreviewPrice(instance)
         return nil
     end
     for mutation in string.gmatch(mutations, "[^_]+") do
-        price = price * (MutationMultipliers[mutation] or 1)
+        price = price * Runtime.GetMutationMultiplier(mutation)
     end
     if huge then
         price = price * 1.5
@@ -6575,7 +6740,7 @@ local function tryBuyPreview(instance)
         clearPendingPurchase()
     end
     local lastAttempt = boughtPreview[instance] or 0
-    if os.clock() - lastAttempt < 0.8 then
+    if os.clock() - lastAttempt < (State.LowPingMode and 0.8 or 0.35) then
         return
     end
     if Runtime.RebirthReady and Runtime.RebirthReady() then
@@ -6602,24 +6767,28 @@ local function tryBuyPreview(instance)
         return
     end
     boughtPreview[instance] = os.clock()
-    if Runtime.IsBackpackNearFull() then
-        Runtime.EnsureBackpackSpace(1)
+    if Runtime.IsBackpackNearFull(1) and not Runtime.EnsureBackpackSpace(1) then
+        Runtime.EndAction(actionToken)
+        return
     end
     local ok = fire("BuyFarmer", instance)
     if ok then
-        local deadline = os.clock() + 0.6
+        local deadline = os.clock() + (State.LowPingMode and 0.6 or 0.35)
         repeat
             task.wait()
         until not instance.Parent or os.clock() >= deadline or not Runtime.Alive
         if not instance.Parent and type(Runtime.Log) == "function" then
             local fName = getFarmerName(instance) or "Gnome"
-            local fRarity = getFarmerRarity(instance) or "Common"
+            local fRarity = getFarmerRarity(instance) or "Unknown"
             local fMut = tostring(instance:GetAttribute("Mutations") or instance:GetAttribute("Mutation") or "")
             local mutText = fMut ~= "" and (" (" .. fMut .. ")") or ""
             local priceStr = (price and price > 0) and (" (-$" .. formatNumber(price) .. ")") or ""
             local msgEN = string.format("Bought Gnome: %s [%s]%s%s", fName, fRarity, mutText, priceStr)
             local msgTH = string.format("ซื้อโนม: %s [%s]%s%s", fName, fRarity, mutText, priceStr)
-            Runtime.Log("ROLL", msgEN, msgTH, "Matched targets - Purchased into inventory", "ตรงกับเป้าหมาย - ซื้อเข้าตัวเรียบร้อย", true)
+            Runtime.Log("ROLL", msgEN, msgTH,
+                neededForRebirth and "Required by next rebirth" or "Matched every active target category",
+                neededForRebirth and "จำเป็นสำหรับการเกิดใหม่รอบถัดไป" or "ตรงกับทุกหมวดเป้าหมายที่เลือกไว้",
+                true)
         end
     end
     Runtime.EndAction(actionToken)
@@ -6665,13 +6834,13 @@ task.spawn(function()
         if pending and (not pending.Parent or not isWantedPreview(pending)) then
             clearPendingPurchase()
         end
-        if preview and (State.AutoBuyTarget or State.AutoBuyMutation or State.AutoBuyRebirthGnomes or State.AutoRebirth) then
+        if preview and (State.AutoBuyTarget or State.AutoBuyRebirthGnomes or State.AutoRebirth) then
             for _, child in ipairs(preview:GetChildren()) do
                 tryBuyPreview(child)
             end
         end
-        task.wait((State.AutoBuyTarget or State.AutoBuyMutation or State.AutoBuyRebirthGnomes or State.AutoRebirth
-            or Runtime.PendingPurchase ~= nil) and 0.5 or 1)
+        task.wait((State.AutoBuyTarget or State.AutoBuyRebirthGnomes or State.AutoRebirth
+            or Runtime.PendingPurchase ~= nil) and (State.LowPingMode and 0.5 or 0.2) or 1)
     end
 end)
 
@@ -6702,7 +6871,10 @@ end)
 task.spawn(function()
     local collecting = setmetatable({}, { __mode = "k" })
     while Runtime.Alive do
-        if State.AutoCollect then
+        if State.AutoCollect and Runtime.IsBackpackNearFull() then
+            Runtime.EnsureBackpackSpace(3)
+        end
+        if State.AutoCollect and not Runtime.IsBackpackNearFull() then
             Runtime.WithAction("Collect", { "Farm" }, function()
                 local plot = getPlot()
                 local plants = plot and plot:FindFirstChild("Plants")
@@ -6723,7 +6895,9 @@ task.spawn(function()
                     local collectedThisPass = 0
                     local specialMutations = {}
                     for _, plant in ipairs(readyPlants) do
-                        if not Runtime.Alive or not State.AutoCollect or collectedThisPass >= 12 then
+                        if not Runtime.Alive or not State.AutoCollect or collectedThisPass >= 12
+                            or Runtime.IsBackpackNearFull()
+                        then
                             break
                         end
                         local fruitReady = plant:GetAttribute("FruitReady") ~= false
@@ -6761,10 +6935,16 @@ task.spawn(function()
     while Runtime.Alive do
         local batch = {}
         if State.AutoSellProduce or Runtime.IsBackpackNearFull() then
-            batch = Runtime.FindSelectedProduceBatch(20)
+            batch = Runtime.FindSelectedProduceBatch(30)
         end
         if batch[1] then
             Runtime.ProduceSellPending = true
+            Runtime.ReserveAction(
+                "SellSelectedProduce",
+                { "Farm", "Equipment" },
+                3,
+                30
+            )
             local actionOk, soldCount, result = Runtime.WithAction("SellSelectedProduce", { "Farm", "Equipment" }, function()
                 local character = LocalPlayer.Character
                 local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -6772,8 +6952,13 @@ task.spawn(function()
                 local count = 0
                 local lastResponse = "no match"
 
-                -- Fast Path: Try SellAll first for instant 1-tick remote sale from anywhere
-                local okAll, resAll = invoke("SellAll")
+                -- SellAll has no mutation filter. Use it only when every
+                -- available mutation is selected; otherwise preserve the
+                -- user's checkboxes and sell confirmed tools individually.
+                local okAll, resAll = false, nil
+                if Runtime.AllProduceMutationsSelected() then
+                    okAll, resAll = invoke("SellAll")
+                end
                 if okAll and type(resAll) == "number" and resAll > 0 then
                     count = #batch
                     Runtime.Stats.Sold = Runtime.Stats.Sold + count
@@ -6842,77 +7027,16 @@ task.spawn(function()
             Runtime.LastProduceSellResult = actionOk
                 and string.format("batch %d | %s", soldCount or 0, tostring(result))
                 or tostring(soldCount)
+            Runtime.ClearActionReservation("SellSelectedProduce")
             Runtime.ProduceSellPending = false
         else
             Runtime.ProduceSellPending = false
         end
-        task.wait(Runtime.ProduceSellPending and 0.1
-            or State.AutoSellProduce and 0.2
+        task.wait(Runtime.ProduceSellPending and 0.06
+            or State.AutoSellProduce and (State.LowPingMode and 0.2 or 0.12)
             or 1)
     end
 end)
-
-Runtime.TriggerGuiButton = function(button)
-    if not button or not button:IsA("GuiButton") then
-        return false
-    end
-    if type(firesignal) == "function" then
-        local ok = pcall(function() firesignal(button.MouseButton1Click) end)
-        if ok then
-            return true
-        end
-    end
-    if type(getconnections) == "function" then
-        local ok, connections = pcall(function() return getconnections(button.MouseButton1Click) end)
-        if ok then
-            local fired = false
-            for _, connection in ipairs(connections) do
-                if type(connection.Fire) == "function" then
-                    fired = pcall(function() if type(connection.Fire) == "function" then connection:Fire() end end) or fired
-                elseif type(connection.Function) == "function" then
-                    fired = pcall(function() if type(connection.Function) == "function" then connection.Function() end end) or fired
-                end
-            end
-            if fired then
-                return true
-            end
-        end
-    end
-    return pcall(function()
-        button:Activate()
-    end)
-end
-
-Runtime.OpenItemShopUI = function(shopFolder)
-    if not Runtime.ClientSignal then
-        local ok, signal = pcall(function() return Library and type(Library.get) == "function" and Library.get("Signal") end)
-        Runtime.ClientSignal = ok and signal or false
-    end
-    local prompt = shopFolder and shopFolder:FindFirstChildWhichIsA("ProximityPrompt", true)
-    if prompt and type(fireproximityprompt) == "function" then
-        pcall(function() fireproximityprompt(prompt, 0) end)
-    end
-    local signal = Runtime.ClientSignal
-    if signal and type(signal.Fire) == "function" then
-        pcall(function() signal:Fire("OpenTab", "ItemShop") end)
-    end
-    local playerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
-    local shopGui = playerGui and playerGui:FindFirstChild("ItemShop")
-    if (not shopGui or not shopGui:IsA("ScreenGui")) and playerGui then
-        shopGui = nil
-        for _, descendant in ipairs(playerGui:GetDescendants()) do
-            if descendant:IsA("ScreenGui") and descendant.Name == "ItemShop" then
-                shopGui = descendant
-                break
-            end
-        end
-    end
-    local deadline = os.clock() + 1
-    while shopGui and not shopGui.Enabled and os.clock() < deadline and Runtime.Alive do
-        task.wait(0.05)
-    end
-    return shopGui
-end
 
 Runtime.CountOwnedShopItem = function(itemName)
     local count = 0
@@ -6939,48 +7063,14 @@ Runtime.TryDirectShopPurchase = function(itemName, moneyBefore, ownedBefore)
     if transportOk and result ~= false and result ~= nil then
         return true, tostring(detail or result)
     end
-    local verifyDeadline = os.clock() + 1.5
+    local verifyDeadline = os.clock() + (State.LowPingMode and 1.2 or 0.65)
     repeat
-        task.wait(0.1)
+        task.wait(State.LowPingMode and 0.1 or 0.04)
         if getPlayerMoney() < moneyBefore or Runtime.CountOwnedShopItem(itemName) > ownedBefore then
             return true, "REPLICATED"
         end
     until os.clock() >= verifyDeadline or not Runtime.Alive
     return false, tostring(detail or result or "REJECTED")
-end
-
-Runtime.TryShopUIPurchase = function(shopGui, itemName, moneyBefore, ownedBefore)
-    if not shopGui then
-        return false, "SHOP UI NOT FOUND"
-    end
-    local list = shopGui:FindFirstChild("List", true)
-    local itemFrame = list and list:FindFirstChild(itemName)
-    local deadline = os.clock() + 1.5
-    while not itemFrame and os.clock() < deadline and Runtime.Alive do
-        task.wait(0.05)
-        list = shopGui:FindFirstChild("List", true)
-        itemFrame = list and list:FindFirstChild(itemName)
-    end
-    local itemButton = itemFrame and itemFrame:FindFirstChild("Button")
-    if not Runtime.TriggerGuiButton(itemButton) then
-        return false, "ITEM BUTTON FAILED"
-    end
-    task.wait(Runtime.Mobile and 0.3 or 0.15)
-    local buyOptions = list and list:FindFirstChild("BuyOptions")
-    local buttons = buyOptions and buyOptions:FindFirstChild("Buttons")
-    local buyFrame = buttons and buttons:FindFirstChild("Buy")
-    local buyButton = buyFrame and buyFrame:FindFirstChild("Button")
-    if not Runtime.TriggerGuiButton(buyButton) then
-        return false, "BUY BUTTON FAILED"
-    end
-    local verifyDeadline = os.clock() + 1.2
-    repeat
-        task.wait(0.1)
-        if getPlayerMoney() < moneyBefore or Runtime.CountOwnedShopItem(itemName) > ownedBefore then
-            return true, "UI BOUGHT " .. itemName
-        end
-    until os.clock() >= verifyDeadline or not Runtime.Alive
-    return false, "UI NOT CONFIRMED"
 end
 
 Runtime.GetShopStockAmount = function(stock, itemName, shopData)
@@ -7050,8 +7140,16 @@ task.spawn(function()
                             end
                         end
                     end
-                    if candidates[1] then
-                        Runtime.ReserveAction("BuyShopItems", { "Economy" }, 3, 30)
+                    if candidates[1] and Runtime.IsBackpackNearFull(1) then
+                        Runtime.EnsureBackpackSpace(1)
+                    end
+                    if candidates[1] and not Runtime.IsBackpackNearFull(1) then
+                        Runtime.ReserveAction(
+                            "BuyShopItems",
+                            { "Economy" },
+                            3,
+                            30
+                        )
                         local actionOk, boughtCount, lastResult = Runtime.WithAction(
                             "BuyShopItems",
                             { "Economy" },
@@ -7092,7 +7190,7 @@ task.spawn(function()
                                     elseif response == "SERVER REJECTED" then
                                         response = directDetail
                                     end
-                                    task.wait(0.12)
+                                    task.wait(State.LowPingMode and 0.12 or 0.03)
                                 end
                                 return count, response
                             end
@@ -7106,6 +7204,9 @@ task.spawn(function()
                         else
                             Runtime.SetShopStatus(tostring(boughtCount):upper(), false)
                         end
+                    elseif candidates[1] then
+                        Runtime.ClearActionReservation("BuyShopItems")
+                        Runtime.SetShopStatus("WAITING FOR INVENTORY SPACE", false)
                     elseif selectedInStock > 0 then
                         Runtime.ClearActionReservation("BuyShopItems")
                         Runtime.SetShopStatus(blockedReason or "BLOCKED", false)
@@ -7124,7 +7225,7 @@ task.spawn(function()
                 Runtime.SetShopStatus("IDLE")
             end
         end
-        task.wait(State.AutoBuyShop and 0.75 or 1.5)
+        task.wait(State.AutoBuyShop and (State.LowPingMode and 0.75 or 0.3) or 1.5)
     end
 end)
 
@@ -7245,7 +7346,7 @@ local function tryBuyExpansion()
                 local boundary = candidate.Boundary
                 expansionAttempts[expansion] = true
                 local ok = fire("ExpandPlot", expansion)
-                task.wait(0.65)
+                task.wait(0.8)
                 local boundaryConsumed = not boundary.Parent or not boundary:IsDescendantOf(expandFolder)
                 if ok and (boundaryConsumed or not expansion:IsDescendantOf(expandFolder)) then
                     Runtime.ExpansionCandidateCache = nil
@@ -7319,6 +7420,7 @@ local function findTreeNode(nodeId)
             end
         end
     end
+    return nil
 end
 
 local function getRebirths()
@@ -7423,7 +7525,7 @@ task.spawn(function()
         if ready then
             -- Stop new conflicting work while current actions drain, so rebirth
             -- cannot be starved by fast collect/use-item loops.
-            Runtime.ReserveAction("Rebirth", { "Movement", "Equipment", "Farm", "Gnome", "Economy", "Roll" }, 2.5, 100)
+            Runtime.ReserveAction("Rebirth", { "Equipment", "Farm", "Gnome", "Economy", "Roll" }, 2.5, 100)
         else
             Runtime.ClearActionReservation("Rebirth")
         end
@@ -7506,26 +7608,17 @@ local function watchErrorPrompt(prompt)
     end)
 end
 
--- Preferred fallback that does not require CoreGui capability.
-local hasErrorSignal, errorSignal = pcall(function()
-    return GuiService.ErrorMessageChanged
-end)
-if hasErrorSignal and errorSignal then
-    connect(errorSignal, function(message)
-        if type(message) == "string" and message ~= "" then
-            requestRejoin()
+-- ErrorMessageChanged and direct CoreGui access require privileged Roblox
+-- capabilities in several executors. Watch the executor-provided UI host
+-- instead, which avoids the noisy capability errors reported by users.
+local promptHost = Runtime.UIHost
+if promptHost then
+    connect(promptHost.DescendantAdded, watchErrorPrompt)
+    for _, descendant in ipairs(promptHost:GetDescendants()) do
+        if descendant.Name == "ErrorPrompt" then
+            watchErrorPrompt(descendant)
         end
-    end)
-end
-
--- Some executors permit reading CoreGui even when parenting to it is blocked.
-local canReadPrompt, promptOverlay = pcall(function()
-    local coreGui = game:GetService("CoreGui")
-    local promptGui = coreGui:FindFirstChild("RobloxPromptGui", true)
-    return promptGui and promptGui:FindFirstChild("promptOverlay", true)
-end)
-if canReadPrompt and promptOverlay then
-    connect(promptOverlay.ChildAdded, watchErrorPrompt)
+    end
 end
 end
 

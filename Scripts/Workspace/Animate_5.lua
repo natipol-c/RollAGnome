@@ -1,13 +1,13 @@
 --[[
   Type:     LocalScript
-  Method:   cached
+  Method:   decompile
   Name:     Animate
   Path:     game.Workspace.Characters.kimzalovemom12.Animate
   Service:  Workspace
   Success:  true
-  Executor: Potassium v2.4.2
+  Executor: Potassium v2.4.3
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Thu Aug 20 00:11:23 2026
+  Time:     Thu Aug 20 23:42:59 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.

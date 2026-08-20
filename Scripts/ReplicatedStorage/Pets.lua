@@ -5,9 +5,9 @@
   Path:     game.ReplicatedStorage.Library.Configs.Pets
   Service:  ReplicatedStorage
   Success:  true
-  Executor: Potassium v2.4.2
+  Executor: Potassium v2.4.3
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Thu Aug 20 00:11:24 2026
+  Time:     Thu Aug 20 23:43:04 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -20,7 +20,7 @@ return {
         name = "Dog",
         rarity = "Common",
         icon = "rbxassetid://83889201963668",
-        desc = "Every <font color=\'#4fc0fa\'>60s-90s</font>, cuts a Gnome\'s plant time by <font color=\'#ffff00\'>25%</font>",
+        desc = "Every <font color=\'#4fc0fa\'>60s-90s</font>, cuts a Gnome\'s plant time by <font color=\'#ffff00\'>10%</font>",
         rng = "1/2",
         resale_value = 0,
         price = 25000,
@@ -32,7 +32,7 @@ return {
         name = "Cat",
         rarity = "Common",
         icon = "rbxassetid://103952235880547",
-        desc = "Every <font color=\'#4fc0fa\'>60s-90s</font>, boosts a fruit\'s Value by <font color=\'#ffff00\'>15%</font>",
+        desc = "Every <font color=\'#4fc0fa\'>60s-90s</font>, cuts a Gnome\'s plant time by <font color=\'#ffff00\'>15%</font>",
         rng = "1/10",
         resale_value = 0,
         price = 15000,
@@ -44,7 +44,7 @@ return {
         name = "Bunny",
         rarity = "Uncommon",
         icon = "rbxassetid://77768076392020",
-        desc = "Every <font color=\'#4fc0fa\'>90s-120s</font>, digs up <font color=\'#ffff00\'>2%-5%</font> of your Coins",
+        desc = "Every <font color=\'#4fc0fa\'>120s-180s</font>, cuts a Gnome\'s plant time by <font color=\'#ffff00\'>20%</font>",
         rng = "1/50",
         resale_value = 0,
         price = 35500,
@@ -73,7 +73,7 @@ return {
         name = "Cow",
         rarity = "Uncommon",
         icon = "rbxassetid://114756845374414",
-        desc = "Every <font color=\'#4fc0fa\'>120s-180s</font>, makes a fruit <font color=\'#ffff00\'>25%</font> larger",
+        desc = "Every <font color=\'#4fc0fa\'>4m-5m</font>, makes a fruit <font color=\'#ffff00\'>5%</font> larger",
         rng = "1/350",
         resale_value = 0,
         price = 65500,
@@ -102,7 +102,7 @@ return {
         name = "Frog",
         rarity = "Rare",
         icon = "rbxassetid://121278629278802",
-        desc = "Every <font color=\'#4fc0fa\'>60s-75s</font>, cuts plant Growth Time by <font color=\'#ffff00\'>15%</font>",
+        desc = "Every <font color=\'#4fc0fa\'>3m-5m</font>, cuts plant Growth Time by <font color=\'#ffff00\'>15%</font>",
         rng = "1/2,500",
         resale_value = 0,
         price = 125000,
@@ -131,7 +131,7 @@ return {
         name = "Bee",
         rarity = "Rare",
         icon = "rbxassetid://91860110674222",
-        desc = "Every <font color=\'#4fc0fa\'>45s-55s</font>, boosts a ripe fruit\'s Value by <font color=\'#ffff00\'>45%</font>",
+        desc = "Every <font color=\'#4fc0fa\'>3m-5m</font>, boosts a ripe fruit\'s Value by <font color=\'#ffff00\'>2.5%</font>",
         rng = "1/15,000",
         resale_value = 0,
         price = 750000,
@@ -160,7 +160,7 @@ return {
         name = "Turtle",
         rarity = "Epic",
         icon = "rbxassetid://130067104519004",
-        desc = "Every <font color=\'#4fc0fa\'>75s-90s</font>, gives a Gnome <font color=\'#ffff00\'>10%-20%</font> level XP",
+        desc = "Every <font color=\'#4fc0fa\'>2m-3m</font>, gives a Gnome <font color=\'#ffff00\'>10%-20%</font> level XP",
         rng = "1/50,000",
         speed = 5,
         resale_value = 0,
@@ -190,7 +190,7 @@ return {
         name = "Owl",
         rarity = "Epic",
         icon = "rbxassetid://102057358860293",
-        desc = "Every <font color=\'#4fc0fa\'>60s-90s</font>, cuts a Gnome\'s plant time by <font color=\'#ffff00\'>75%</font>",
+        desc = "Every <font color=\'#4fc0fa\'>3m-5m</font>, cuts a Gnome\'s plant time by <font color=\'#ffff00\'>75%</font>",
         rng = "1/150,000",
         resale_value = 0,
         price = 5500000,
@@ -219,7 +219,7 @@ return {
         name = "Pig",
         rarity = "Legendary",
         icon = "rbxassetid://97483832653172",
-        desc = "Every <font color=\'#4fc0fa\'>180s-300s</font>, makes a fruit <font color=\'#ffff00\'>75%</font> bigger and <font color=\'#ffff00\'>65%</font> richer",
+        desc = "Every <font color=\'#4fc0fa\'>4m-6m</font>, makes a fruit <font color=\'#ffff00\'>2.5%</font> bigger and <font color=\'#ffff00\'>5%</font> richer",
         rng = "1/750,000",
         resale_value = 0,
         price = 25000000,
@@ -306,7 +306,7 @@ return {
         name = "Ant",
         rarity = "Mythic",
         icon = "rbxassetid://90429055249337",
-        desc = "Every <font color=\'#4fc0fa\'>30s-60s</font>, collects a fruit with <font color=\'#ffff00\'>45%</font> Value",
+        desc = "Every <font color=\'#4fc0fa\'>3m-5m</font>, collects a fruit with <font color=\'#ffff00\'>10%</font> Value",
         rng = "1/25,000,000",
         resale_value = 0,
         price = 90000000,

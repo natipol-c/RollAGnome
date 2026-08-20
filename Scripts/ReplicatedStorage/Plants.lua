@@ -5,9 +5,9 @@
   Path:     game.ReplicatedStorage.Library.Configs.Plants
   Service:  ReplicatedStorage
   Success:  true
-  Executor: Potassium v2.4.2
+  Executor: Potassium v2.4.3
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Thu Aug 20 00:11:23 2026
+  Time:     Thu Aug 20 23:43:03 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -666,11 +666,11 @@ return {
         growth_time = 7200,
         sell_price = 3550000,
         weight = 80,
-        order = 44,
+        order = 45,
         model = Plants.Starbush,
         fruit = {
             name = "Starbush Fruit",
-            icon = "rbxassetid://93344944179768",
+            icon = "rbxassetid://116939767530933",
             growth_time = 4800,
             model = Fruit["Starbush Fruit"]
         }

@@ -5,9 +5,9 @@
   Path:     game.ReplicatedStorage.Library.Configs.Pet RNG
   Service:  ReplicatedStorage
   Success:  true
-  Executor: Potassium v2.4.2
+  Executor: Potassium v2.4.3
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Thu Aug 20 00:11:24 2026
+  Time:     Thu Aug 20 23:43:04 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -15,20 +15,20 @@
 return {
     Group1 = {
         contents = {
-            Dog = 30,
-            Cat = 24,
-            Bunny = 16,
-            Cow = 10,
-            Frog = 6,
-            Bee = 4,
-            Turtle = 2.5,
-            Owl = 1.5,
-            Pig = 0.8,
-            Raccoon = 0.45,
-            Hornet = 0.2,
-            Ant = 0.08,
-            ["Mutant Ant"] = 0.01,
-            ["Mutant Bee"] = 0.005
+            Dog = 35,
+            Cat = 28,
+            Bunny = 8,
+            Cow = 5,
+            Frog = 3,
+            Bee = 2.5,
+            Turtle = 1,
+            Owl = 0.8,
+            Pig = 0.5,
+            Raccoon = 0.15,
+            Hornet = 0.05,
+            Ant = 0.025,
+            ["Mutant Ant"] = 0.001,
+            ["Mutant Bee"] = 0.0001
         }
     }
 };

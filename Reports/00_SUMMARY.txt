@@ -4,16 +4,16 @@
 =======================================================
   Game:            Roll_A_Gnome
   PlaceId:         117539213094671
-  Executor:        Potassium v2.4.2
-  Time:            Thu Aug 20 00:11:32 2026
-  Elapsed:         00:15
+  Executor:        Potassium v2.4.3
+  Time:            Thu Aug 20 23:43:14 2026
+  Elapsed:         00:26
 
-  LocalScripts:    55 found  55 ok  0 fail
+  LocalScripts:    75 found  75 ok  0 fail
   ModuleScripts:   383 found  383 ok  0 fail
   Script[Client]:  1 found  1 ok  0 fail
-  Cache hits:      35  | Retried: 0 | RSB1: 0
-  Remotes:         109  | Bindables: 0
+  Cache hits:      53  | Retried: 0 | RSB1: 0
+  Remotes:         88  | Bindables: 0
 
-  Instances scanned: 45657
-  Files written:   443  (3713.8 KB)
+  Instances scanned: 76611
+  Files written:   463  (4641.3 KB)
 =======================================================
