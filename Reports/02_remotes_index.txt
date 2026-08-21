@@ -1,7 +1,18 @@
 REMOTES INDEX  — DUMPER v7.0
-Total: 88
+Total: 110
 
--- UnreliableRemoteEvent (29) --
+-- UnreliableRemoteEvent (40) --
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
@@ -32,7 +43,7 @@ Total: 88
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events..Unreliable
 
--- RemoteEvent (37) --
+-- RemoteEvent (48) --
   [ReplicatedStorage] game.ReplicatedStorage.Library.GrowPlants.GrowthStarted
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
@@ -63,12 +74,23 @@ Total: 88
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
   [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
-  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.log_command
-  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.log
-  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.register_command
-  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.update_role_permissions
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
+  [ReplicatedStorage] game.ReplicatedStorage.Communication.Events.
   [ReplicatedStorage] game.ReplicatedStorage.conch_networking.update_user_roles
   [ReplicatedStorage] game.ReplicatedStorage.conch_networking.create_user
+  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.update_role_permissions
+  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.register_command
+  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.log
+  [ReplicatedStorage] game.ReplicatedStorage.conch_networking.log_command
   [ReplicatedStorage] game.ReplicatedStorage.conch_networking.invoke_server_command
 
 -- RemoteFunction (22) --

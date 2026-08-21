@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.3
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Thu Aug 20 23:43:10 2026
+  Time:     Sat Aug 22 00:22:42 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -520,22 +520,22 @@ local function queryViewport(p74, p75) -- Line: 361
         for i2 = 0, 1 do
             local v81, v82 = queryPoint(p + u14 * (v80 + upVector * ((i2 - 0.5) * u13)), v76, p75, u5:ViewportPointToRay(ViewportSize.x * i, ViewportSize.y * i2).Origin);
 
-            if v82 >= v78 then
-                v82 = v78;
+            if v82 >= v79 then
+                v82 = v79;
             end;
 
-            if v81 < v79 then
-                v79 = v81;
-                v78 = v82;
+            if v81 < v78 then
+                v79 = v82;
+                v78 = v81;
             else
-                v78 = v82;
+                v79 = v82;
             end;
         end;
     end;
 
     debug.profileend();
 
-    return v79, v78;
+    return v78, v79;
 end;
 
 local function testPromotion(p83, p84, p85) -- Line: 404

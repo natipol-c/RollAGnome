@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.3
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Thu Aug 20 23:43:03 2026
+  Time:     Sat Aug 22 00:22:31 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -137,8 +137,22 @@ function u2.applyMutations(p7, p8) -- Line: 53
         end;
     end;
 
+    if table.find(v9, "Solar") then
+        local v23 = getParticlePart(p7);
+        local Solar = Particles:FindFirstChild("Solar");
+
+        if Solar and not v23:FindFirstChild("SolarA") then
+            local v24 = next;
+            local v25, v26 = Solar:GetChildren();
+
+            for _, v in v24, v25, v26 do
+                v:Clone().Parent = v23;
+            end;
+        end;
+    end;
+
     if table.find(v9, "Frozen") then
-        local v23, v24 = p7:GetBoundingBox();
+        local v27, v28 = p7:GetBoundingBox();
         local Part = Instance.new("Part");
         Part.Material = "Ice";
         Part.Color = Color3.fromRGB(0, 170, 255);
@@ -146,8 +160,8 @@ function u2.applyMutations(p7, p8) -- Line: 53
         Part.Anchored = false;
         Part.CanCollide = false;
         Part.Massless = true;
-        Part.Size = Vector3.new(v24.X, v24.Y, v24.Z);
-        Part:PivotTo(v23);
+        Part.Size = Vector3.new(v28.X, v28.Y, v28.Z);
+        Part:PivotTo(v27);
         Part.Parent = p7;
         local WeldConstraint = Instance.new("WeldConstraint");
         WeldConstraint.Part0 = p7.PrimaryPart;
@@ -156,41 +170,41 @@ function u2.applyMutations(p7, p8) -- Line: 53
     end;
 end;
 
-function u2.getModel(p25, p26, p27) -- Line: 159
+function u2.getModel(p29, p30, p31) -- Line: 169
     -- upvalues: ReplicatedStorage (copy), u2 (copy)
-    local v28 = ReplicatedStorage.Assets.Farmers:FindFirstChild(p25);
+    local v32 = ReplicatedStorage.Assets.Farmers:FindFirstChild(p29);
 
-    if v28 then
-        local v29 = v28:Clone();
-        v29:SetAttribute("Mutations", p26 or "");
-        v29:SetAttribute("Huge", p27 == true);
+    if v32 then
+        local v33 = v32:Clone();
+        v33:SetAttribute("Mutations", p30 or "");
+        v33:SetAttribute("Huge", p31 == true);
 
-        if p27 then
-            v29:ScaleTo(v29:GetScale() * 1.8);
+        if p31 then
+            v33:ScaleTo(v33:GetScale() * 1.8);
         end;
 
-        u2.applyMutations(v29, p26);
+        u2.applyMutations(v33, p30);
 
-        return v29;
+        return v33;
     end;
 end;
 
-function u2.getDisplayModel(p30, p31, p32) -- Line: 174
+function u2.getDisplayModel(p34, p35, p36) -- Line: 184
     -- upvalues: ReplicatedStorage (copy), u2 (copy)
-    local v33 = ReplicatedStorage.Assets:FindFirstChild("FarmerPerformance"):FindFirstChild(p30) or ReplicatedStorage.Assets.Farmers:FindFirstChild(p30);
+    local v37 = ReplicatedStorage.Assets:FindFirstChild("FarmerPerformance"):FindFirstChild(p34) or ReplicatedStorage.Assets.Farmers:FindFirstChild(p34);
 
-    if v33 then
-        local v34 = v33:Clone();
-        v34:SetAttribute("Mutations", p31 or "");
-        v34:SetAttribute("Huge", p32 == true);
+    if v37 then
+        local v38 = v37:Clone();
+        v38:SetAttribute("Mutations", p35 or "");
+        v38:SetAttribute("Huge", p36 == true);
 
-        if p32 then
-            v34:ScaleTo(v34:GetScale() * 1.8);
+        if p36 then
+            v38:ScaleTo(v38:GetScale() * 1.8);
         end;
 
-        u2.applyMutations(v34, p31);
+        u2.applyMutations(v38, p35);
 
-        return v34;
+        return v38;
     end;
 end;
 

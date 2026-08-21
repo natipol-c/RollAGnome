@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.3
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Thu Aug 20 23:43:03 2026
+  Time:     Sat Aug 22 00:22:30 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -33,10 +33,11 @@ local u3 = {
     Toxic = 1.85,
     Charged = 1.25,
     Frozen = 1.5,
-    Cursed = 2
+    Cursed = 2,
+    Solar = 2
 };
 
-function u1.buffStat(p4, p5, p6) -- Line: 50
+function u1.buffStat(p4, p5, p6) -- Line: 53
     -- upvalues: u3 (copy)
     if type(p6) == "string" then
         p6 = p4:toTable(p6);
@@ -51,7 +52,7 @@ function u1.buffStat(p4, p5, p6) -- Line: 50
     return math.round(p5);
 end;
 
-function u1.getMutation(p7, p8, p9, p10, p11, p12) -- Line: 64
+function u1.getMutation(p7, p8, p9, p10, p11, p12) -- Line: 67
     -- upvalues: RunService (copy), ConfigService (copy), u2 (copy), ReplicatedStorage (copy), u1 (copy)
     if RunService:IsServer() then
         local v13 = {};
@@ -60,6 +61,7 @@ function u1.getMutation(p7, p8, p9, p10, p11, p12) -- Line: 64
         u2.Charged = v14.charged.roll_chance;
         u2.Frozen = v14.blizzard.roll_chance;
         u2.Cursed = v14.cursed.roll_chance;
+        u2.Solar = v14.solarflare.roll_chance;
         local v15 = ReplicatedStorage:GetAttribute("MutationRush") or nil;
         local v16 = ReplicatedStorage:GetAttribute("MutationMulti") or nil;
         local v17 = type(p9) == "number" and (math.max(p9 - 1, 0) * 0.025 or 0) or 0;
@@ -76,7 +78,7 @@ function u1.getMutation(p7, p8, p9, p10, p11, p12) -- Line: 64
         end;
 
         for i, v in next, u2 do
-            if i ~= "Golden" and (i ~= "Diamond" and (i ~= "Toxic" or ReplicatedStorage:GetAttribute("Toxic"))) and ((i ~= "Charged" or ReplicatedStorage:GetAttribute("LightningStorm")) and ((i ~= "Frozen" or ReplicatedStorage:GetAttribute("Blizzard")) and (i ~= "Cursed" or ReplicatedStorage:GetAttribute("Cursed")))) and math.clamp(v * (v15 == i and v16 and v16 or 1) * v19, 0, 100) >= math.random() * 100 then
+            if i ~= "Golden" and (i ~= "Diamond" and (i ~= "Toxic" or ReplicatedStorage:GetAttribute("Toxic"))) and ((i ~= "Charged" or ReplicatedStorage:GetAttribute("LightningStorm")) and ((i ~= "Frozen" or ReplicatedStorage:GetAttribute("Blizzard")) and ((i ~= "Cursed" or ReplicatedStorage:GetAttribute("Cursed")) and (i ~= "Solar" or ReplicatedStorage:GetAttribute("SolarFlare"))))) and math.clamp(v * (v15 == i and v16 and v16 or 1) * v19, 0, 100) >= math.random() * 100 then
                 table.insert(v13, i);
             end;
         end;
@@ -85,7 +87,7 @@ function u1.getMutation(p7, p8, p9, p10, p11, p12) -- Line: 64
     end;
 end;
 
-function u1.updateList(p23, p24, p25) -- Line: 151
+function u1.updateList(p23, p24, p25) -- Line: 163
     -- upvalues: u1 (copy), MutationLabels (copy)
     if not (p24 and p25) then
         return;
@@ -111,7 +113,7 @@ function u1.updateList(p23, p24, p25) -- Line: 151
         end;
     end;
 
-    table.sort(v26, function(p28, p29) -- Line: 174
+    table.sort(v26, function(p28, p29) -- Line: 186
         return p28.LayoutOrder < p29.LayoutOrder;
     end);
 
@@ -138,7 +140,7 @@ function u1.updateList(p23, p24, p25) -- Line: 151
     p24.Visible = #v26 > 0;
 end;
 
-function u1.toTable(p34, p35) -- Line: 203
+function u1.toTable(p34, p35) -- Line: 215
     if type(p35) == "table" then
         return p35;
     end;
@@ -148,7 +150,7 @@ function u1.toTable(p34, p35) -- Line: 203
     return v36 == "" and {} or string.split(v36, "_");
 end;
 
-function u1.toString(p37, p38) -- Line: 214
+function u1.toString(p37, p38) -- Line: 226
     if type(p38) == "string" then
         p38 = p37:toTable(p38);
     end;

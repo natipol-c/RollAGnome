@@ -5,15 +5,15 @@
   Game:            Roll_A_Gnome
   PlaceId:         117539213094671
   Executor:        Potassium v2.4.3
-  Time:            Thu Aug 20 23:43:14 2026
-  Elapsed:         00:26
+  Time:            Sat Aug 22 00:22:47 2026
+  Elapsed:         00:29
 
-  LocalScripts:    75 found  75 ok  0 fail
-  ModuleScripts:   383 found  383 ok  0 fail
+  LocalScripts:    113 found  113 ok  0 fail
+  ModuleScripts:   384 found  384 ok  0 fail
   Script[Client]:  1 found  1 ok  0 fail
-  Cache hits:      53  | Retried: 0 | RSB1: 0
-  Remotes:         88  | Bindables: 0
+  Cache hits:      90  | Retried: 0 | RSB1: 0
+  Remotes:         110  | Bindables: 0
 
-  Instances scanned: 76611
-  Files written:   463  (4641.3 KB)
+  Instances scanned: 75159
+  Files written:   502  (4605.9 KB)
 =======================================================

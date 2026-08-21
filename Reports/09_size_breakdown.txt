@@ -1,17 +1,17 @@
 SIZE BREAKDOWN — DUMPER v7.0
 
 ── By Service ──
-  StarterPlayer           132 scripts     943.8 KB
-  Workspace                 2 scripts      51.4 KB
+  StarterPlayer           133 scripts     945.6 KB
+  Workspace                 5 scripts     103.2 KB
   StarterGui               22 scripts      19.0 KB
-  Backpack                 20 scripts      10.8 KB
+  Backpack                 55 scripts      30.9 KB
   PlayerGui                21 scripts      16.4 KB
-  ReplicatedStorage       262 scripts    1187.4 KB
+  ReplicatedStorage       262 scripts    1188.8 KB
 
 ── By Type ──
-  LocalScript              75 scripts     145.4 KB
+  LocalScript             113 scripts     217.4 KB
   Script[Client]            1 scripts       0.1 KB
-  ModuleScript            383 scripts    2083.3 KB
+  ModuleScript            384 scripts    2086.6 KB
 
 ── Top 10 Largest Scripts ──
    1.     83.2 KB  [ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Conch.roblox_packages..pesde.alicesaidhi+conch_analysis.0.2.2-rc.2.conch_analysis.src.optional_ast

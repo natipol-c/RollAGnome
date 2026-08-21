@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.3
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Thu Aug 20 23:43:07 2026
+  Time:     Sat Aug 22 00:22:39 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -40,19 +40,36 @@ local u9 = nil;
 local u10 = nil;
 local u11 = nil;
 
-local function canSendGameInvite(u12) -- Line: 45
+local function updateMobileButtons() -- Line: 45
+    -- upvalues: UserInputService (copy), ReplicatedStorage (copy), u8 (ref), u9 (ref)
+    if not UserInputService.TouchEnabled then
+        return;
+    end;
+
+    local v12 = ReplicatedStorage:GetAttribute("FrameOpen") == true;
+
+    if u8 then
+        u8.Visible = not v12;
+    end;
+
+    if u9 then
+        u9.Visible = not v12;
+    end;
+end;
+
+local function canSendGameInvite(u13) -- Line: 57
     -- upvalues: SocialService (copy)
-    local success, result = pcall(function() -- Line: 46
-        -- upvalues: SocialService (ref), u12 (copy)
-        return SocialService:CanSendGameInviteAsync(u12);
+    local success, result = pcall(function() -- Line: 58
+        -- upvalues: SocialService (ref), u13 (copy)
+        return SocialService:CanSendGameInviteAsync(u13);
     end);
 
     return success and result;
 end;
 
-function v6.Start(p13, p14) -- Line: 52
-    -- upvalues: u7 (ref), u8 (ref), u4 (copy), u10 (ref), u11 (ref), u9 (ref), UserInputService (copy), u5 (copy), u3 (copy)
-    u7 = p14;
+function v6.Start(p14, p15) -- Line: 64
+    -- upvalues: u7 (ref), u8 (ref), u4 (copy), u10 (ref), u11 (ref), u9 (ref), UserInputService (copy), ReplicatedStorage (copy), updateMobileButtons (copy), u5 (copy), u3 (copy)
+    u7 = p15;
     u8 = u4(u7, "Right");
     u10 = u4(u7, "Indicators");
     u11 = u4(u7, "Boosts");
@@ -67,53 +84,67 @@ function v6.Start(p13, p14) -- Line: 52
     end;
 
     Buttons();
-    local u15 = false;
-    u5.new():setImage("rbxassetid://136218027159968"):align(UserInputService.TouchEnabled and "Right" or "Left"):bindEvent("selected", function(p16) -- Line: 76
-        -- upvalues: u15 (ref), u3 (ref)
-        _G.Play("Tap");
-        p16:deselect();
 
-        if not u15 then
-            u15 = true;
+    if UserInputService.TouchEnabled then
+        local v16 = ReplicatedStorage:GetAttribute("FrameOpen") == true;
+
+        if u8 then
+            u8.Visible = not v16;
+        end;
+
+        if u9 then
+            u9.Visible = not v16;
+        end;
+    end;
+
+    ReplicatedStorage:GetAttributeChangedSignal("FrameOpen"):Connect(updateMobileButtons);
+    local u17 = false;
+    u5.new():setImage("rbxassetid://136218027159968"):align(UserInputService.TouchEnabled and "Right" or "Left"):bindEvent("selected", function(p18) -- Line: 90
+        -- upvalues: u17 (ref), u3 (ref)
+        _G.Play("Tap");
+        p18:deselect();
+
+        if not u17 then
+            u17 = true;
             u3.Fire("ToggleTab", "Settings");
             task.wait(0.2);
-            u15 = false;
+            u17 = false;
         end;
     end);
 end;
 
 function Buttons()
     -- upvalues: u8 (ref), u9 (ref), u4 (copy), LocalPlayer (copy), SocialService (copy), u3 (copy), u2 (copy), u1 (copy)
-    task.spawn(function() -- Line: 93
+    task.spawn(function() -- Line: 107
         -- upvalues: u8 (ref), u9 (ref), u4 (ref), LocalPlayer (ref), SocialService (ref), u3 (ref), u2 (ref), u1 (ref)
-        local v17 = u8.Frame:GetChildren();
-        local v18 = next;
-        local v19, v20 = u9:GetChildren();
-        local u21 = false;
+        local v19 = u8.Frame:GetChildren();
+        local v20 = next;
+        local v21, v22 = u9:GetChildren();
+        local u23 = false;
 
-        for _, v in v18, v19, v20 do
-            table.insert(v17, v);
+        for _, v in v20, v21, v22 do
+            table.insert(v19, v);
         end;
 
-        for _, v in next, v17 do
+        for _, v in next, v19 do
             if v:IsA("Frame") then
-                u4(v, "Button").MouseButton1Click:Connect(function() -- Line: 106
-                    -- upvalues: LocalPlayer (ref), u21 (ref), v (copy), SocialService (ref), u3 (ref), u2 (ref), u1 (ref)
+                u4(v, "Button").MouseButton1Click:Connect(function() -- Line: 120
+                    -- upvalues: LocalPlayer (ref), u23 (ref), v (copy), SocialService (ref), u3 (ref), u2 (ref), u1 (ref)
                     if LocalPlayer:GetAttribute("DisableButtons") then
                         return;
                     end;
 
-                    if u21 then
+                    if u23 then
                         return;
                     end;
 
-                    u21 = true;
+                    u23 = true;
 
                     if v.Name == "Invite" then
-                        local u22 = LocalPlayer;
-                        local success, result = pcall(function() -- Line: 46
-                            -- upvalues: SocialService (ref), u22 (copy)
-                            return SocialService:CanSendGameInviteAsync(u22);
+                        local u24 = LocalPlayer;
+                        local success, result = pcall(function() -- Line: 58
+                            -- upvalues: SocialService (ref), u24 (copy)
+                            return SocialService:CanSendGameInviteAsync(u24);
                         end);
 
                         if success and result then
@@ -135,7 +166,7 @@ function Buttons()
                     end;
 
                     task.wait(0.2);
-                    u21 = false;
+                    u23 = false;
                 end);
             end;
         end;

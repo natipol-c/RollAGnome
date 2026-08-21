@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.3
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Thu Aug 20 23:43:09 2026
+  Time:     Sat Aug 22 00:22:41 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -74,27 +74,38 @@ end;
 local function rollEventPanel(u15, u16, u17) -- Line: 69
     -- upvalues: u1 (copy), TweenService (copy)
     local eventIcon = u15.eventIcon;
-    local events = u1.events;
-    local Position = eventIcon.Position;
+    local u18 = {};
 
-    local function getOffsetPosition(p18) -- Line: 76
-        -- upvalues: Position (copy)
-        return UDim2.new(Position.X.Scale, Position.X.Offset, Position.Y.Scale + p18, Position.Y.Offset);
+    for _, v in u1.events do
+        if not v.admin then
+            table.insert(u18, v);
+        end;
     end;
 
-    task.spawn(function() -- Line: 85
-        -- upvalues: events (copy), u15 (copy), eventIcon (copy), Position (copy), TweenService (ref), u16 (copy), u17 (copy)
+    local Position = eventIcon.Position;
+
+    local function getOffsetPosition(p19) -- Line: 81
+        -- upvalues: Position (copy)
+        return UDim2.new(Position.X.Scale, Position.X.Offset, Position.Y.Scale + p19, Position.Y.Offset);
+    end;
+
+    task.spawn(function() -- Line: 90
+        -- upvalues: u18 (copy), u15 (copy), eventIcon (copy), Position (copy), TweenService (ref), u16 (copy), u17 (copy)
+        if #u18 < 1 then
+            return;
+        end;
+
         for i = 1, 12 do
-            local v19 = events[math.random(1, #events)];
-            u15.eventName.Text = v19.name;
-            u15.eventName.TextColor3 = v19.color;
-            u15.eventIcon.Image = v19.icon;
+            local v20 = u18[math.random(1, #u18)];
+            u15.eventName.Text = v20.name;
+            u15.eventName.TextColor3 = v20.color;
+            u15.eventIcon.Image = v20.icon;
             eventIcon.Position = UDim2.new(Position.X.Scale, Position.X.Offset, Position.Y.Scale + 0.15, Position.Y.Offset);
-            local v20 = TweenService:Create(eventIcon, TweenInfo.new(i / 12 * 0.12 + 0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            local v21 = TweenService:Create(eventIcon, TweenInfo.new(i / 12 * 0.12 + 0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
                 Position = UDim2.new(Position.X.Scale, Position.X.Offset, Position.Y.Scale + -0.15, Position.Y.Offset)
             });
-            v20:Play();
-            v20.Completed:Wait();
+            v21:Play();
+            v21.Completed:Wait();
             eventIcon.Position = Position;
         end;
 
@@ -102,11 +113,11 @@ local function rollEventPanel(u15, u16, u17) -- Line: 69
         u15.eventName.TextColor3 = u16.color;
         u15.eventIcon.Image = u16.icon;
         eventIcon.Position = UDim2.new(Position.X.Scale, Position.X.Offset, Position.Y.Scale + 0.2, Position.Y.Offset);
-        local v21 = TweenService:Create(eventIcon, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        local v22 = TweenService:Create(eventIcon, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
             Position = Position
         });
-        v21:Play();
-        v21.Completed:Wait();
+        v22:Play();
+        v22.Completed:Wait();
 
         if u17 then
             u17();
@@ -114,10 +125,10 @@ local function rollEventPanel(u15, u16, u17) -- Line: 69
     end);
 end;
 
-local function getEventConfig(p22) -- Line: 117
+local function getEventConfig(p23) -- Line: 126
     -- upvalues: u1 (copy)
     for _, v in u1.events do
-        if v.name == p22 then
+        if v.name == p23 then
             return v;
         end;
     end;
@@ -125,86 +136,86 @@ local function getEventConfig(p22) -- Line: 117
     return nil;
 end;
 
-local function setBoardIdle(p23, p24) -- Line: 126
+local function setBoardIdle(p24, p25) -- Line: 135
     -- upvalues: u2 (copy)
-    p23.nextLabel.Text = "Next Event in:";
-    p23.countdown.Visible = true;
+    p24.nextLabel.Text = "Next Event in:";
+    p24.countdown.Visible = true;
 
-    if p24 then
-        p23.eventName.Text = p24.name;
-        p23.eventName.TextColor3 = p24.color;
-        p23.eventIcon.Image = p24.icon;
+    if p25 then
+        p24.eventName.Text = p25.name;
+        p24.eventName.TextColor3 = p25.color;
+        p24.eventIcon.Image = p25.icon;
 
         return;
     end;
 
-    p23.eventName.Text = "?";
-    p23.eventName.TextColor3 = u2;
-    p23.eventIcon.Image = "";
+    p24.eventName.Text = "?";
+    p24.eventName.TextColor3 = u2;
+    p24.eventIcon.Image = "";
 end;
 
-local function setBoardActive(p25, p26) -- Line: 141
-    p25.nextLabel.Text = "Event Active:";
-    p25.eventName.Text = p26.name;
-    p25.eventName.TextColor3 = p26.color;
-    p25.eventIcon.Image = p26.icon;
+local function setBoardActive(p26, p27) -- Line: 150
+    p26.nextLabel.Text = "Event Active:";
+    p26.eventName.Text = p27.name;
+    p26.eventName.TextColor3 = p27.color;
+    p26.eventIcon.Image = p27.icon;
 end;
 
-local function updateAllBoards() -- Line: 150
+local function updateAllBoards() -- Line: 159
     -- upvalues: ReplicatedStorage (copy), u1 (copy), u6 (ref), u4 (ref), u5 (ref), u3 (copy), u2 (copy), rollEventPanel (copy)
-    local v27 = ReplicatedStorage:GetAttribute("WeatherEvent");
-    local v28 = ReplicatedStorage:GetAttribute("WeatherUpcomingEvent");
-    local v29 = ReplicatedStorage:GetAttribute("WeatherEndTime");
-    local v30 = ReplicatedStorage:GetAttribute("WeatherRolling");
-    local v31;
+    local v28 = ReplicatedStorage:GetAttribute("WeatherEvent");
+    local v29 = ReplicatedStorage:GetAttribute("WeatherUpcomingEvent");
+    local v30 = ReplicatedStorage:GetAttribute("WeatherEndTime");
+    local v31 = ReplicatedStorage:GetAttribute("WeatherRolling");
+    local v32;
 
-    if v27 == nil then
-        v31 = false;
+    if v28 == nil then
+        v32 = false;
     else
-        v31 = v29 ~= nil;
+        v32 = v30 ~= nil;
     end;
 
-    local u32;
+    local u33;
 
-    if v31 then
-        for _, u32 in u1.events do
-            if u32.name == v27 then
+    if v32 then
+        for _, u33 in u1.events do
+            if u33.name == v28 then
                 break;
             end;
         end;
 
-        if not u32 then
-            u32 = nil;
+        if not u33 then
+            u33 = nil;
         end;
     else
-        u32 = nil;
-    end;
-
-    local v33;
-
-    if v31 or not v28 then
-        v33 = nil;
-    else
-        for _, v33 in u1.events do
-            if v33.name == v28 then
-                break;
-            end;
-        end;
-
-        if not v33 then
-            v33 = nil;
-        end;
+        u33 = nil;
     end;
 
     local v34;
 
-    if v31 then
-        v34 = v27 ~= u6;
+    if v32 or not v29 then
+        v34 = nil;
     else
-        v34 = v31;
+        for _, v34 in u1.events do
+            if v34.name == v29 then
+                break;
+            end;
+        end;
+
+        if not v34 then
+            v34 = nil;
+        end;
     end;
 
-    if not v31 then
+    local v35;
+
+    if v32 then
+        v35 = v28 ~= u6;
+    else
+        v35 = v32;
+    end;
+
+    if not v32 then
         u4 = false;
         u5 = false;
 
@@ -212,10 +223,10 @@ local function updateAllBoards() -- Line: 150
             v.nextLabel.Text = "Next Event in:";
             v.countdown.Visible = true;
 
-            if v33 then
-                v.eventName.Text = v33.name;
-                v.eventName.TextColor3 = v33.color;
-                v.eventIcon.Image = v33.icon;
+            if v34 then
+                v.eventName.Text = v34.name;
+                v.eventName.TextColor3 = v34.color;
+                v.eventIcon.Image = v34.icon;
             else
                 v.eventName.Text = "?";
                 v.eventName.TextColor3 = u2;
@@ -223,96 +234,96 @@ local function updateAllBoards() -- Line: 150
             end;
         end;
 
-        u6 = v27;
+        u6 = v28;
 
         return;
     end;
 
-    if not v34 or (not v30 or u4) then
-        if not (v30 or u4) then
+    if not v35 or (not v31 or u4) then
+        if not (v31 or u4) then
             u5 = true;
         end;
 
         if u5 then
             for _, v in u3 do
                 v.nextLabel.Text = "Event Active:";
-                v.eventName.Text = u32.name;
-                v.eventName.TextColor3 = u32.color;
-                v.eventIcon.Image = u32.icon;
+                v.eventName.Text = u33.name;
+                v.eventName.TextColor3 = u33.color;
+                v.eventIcon.Image = u33.icon;
             end;
         end;
 
-        u6 = v27;
+        u6 = v28;
 
         return;
     end;
 
     u4 = true;
     u5 = false;
-    u6 = v27;
+    u6 = v28;
 
     for _, v in u3 do
         v.nextLabel.Text = "Rolling...";
-        rollEventPanel(v, u32, function() -- Line: 180
-            -- upvalues: u5 (ref), u4 (ref), u3 (ref), u32 (copy)
+        rollEventPanel(v, u33, function() -- Line: 189
+            -- upvalues: u5 (ref), u4 (ref), u3 (ref), u33 (copy)
             u5 = true;
             u4 = false;
 
             for _, v2 in u3 do
-                local v35 = u32;
+                local v36 = u33;
                 v2.nextLabel.Text = "Event Active:";
-                v2.eventName.Text = v35.name;
-                v2.eventName.TextColor3 = v35.color;
-                v2.eventIcon.Image = v35.icon;
+                v2.eventName.Text = v36.name;
+                v2.eventName.TextColor3 = v36.color;
+                v2.eventIcon.Image = v36.icon;
             end;
         end);
     end;
 end;
 
-local function startCountdownLoop() -- Line: 206
+local function startCountdownLoop() -- Line: 215
     -- upvalues: RunService (copy), ReplicatedStorage (copy), formatCountdown (copy), u3 (copy)
-    RunService.Heartbeat:Connect(function() -- Line: 207
+    RunService.Heartbeat:Connect(function() -- Line: 216
         -- upvalues: ReplicatedStorage (ref), formatCountdown (ref), u3 (ref)
-        local v36 = ReplicatedStorage:GetAttribute("WeatherEndTime");
-        local v37 = ReplicatedStorage:GetAttribute("WeatherNextTime");
-        local v38 = os.time();
-        local v39;
+        local v37 = ReplicatedStorage:GetAttribute("WeatherEndTime");
+        local v38 = ReplicatedStorage:GetAttribute("WeatherNextTime");
+        local v39 = os.time();
+        local v40;
 
-        if v36 and v38 < v36 then
-            v39 = v36 - v38;
+        if v37 and v39 < v37 then
+            v40 = v37 - v39;
         else
-            v39 = (not v37 or v38 >= v37) and 0 or v37 - v38;
+            v40 = (not v38 or v39 >= v38) and 0 or v38 - v39;
         end;
 
-        local v40 = formatCountdown(v39);
+        local v41 = formatCountdown(v40);
 
         for _, v in u3 do
-            v.countdown.Text = v40;
+            v.countdown.Text = v41;
         end;
     end);
 end;
 
-local function onPartAdded(p41) -- Line: 229
+local function onPartAdded(p42) -- Line: 238
     -- upvalues: buildBoard (copy), u3 (copy), updateAllBoards (copy)
-    if not p41:IsA("BasePart") then
+    if not p42:IsA("BasePart") then
         return;
     end;
 
-    u3[p41] = buildBoard(p41);
+    u3[p42] = buildBoard(p42);
     updateAllBoards();
 end;
 
-local function onPartRemoved(p42) -- Line: 238
+local function onPartRemoved(p43) -- Line: 247
     -- upvalues: u3 (copy)
-    local v43 = u3[p42];
+    local v44 = u3[p43];
 
-    if v43 then
-        v43.gui:Destroy();
-        u3[p42] = nil;
+    if v44 then
+        v44.gui:Destroy();
+        u3[p43] = nil;
     end;
 end;
 
-function v7.Initialize(p44) -- Line: 247
+function v7.Initialize(p45) -- Line: 256
     -- upvalues: CollectionService (copy), onPartAdded (copy), onPartRemoved (copy), ReplicatedStorage (copy), updateAllBoards (copy), RunService (copy), formatCountdown (copy), u3 (copy)
     for _, v in CollectionService:GetTagged("WeatherEventBoardPart") do
         task.spawn(onPartAdded, v);
@@ -326,23 +337,23 @@ function v7.Initialize(p44) -- Line: 247
     ReplicatedStorage:GetAttributeChangedSignal("WeatherRolling"):Connect(updateAllBoards);
     ReplicatedStorage:GetAttributeChangedSignal("WeatherUpcomingEvent"):Connect(updateAllBoards);
     updateAllBoards();
-    RunService.Heartbeat:Connect(function() -- Line: 207
+    RunService.Heartbeat:Connect(function() -- Line: 216
         -- upvalues: ReplicatedStorage (ref), formatCountdown (ref), u3 (ref)
-        local v45 = ReplicatedStorage:GetAttribute("WeatherEndTime");
-        local v46 = ReplicatedStorage:GetAttribute("WeatherNextTime");
-        local v47 = os.time();
-        local v48;
+        local v46 = ReplicatedStorage:GetAttribute("WeatherEndTime");
+        local v47 = ReplicatedStorage:GetAttribute("WeatherNextTime");
+        local v48 = os.time();
+        local v49;
 
-        if v45 and v47 < v45 then
-            v48 = v45 - v47;
+        if v46 and v48 < v46 then
+            v49 = v46 - v48;
         else
-            v48 = (not v46 or v47 >= v46) and 0 or v46 - v47;
+            v49 = (not v47 or v48 >= v47) and 0 or v47 - v48;
         end;
 
-        local v49 = formatCountdown(v48);
+        local v50 = formatCountdown(v49);
 
         for _, v in u3 do
-            v.countdown.Text = v49;
+            v.countdown.Text = v50;
         end;
     end);
 end;

@@ -1360,6 +1360,11 @@ Runtime.ApplyStrategyPreset = function(preset)
         table.clear(State.ShopTargets)
         Runtime.SelectionVersion = Runtime.SelectionVersion + 1
         ensurePresetTargets(preset)
+        -- ensurePresetTargets queries the empty lists before filling them, so
+        -- those lookups may be cached at the version above. Advance once more
+        -- after every preset mutation to make the newly-filled targets visible
+        -- immediately to buy/use/roll loops without requiring a manual click.
+        Runtime.SelectionVersion = Runtime.SelectionVersion + 1
         -- If the master pause is active, store the new preset as the state to
         -- restore on Resume while keeping all automation stopped right now.
         if Runtime.Paused then
@@ -1606,6 +1611,19 @@ local function loadProfile(name)
     State.ConfigProfile = name
     Environment.RollAGnomeProfile = name
     Runtime.NormalizeAutomation()
+    -- The selection tables retain their identity across loads, so invalidate
+    -- lookups before asking whether a preset list is empty.
+    Runtime.SelectionVersion = Runtime.SelectionVersion + 1
+    if State.AutomationStrategy == "Balanced" or State.AutomationStrategy == "MaxProgression"
+        or State.AutomationStrategy == "GnomeHunter" or State.AutomationStrategy == "MoneyMachine"
+    then
+        -- Profiles saved by older builds could carry a preset name with empty
+        -- generated target tables. Rehydrate only missing lists; explicit
+        -- custom profiles and existing user selections remain untouched.
+        ensurePresetTargets(State.AutomationStrategy)
+    else
+        State.AutomationStrategy = "Custom"
+    end
     Runtime.PendingPurchase = nil
     Runtime.WaitingForMoney = false
     Runtime.PendingPurchasePrice = 0
@@ -1974,8 +1992,17 @@ Runtime.IsGiftReserved = function(tool)
         return false
     end
     local itemType = string.lower(tostring(tool:GetAttribute("type") or tool:GetAttribute("Type") or ""))
-    return tool:GetAttribute("Id") ~= nil
+    local giftable = tool:GetAttribute("Id") ~= nil
         and (itemType == "plant" or itemType == "fruit" or itemType == "farmer" or itemType == "gnome")
+    -- With normal Auto Sell enabled, a checked held crop belongs to the sell
+    -- flow (Auto Give already applies the same exclusion). When selling is off
+    -- and only overflow cleanup is active, the held gift remains reserved.
+    if giftable and State.AutoSellProduce and Runtime.IsProduceTool(tool)
+        and Runtime.IsSelectedProduceMutation(tool)
+    then
+        return false
+    end
+    return giftable
 end
 
 local function paceRemote(remoteName)
@@ -3322,9 +3349,14 @@ for _, option in ipairs({
         State.RollPriority = option.Key
         Runtime.MarkCustomStrategy()
         if option.Key == "RebirthFirst" then
-            Runtime.PendingPurchase = nil
-            Runtime.WaitingForMoney = false
-            Runtime.PendingPurchasePrice = 0
+            local pending = Runtime.PendingPurchase
+            local requiredPending = pending and pending.Parent
+                and Runtime.NeedsRebirthGnome and Runtime.NeedsRebirthGnome(pending)
+            if not requiredPending then
+                Runtime.PendingPurchase = nil
+                Runtime.WaitingForMoney = false
+                Runtime.PendingPurchasePrice = 0
+            end
         end
         for key, target in pairs(RollPriorityButtons) do
             local selected = State.RollPriority == key
@@ -5234,6 +5266,7 @@ Runtime.FindSelectedProduceBatch = function(limit)
     local now = os.clock()
     for _, tool in ipairs(Runtime.GetInventoryTools()) do
         if tool.Parent and (Runtime.ProduceSellRetry[tool] or 0) <= now
+            and not Runtime.IsGiftReserved(tool)
             and Runtime.IsProduceTool(tool)
             and Runtime.IsSelectedProduceMutation(tool)
         then
@@ -5244,16 +5277,22 @@ Runtime.FindSelectedProduceBatch = function(limit)
     return result
 end
 Runtime.AllProduceMutationsSelected = function()
-    local options = type(collectMutationOptions) == "function" and collectMutationOptions() or {}
-    if #options == 0 then
-        return false
-    end
-    for _, mutation in ipairs(options) do
-        if not isSelected(State.SellProduceMutationTargets, mutation) then
-            return false
+    -- SellAll is safe whenever every produce tool currently owned matches the
+    -- user's mutation rules. Checking the live inventory is both stricter than
+    -- a stale catalog cache and faster than requiring every mutation that the
+    -- game advertises (including mutations not present in this backpack).
+    local foundProduce = false
+    local produceCount = 0
+    for _, tool in ipairs(Runtime.GetInventoryTools()) do
+        if tool.Parent and Runtime.IsProduceTool(tool) then
+            foundProduce = true
+            produceCount = produceCount + 1
+            if Runtime.IsGiftReserved(tool) or not Runtime.IsSelectedProduceMutation(tool) then
+                return false, produceCount
+            end
         end
     end
-    return true
+    return foundProduce, produceCount
 end
 local autoPlacePending = setmetatable({}, { __mode = "k" })
 local autoPlaceRetryAt = setmetatable({}, { __mode = "k" })
@@ -5308,7 +5347,10 @@ local function tryAutoPlace(tool)
                 return false
             end
 
-            local farmerName = tool.Name
+            -- Placement resolves FarmerName from the held tool before sending
+            -- the remote. Mutation/event tools may expose an inventory display
+            -- name that differs from the server's canonical farmer name.
+            local farmerName = getFarmerName(tool) or tool.Name
             attemptedPlacement = fire("Place", "Farmer", farmerName, placeCFrame, floorId or "1") == true
             local directDeadline = os.clock() + (State.LowPingMode and 0.4 or 0.22)
             repeat
@@ -5751,6 +5793,7 @@ local function isProtectedGnome(tool)
     return getProtectedRankSet()[tool] == true
 end
 
+local policySellsGnome
 local function sellInventoryGnomeBatch(tools)
     if type(tools) ~= "table" or #tools == 0 then
         return 0
@@ -5787,10 +5830,21 @@ local function sellInventoryGnomeBatch(tools)
             if not Runtime.Alive or not State.AutoBest30 or not tool.Parent then
                 break
             end
-            if not Runtime.IsGiftReserved(tool) then
-                if Runtime.EquipToolConfirmed(tool) and State.AutoBest30 then
+            local currentRecord = {
+                Instance = tool,
+                FarmerName = getFarmerName(tool),
+            }
+            -- Target/keep checkboxes and profiles can change while an earlier
+            -- sale is yielding. Re-rank protection immediately before every
+            -- destructive remote so a newly-protected gnome is never sold.
+            if not Runtime.IsGiftReserved(tool) and policySellsGnome(currentRecord) then
+                if Runtime.EquipToolConfirmed(tool) and State.AutoBest30
+                    and policySellsGnome(currentRecord)
+                then
                     local ok, result = invoke("SellGnome")
-                    if not ok or result == "Not Holding" then
+                    if (not ok or result == "Not Holding")
+                        and State.AutoBest30 and policySellsGnome(currentRecord)
+                    then
                         ok, result = invoke("SellThis")
                     end
                     local deadline = os.clock() + (State.LowPingMode and 0.65 or 0.38)
@@ -5834,7 +5888,7 @@ local function sellInventoryGnomeBatch(tools)
     return soldCount
 end
 
-local function policySellsGnome(record)
+policySellsGnome = function(record)
     if not record or not record.Instance then
         return false
     end
@@ -5873,15 +5927,26 @@ Runtime.PurgeInventoryOverflow = function()
         local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 
         -- 1. Sell only produce explicitly selected by the user. SellAll is
-        -- reserved for the true all-mutations case because the server remote
-        -- has no filter argument.
-        if Runtime.AllProduceMutationsSelected() then
-            invoke("SellAll")
+        -- used only when every live produce tool is allowed because the
+        -- server remote has no filter argument.
+        local soldAllProduce = false
+        local allProduceAllowed, allProduceCount = Runtime.AllProduceMutationsSelected()
+        if allProduceAllowed then
+            local ok, result = invoke("SellAll")
+            if ok and type(result) == "number" and result > 0 then
+                soldAllProduce = true
+                Runtime.Stats.Sold = Runtime.Stats.Sold + allProduceCount
+            end
         end
-        local produceBatch = Runtime.FindSelectedProduceBatch(30)
+        local produceBatch = not soldAllProduce and Runtime.FindSelectedProduceBatch(30) or {}
         for _, produce in ipairs(produceBatch) do
-            if produce.Parent and Runtime.IsProduceTool(produce) and Runtime.IsSelectedProduceMutation(produce) then
-                if Runtime.EquipToolConfirmed(produce) then
+            if Runtime.Paused or not Runtime.Alive then break end
+            if produce.Parent and not Runtime.IsGiftReserved(produce)
+                and Runtime.IsProduceTool(produce) and Runtime.IsSelectedProduceMutation(produce)
+            then
+                if Runtime.EquipToolConfirmed(produce) and not Runtime.IsGiftReserved(produce)
+                    and Runtime.IsSelectedProduceMutation(produce)
+                then
                     local ok, res = invoke("SellThis")
                     if ok and type(res) == "number" then
                         Runtime.Stats.Sold = Runtime.Stats.Sold + 1
@@ -5889,6 +5954,7 @@ Runtime.PurgeInventoryOverflow = function()
                 end
             end
         end
+        Runtime.InvalidateInventory()
 
         -- 2. If still high, sell junk inventory gnomes (never Top 30 placed or keep targets)
         if State.InventoryOverflowPolicy == "FlushAll" and Runtime.GetBackpackItemCount() > threshold then
@@ -5905,10 +5971,15 @@ Runtime.PurgeInventoryOverflow = function()
                 end
             end
             for _, gnomeTool in ipairs(junkGnomes) do
+                if Runtime.Paused or not Runtime.Alive then break end
                 if gnomeTool.Parent and not Runtime.IsGiftReserved(gnomeTool) then
-                    if Runtime.EquipToolConfirmed(gnomeTool) then
+                    local currentRecord = {
+                        Instance = gnomeTool,
+                        FarmerName = getFarmerName(gnomeTool),
+                    }
+                    if Runtime.EquipToolConfirmed(gnomeTool) and policySellsGnome(currentRecord) then
                         local ok, res = invoke("SellGnome")
-                        if not ok or res == "Not Holding" then
+                        if (not ok or res == "Not Holding") and policySellsGnome(currentRecord) then
                             ok, res = invoke("SellThis")
                         end
                         if ok and type(res) == "number" then
@@ -5938,7 +6009,9 @@ local function removePlacedGnome(record, sell)
     local originalParent = instance.Parent
     local owner = sell and "SellPlacedGnome" or "PickupPlacedGnome"
     local actionOk, removed = Runtime.WithAction(owner, { "Gnome" }, function()
-        if not State.AutoBest30 or not instance.Parent then
+        if not State.AutoBest30 or not instance.Parent
+            or (sell and not policySellsGnome(record))
+        then
             return false
         end
         local ok = fire(sell and "SellFarmer" or "PickupFarmer", instance.Name)
@@ -6469,9 +6542,14 @@ Runtime.GetUseTargetSignature = function(instance)
         "READY", "FruitReady", "GrowthSpeedMulti", "GrowthSpeedStartTime",
         "GrowthStartTime", "GrowthElapsedOffset", "SecondsUntilReady", "TotalGrowTime",
         "NextHarvest", "NextPlant", "FinishTime", "GrowTime", "TimeLeft", "GnomeSpeed",
+        "HasCoffee",
     }) do
         table.insert(values, tostring(instance:GetAttribute(attribute)))
     end
+    local root = instance:FindFirstChild("RootPart")
+        or (instance:IsA("Model") and instance.PrimaryPart or nil)
+    table.insert(values, tostring(instance:FindFirstChild("CoffeeTrail") ~= nil
+        or (root and root:FindFirstChild("CoffeeTrail") ~= nil)))
     return table.concat(values, "|")
 end
 
@@ -6567,7 +6645,9 @@ local function tryUseItem(tool)
             end
             local didAttempt = false
             local wasConfirmed = false
-            if equipped and character and tool.Parent == character and State.AutoUseItems then
+            if equipped and character and tool.Parent == character and State.AutoUseItems
+                and isSelected(State.UseItemTargets, itemName)
+            then
                 if itemType == "WateringCan" and target and target.Parent then
                     didAttempt = fire("WaterPlant", target)
                 elseif itemType == "GnomeItem" and target and target.Parent then
@@ -6575,8 +6655,8 @@ local function tryUseItem(tool)
                     -- tool's GiveGnomeItem signal. Tool.Name remains a fallback
                     -- for executors where custom Signal inspection is blocked.
                     local identifier = Runtime.EquippedGnomeItemIdentifier
-                        or (tool.Name ~= "" and tool.Name)
                         or Runtime.GetToolItemId(tool)
+                        or (tool.Name ~= "" and tool.Name)
                     didAttempt = identifier ~= nil and fire("GiveFarmerItem", target, identifier) or false
                 elseif placeCFrame then
                     didAttempt = fire("Place", itemType, itemName, placeCFrame, floorId or "1")
@@ -6594,6 +6674,10 @@ local function tryUseItem(tool)
                         or State.LowPingMode and 1.5 or 0.6)
                 end
                 if wasConfirmed and (itemType == "Sprinkler" or itemType == "Fertilizer") then
+                    -- The placement scan is cached briefly for performance.
+                    -- Invalidate it now so the next item accounts for the area
+                    -- that was just covered instead of reusing the same spot.
+                    Runtime.AreaItemCache = nil
                     Runtime.Stats.Placed = Runtime.Stats.Placed + 1
                 end
             end
@@ -6662,10 +6746,12 @@ end
 task.spawn(function()
     while Runtime.Alive do
         if not State.AutoUseItems then
+            Runtime.ClearActionReservation("UseItem")
             if Runtime.LastUseItemResult ~= "IDLE" then
                 Runtime.SetUseItemStatus("IDLE")
             end
         elseif not Runtime.HasAnySelection(State.UseItemTargets) then
+            Runtime.ClearActionReservation("UseItem")
             Runtime.SetUseItemStatus("SELECT AN ITEM", false)
         elseif not Runtime.ItemActionActive
             or (Runtime.ItemActionActiveAt and os.clock() - Runtime.ItemActionActiveAt > 4)
@@ -6675,12 +6761,17 @@ task.spawn(function()
                 Runtime.ItemActionActiveAt = nil
             end
             local now = os.clock()
+            local started = false
             for _, tool in ipairs(getUseItemCandidates()) do
                 if tool.Parent and not itemPending[tool] and (itemRetryAt[tool] or 0) <= now
                     and tryUseItem(tool)
                 then
+                    started = true
                     break
                 end
+            end
+            if not started and not Runtime.ItemActionActive then
+                Runtime.ClearActionReservation("UseItem")
             end
         end
         task.wait(State.AutoUseItems and (State.LowPingMode and 0.45 or 0.2) or 1.5)
@@ -6844,7 +6935,12 @@ task.spawn(function()
                         Runtime.Gifting = true
                         task.spawn(function()
                             pcall(function()
-                                if heldTool.Parent and State.AutoGive then
+                                if heldTool.Parent and State.AutoGive and recipient.Parent == Players
+                                    and isSelected(State.GivePlayers, recipient.Name)
+                                    and not (State.AutoSellProduce and Runtime.IsProduceTool(heldTool)
+                                        and Runtime.IsSelectedProduceMutation(heldTool))
+                                    and not (State.AutoBest30 and isProtectedGnome(heldTool))
+                                then
                                     fire("RequestGiftItem", recipient, heldTool:GetAttribute("Id"))
                                     local deadline = os.clock() + 1.5
                                     repeat
@@ -6997,7 +7093,10 @@ local function tryBuyPreview(instance)
         end
         return
     end
-    if targetFirst or State.PauseRollUntilAffordable then
+    -- A rebirth requirement must also hold its preview while the purchase
+    -- remote is being scheduled. Otherwise RebirthFirst can reroll the exact
+    -- gnome it still needs between this check and BuyFarmer.
+    if neededForRebirth or targetFirst or State.PauseRollUntilAffordable then
         Runtime.PendingPurchase = instance
         Runtime.PendingPurchasePrice = price or 0
         Runtime.WaitingForMoney = false
@@ -7011,18 +7110,23 @@ local function tryBuyPreview(instance)
     if Runtime.RebirthReady and Runtime.RebirthReady() then
         return
     end
-    local actionToken = Runtime.BeginAction("BuyGnome", { "Economy" })
+    -- Buying consumes the current RNG preview, so it shares the Roll lock in
+    -- addition to Economy. This closes the race where Roll replaced Preview
+    -- while BuyFarmer was still validating it.
+    local actionToken = Runtime.BeginAction("BuyGnome", { "Economy", "Roll" })
     if not actionToken then
         return
     end
     price = getPreviewPrice(instance)
     neededForRebirth = Runtime.NeedsRebirthGnome(instance)
     targetFirst = State.RollPriority == "TargetFirst"
-    if (not neededForRebirth and not targetFirst and not Runtime.CanSpendAfterRebirthReserve(price))
+    local stillWanted = isWantedPreview(instance)
+    if not stillWanted
+        or (not neededForRebirth and not targetFirst and not Runtime.CanSpendAfterRebirthReserve(price))
         or (price and getPlayerMoney() < price)
     then
         Runtime.EndAction(actionToken)
-        if price and getPlayerMoney() < price and State.PauseRollUntilAffordable then
+        if stillWanted and price and getPlayerMoney() < price and State.PauseRollUntilAffordable then
             Runtime.PendingPurchase = instance
             Runtime.PendingPurchasePrice = price
             Runtime.WaitingForMoney = true
@@ -7097,10 +7201,14 @@ task.spawn(function()
         local rng = plot and plot:FindFirstChild("RNG")
         local preview = rng and rng:FindFirstChild("Preview")
         local pending = Runtime.PendingPurchase
-        if pending and (not pending.Parent or not isWantedPreview(pending)) then
+        if pending and not pending.Parent then
+            clearPendingPurchase()
+        elseif pending and not Runtime.Paused and not isWantedPreview(pending) then
             clearPendingPurchase()
         end
-        if preview and (State.AutoBuyTarget or State.AutoBuyRebirthGnomes or State.AutoRebirth) then
+        if not Runtime.Paused and preview
+            and (State.AutoBuyTarget or State.AutoBuyRebirthGnomes or State.AutoRebirth)
+        then
             for _, child in ipairs(preview:GetChildren()) do
                 tryBuyPreview(child)
             end
@@ -7116,14 +7224,31 @@ task.spawn(function()
         local waitingForTarget = pending and pending.Parent and isWantedPreview(pending)
         local rebirthReady = Runtime.RebirthReady and Runtime.RebirthReady()
         if State.AutoRoll and not waitingForTarget and not rebirthReady then
+            local rollingDeadline = os.clock() + 10
             while Runtime.Alive and State.AutoRoll and LocalPlayer:GetAttribute("Rolling") do
+                if os.clock() >= rollingDeadline then
+                    break
+                end
                 task.wait(0.08)
             end
-            if Runtime.Alive and State.AutoRoll then
+            -- Preview can arrive while the loop above is waiting for the
+            -- previous roll animation. Recheck both priorities immediately;
+            -- otherwise one extra Roll can erase a newly-found wanted gnome.
+            pending = Runtime.PendingPurchase
+            waitingForTarget = pending and pending.Parent and isWantedPreview(pending)
+            rebirthReady = Runtime.RebirthReady and Runtime.RebirthReady()
+            if Runtime.Alive and State.AutoRoll and not waitingForTarget and not rebirthReady then
                 local actionOk, ok, result = Runtime.WithAction("Roll", { "Roll" }, function()
+                    local held = Runtime.PendingPurchase
+                    if not State.AutoRoll
+                        or (held and held.Parent and isWantedPreview(held))
+                        or (Runtime.RebirthReady and Runtime.RebirthReady())
+                    then
+                        return false, "cancelled"
+                    end
                     return invoke("Roll")
                 end)
-                if actionOk and ok and result ~= false then
+                if actionOk and ok and result then
                     Runtime.Stats.Rolls = Runtime.Stats.Rolls + 1
                 end
             end
@@ -7211,7 +7336,7 @@ end)
 task.spawn(function()
     while Runtime.Alive do
         local batch = {}
-        if State.AutoSellProduce or Runtime.IsBackpackNearFull() then
+        if not Runtime.Paused and (State.AutoSellProduce or Runtime.IsBackpackNearFull()) then
             batch = Runtime.FindSelectedProduceBatch(30)
         end
         if batch[1] then
@@ -7229,15 +7354,17 @@ task.spawn(function()
                 local count = 0
                 local lastResponse = "no match"
 
-                -- SellAll has no mutation filter. Use it only when every
-                -- available mutation is selected; otherwise preserve the
-                -- user's checkboxes and sell confirmed tools individually.
+                -- SellAll has no mutation filter. Use it only when every live
+                -- produce tool passes the selected mutation rules; otherwise
+                -- preserve the checkboxes and sell confirmed tools individually.
                 local okAll, resAll = false, nil
-                if Runtime.AllProduceMutationsSelected() then
+                local allProduceAllowed, allProduceCount = Runtime.AllProduceMutationsSelected()
+                if allProduceAllowed then
                     okAll, resAll = invoke("SellAll")
                 end
                 if okAll and type(resAll) == "number" and resAll > 0 then
-                    count = #batch
+                    count = allProduceCount
+                    Runtime.InvalidateInventory()
                     Runtime.Stats.Sold = Runtime.Stats.Sold + count
                     lastResponse = "SellAll " .. tostring(resAll) .. "$"
                     if type(Runtime.Log) == "function" then
@@ -7250,10 +7377,13 @@ task.spawn(function()
                 else
                     -- Selective Fallback: Equip and sell matching produce individually via SellThis
                     for _, produce in ipairs(batch) do
-                        if not Runtime.Alive or not (State.AutoSellProduce or Runtime.IsBackpackNearFull()) then
+                        if not Runtime.Alive or Runtime.Paused
+                            or not (State.AutoSellProduce or Runtime.IsBackpackNearFull())
+                        then
                             break
                         end
                         if produce.Parent and Runtime.IsProduceTool(produce)
+                            and not Runtime.IsGiftReserved(produce)
                             and Runtime.IsSelectedProduceMutation(produce)
                         then
                             Runtime.SellingProduceTool = produce
@@ -7261,7 +7391,9 @@ task.spawn(function()
                             local success = false
                             for attempt = 1, 3 do
                                 local equipped = Runtime.EquipToolConfirmed(produce, attempt > 1)
-                                if equipped then
+                                if equipped and not Runtime.IsGiftReserved(produce)
+                                    and Runtime.IsSelectedProduceMutation(produce)
+                                then
                                     ok, response = invoke("SellThis")
                                     success = ok and type(response) == "number"
                                 else
@@ -7304,9 +7436,15 @@ task.spawn(function()
             Runtime.LastProduceSellResult = actionOk
                 and string.format("batch %d | %s", soldCount or 0, tostring(result))
                 or tostring(soldCount)
-            Runtime.ClearActionReservation("SellSelectedProduce")
+            -- If Collect/UseItem was already holding a shared resource, keep
+            -- this reservation until the next retry so continuous harvesting
+            -- cannot starve selling and fill the backpack forever.
+            if actionOk or soldCount ~= "busy" then
+                Runtime.ClearActionReservation("SellSelectedProduce")
+            end
             Runtime.ProduceSellPending = false
         else
+            Runtime.ClearActionReservation("SellSelectedProduce")
             Runtime.ProduceSellPending = false
         end
         task.wait(Runtime.ProduceSellPending and 0.06
@@ -7434,6 +7572,14 @@ task.spawn(function()
                                     if not Runtime.Alive or not State.AutoBuyShop
                                         or (Runtime.RebirthReady and Runtime.RebirthReady())
                                     then
+                                        break
+                                    end
+                                    -- Candidate lists are snapshots. A profile
+                                    -- load or checkbox change may occur while a
+                                    -- prior Purchase is yielding, so never buy
+                                    -- an item that is no longer selected.
+                                    if not isSelected(State.ShopTargets, itemName) then
+                                        response = "TARGET CHANGED"
                                         break
                                     end
                                     local shopData = (ItemShop.Items or {})[itemName] or {}

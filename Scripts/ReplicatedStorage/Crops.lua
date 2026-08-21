@@ -7,7 +7,7 @@
   Success:  true
   Executor: Potassium v2.4.3
   Game:     Roll_A_Gnome (117539213094671)
-  Time:     Thu Aug 20 23:43:03 2026
+  Time:     Sat Aug 22 00:22:30 2026
 ]]
 
 -- Decompiled with Potassium's decompiler.
@@ -244,8 +244,22 @@ function u1.applyMutations(p22, p23) -- Line: 135
         end;
     end;
 
+    if table.find(v24, "Solar") then
+        local v38 = getParticlePart(p22);
+        local Small_Solar = Particles:FindFirstChild("Small_Solar");
+
+        if Small_Solar and not v38:FindFirstChild("SolarA") then
+            local v39 = next;
+            local v40, v41 = Small_Solar:GetChildren();
+
+            for _, v in v39, v40, v41 do
+                v:Clone().Parent = v38;
+            end;
+        end;
+    end;
+
     if table.find(v24, "Frozen") then
-        local v38, v39 = p22:GetBoundingBox();
+        local v42, v43 = p22:GetBoundingBox();
         local Part = Instance.new("Part");
         Part.Material = "Ice";
         Part.Color = Color3.fromRGB(0, 170, 255);
@@ -253,8 +267,8 @@ function u1.applyMutations(p22, p23) -- Line: 135
         Part.Anchored = false;
         Part.CanCollide = false;
         Part.Massless = true;
-        Part.Size = Vector3.new(v39.X - 0.05, v39.Y - 0.05, v39.Z - 0.05);
-        Part:PivotTo(v38);
+        Part.Size = Vector3.new(v43.X - 0.05, v43.Y - 0.05, v43.Z - 0.05);
+        Part:PivotTo(v42);
         Part.Parent = p22;
         local WeldConstraint = Instance.new("WeldConstraint");
         WeldConstraint.Part0 = p22.CenterPart;
@@ -267,56 +281,56 @@ function u1.applyMutations(p22, p23) -- Line: 135
             if descendant:IsA("BasePart") and not descendant:GetAttribute("BLOCK") then
                 local Color = descendant.Color;
                 local fromRGB = Color3.fromRGB;
-                local v40 = math.floor(Color.R * 255) + 75;
-                local v41 = math.clamp(v40, 0, 255);
-                local v42 = math.floor(Color.G * 255) + 75;
-                local v43 = math.clamp(v42, 0, 255);
-                local v44 = math.floor(Color.B * 255) + 75;
-                descendant.Color = fromRGB(v41, v43, (math.clamp(v44, 0, 255)));
+                local v44 = math.floor(Color.R * 255) + 75;
+                local v45 = math.clamp(v44, 0, 255);
+                local v46 = math.floor(Color.G * 255) + 75;
+                local v47 = math.clamp(v46, 0, 255);
+                local v48 = math.floor(Color.B * 255) + 75;
+                descendant.Color = fromRGB(v45, v47, (math.clamp(v48, 0, 255)));
             end;
         end;
     end;
 end;
 
-function u1.getModel(p45, p46) -- Line: 260
+function u1.getModel(p49, p50) -- Line: 272
     -- upvalues: u1 (copy)
-    local v47 = u1.get(p45, p46);
+    local v51 = u1.get(p49, p50);
 
-    if v47 then
-        v47 = v47.model;
+    if v51 then
+        v51 = v51.model;
     end;
 
-    if v47 then
-        local v48 = v47:Clone();
-        u1.applyMutations(v48, p46);
+    if v51 then
+        local v52 = v51:Clone();
+        u1.applyMutations(v52, p50);
 
-        return v48;
+        return v52;
     end;
 end;
 
-function u1.getPrice(p49, p50, p51) -- Line: 271
+function u1.getPrice(p53, p54, p55) -- Line: 283
     -- upvalues: u1 (copy), Mutations (copy), toMutationList (copy)
-    local v52 = u1.get(p49);
+    local v56 = u1.get(p53);
 
-    if v52 then
-        v52 = v52.sell_price;
+    if v56 then
+        v56 = v56.sell_price;
     end;
 
-    if type(v52) ~= "number" then
+    if type(v56) ~= "number" then
         return nil;
     end;
 
-    local v53 = p50 == nil and 1 or p50;
+    local v57 = p54 == nil and 1 or p54;
 
-    if type(v53) ~= "number" or v53 ~= v53 then
+    if type(v57) ~= "number" or v57 ~= v57 then
         return nil;
     end;
 
-    if v53 == (1 / 0) or v53 == (-1 / 0) then
+    if v57 == (1 / 0) or v57 == (-1 / 0) then
         return nil;
     end;
 
-    return Mutations:buffStat(v52 * v53, toMutationList(p51));
+    return Mutations:buffStat(v56 * v57, toMutationList(p55));
 end;
 
 return u1;

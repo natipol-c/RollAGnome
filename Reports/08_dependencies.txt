@@ -1,6 +1,9 @@
 DEPENDENCY GRAPH — DUMPER v7.0
 Shows require() calls found in decompiled scripts
 
+[Workspace] game.Players.NotHub024.Backpack.Pepper.LocalScript
+    → require(ReplicatedStorage.Library)
+
 [ReplicatedStorage] game.ReplicatedStorage.Library
     → require(v4)
     → require(v)
@@ -32,6 +35,132 @@ Shows require() calls found in decompiled scripts
 [ReplicatedStorage] game.ReplicatedStorage.Library.Refresh
     → require(ReplicatedStorage.Library)
     → require(game.ServerStorage.ServerLibrary)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Crops
+    → require(script.Parent.Plants)
+    → require(script.Parent.Mutations)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.GnomeUtil
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.Utility
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.Brainrot
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.Mutation
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.Zone
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.LuckyBlock
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.WheelType
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.EventCurrency
+    → require(ReplicatedStorage.Library)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets
+    → require(script.Assets)
+    → require(Definitions.Dog)
+    → require(Definitions.Cat)
+    → require(Definitions.Bunny)
+    → require(Definitions.Cow)
+    → require(Definitions.Frog)
+    → require(Definitions.Bee)
+    → require(Definitions.Turtle)
+    → require(Definitions.Owl)
+    → require(Definitions.Pig)
+    → require(Definitions.Raccoon)
+    → require(Definitions.Hornet)
+    → require(Definitions.Ant)
+    → require(Definitions["Mutant Ant"])
+    → require(Definitions["Mutant Bee"])
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Behavior
+    → require(script.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Ant
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Bee
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Bunny
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Cat
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Chicken
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Cow
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Dog
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Frog
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Hornet
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Mutant Ant
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Owl
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Pig
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Raccoon
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Turtle
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Mutant Bee
+    → require(script.Parent.Parent.Assets)
+    → require(script.Parent.Parent.Behavior)
+    → require(script.Parent.Parent.Types)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.PetsUtil
+    → require(ReplicatedStorage.Library.Configs.Mutations)
 
 [ReplicatedStorage] game.ReplicatedStorage.Library.Imported.Network
     → require(script.Callback)
@@ -506,6 +635,23 @@ Shows require() calls found in decompiled scripts
     → require(u29.iconModule)
     → require(u63.iconModule)
 
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Packages.Janitor
+    → require(game:GetService("ReplicatedStorage")
+    → require(game:GetService("ReplicatedStorage")
+    → require(game:GetService("ReplicatedStorage")
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Gamepad
+    → require(script.Parent.Parent.Utility)
+    → require(script.Parent.Parent.Elements.Selection)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Overflow
+    → require(script.Parent.Parent.Utility)
+
+[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Themes
+    → require(script.Parent.Parent.Utility)
+    → require(script.Default)
+    → require(p68)
+
 [ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Elements.Caption
     → require(u1.iconModule)
 
@@ -526,149 +672,6 @@ Shows require() calls found in decompiled scripts
     → require(Packages.Janitor)
     → require(Packages.GoodSignal)
     → require(Parent.Utility)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Gamepad
-    → require(script.Parent.Parent.Utility)
-    → require(script.Parent.Parent.Elements.Selection)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Overflow
-    → require(script.Parent.Parent.Utility)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Features.Themes
-    → require(script.Parent.Parent.Utility)
-    → require(script.Default)
-    → require(p68)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Imported.TopbarPlus.Packages.Janitor
-    → require(game:GetService("ReplicatedStorage")
-    → require(game:GetService("ReplicatedStorage")
-    → require(game:GetService("ReplicatedStorage")
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Crops
-    → require(script.Parent.Plants)
-    → require(script.Parent.Mutations)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.GnomeUtil
-    → require(ReplicatedStorage.Library)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.Utility
-    → require(ReplicatedStorage.Library)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.Brainrot
-    → require(ReplicatedStorage.Library)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.Mutation
-    → require(ReplicatedStorage.Library)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.Zone
-    → require(ReplicatedStorage.Library)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.LuckyBlock
-    → require(ReplicatedStorage.Library)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.WheelType
-    → require(ReplicatedStorage.Library)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.ConchTypes.EventCurrency
-    → require(ReplicatedStorage.Library)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets
-    → require(script.Assets)
-    → require(Definitions.Dog)
-    → require(Definitions.Cat)
-    → require(Definitions.Bunny)
-    → require(Definitions.Cow)
-    → require(Definitions.Frog)
-    → require(Definitions.Bee)
-    → require(Definitions.Turtle)
-    → require(Definitions.Owl)
-    → require(Definitions.Pig)
-    → require(Definitions.Raccoon)
-    → require(Definitions.Hornet)
-    → require(Definitions.Ant)
-    → require(Definitions["Mutant Ant"])
-    → require(Definitions["Mutant Bee"])
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Behavior
-    → require(script.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Ant
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Bee
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Bunny
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Cat
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Chicken
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Cow
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Dog
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Frog
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Hornet
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Mutant Ant
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Owl
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Pig
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Raccoon
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Turtle
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.Pets.Definitions.Mutant Bee
-    → require(script.Parent.Parent.Assets)
-    → require(script.Parent.Parent.Behavior)
-    → require(script.Parent.Parent.Types)
-
-[ReplicatedStorage] game.ReplicatedStorage.Library.Configs.PetsUtil
-    → require(ReplicatedStorage.Library.Configs.Mutations)
 
 [ReplicatedStorage] game.ReplicatedStorage.Replication
     → require(ReplicatedStorage.Library)
@@ -713,6 +716,17 @@ Shows require() calls found in decompiled scripts
     → require(u29.iconModule)
     → require(u63.iconModule)
 
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Gamepad
+    → require(script.Parent.Parent.Elements.Selection)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Overflow
+    → require(script.Parent.Parent.Utility)
+
+[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Themes
+    → require(script.Parent.Parent.Utility)
+    → require(script.Default)
+    → require(p68)
+
 [ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Elements.Caption
     → require(u2.iconModule)
 
@@ -737,17 +751,6 @@ Shows require() calls found in decompiled scripts
     → require(script.Parent.Menu)
     → require(script.Parent.Parent.Features.Gamepad)
     → require(script.Parent.Parent.Utility)
-
-[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Gamepad
-    → require(script.Parent.Parent.Elements.Selection)
-
-[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Overflow
-    → require(script.Parent.Parent.Utility)
-
-[ReplicatedStorage] game.ReplicatedStorage.SatchelLoader.Satchel.Packages._Index.1foreverhd_topbarplus@3.3.1.topbarplus.Features.Themes
-    → require(script.Parent.Parent.Utility)
-    → require(script.Default)
-    → require(p68)
 
 [StarterGui] game.StarterGui.Display.LocalScript
     → require(ReplicatedStorage.Library)
@@ -1028,6 +1031,9 @@ Shows require() calls found in decompiled scripts
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.Cursed
     → require(script.Parent.Parent.Parent.LightingController)
 
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.GlobalEvents.Events.SolarFlare
+    → require(script.Parent.Parent.Parent.LightingController)
+
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.Client.Controllers.Lightning Strike
     → require(ReplicatedStorage.Library)
 
@@ -1067,6 +1073,60 @@ Shows require() calls found in decompiled scripts
     → require(script:WaitForChild("CameraModule")
     → require(script:WaitForChild("ControlModule")
 
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule
+    → require(script:WaitForChild("Keyboard")
+    → require(script:WaitForChild("Gamepad")
+    → require(script:WaitForChild("DynamicThumbstick")
+    → require(script:WaitForChild("TouchThumbstick")
+    → require(script:WaitForChild("ClickToMoveController")
+    → require(script:WaitForChild("TouchJump")
+    → require(script:WaitForChild("VehicleController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.ClickToMoveDisplay
+    → require(CommonUtils:WaitForChild("FlagUtil")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.Gamepad
+    → require(script.Parent:WaitForChild("BaseCharacterController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.BaseCharacterController
+    → require(CommonUtils:WaitForChild("ConnectionUtil")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.AvatarAbilitiesInterface
+    → require(CommonUtils:WaitForChild("FlagUtil")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.PathDisplay
+    → require(CommonUtils:WaitForChild("FlagUtil")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.TouchThumbstick
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("AvatarAbilitiesInterface")
+    → require(script.Parent:WaitForChild("BaseCharacterController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.Keyboard
+    → require(script.Parent:WaitForChild("BaseCharacterController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.DynamicThumbstick
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("AvatarAbilitiesInterface")
+    → require(script.Parent:WaitForChild("BaseCharacterController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.VRNavigation
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(PathDisplay)
+    → require(script.Parent:WaitForChild("BaseCharacterController")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.ClickToMoveController
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("ClickToMoveDisplay")
+    → require(script.Parent:WaitForChild("Keyboard")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.TouchJump
+    → require(CommonUtils:WaitForChild("ConnectionUtil")
+    → require(CommonUtils:WaitForChild("CharacterUtil")
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("AvatarAbilitiesInterface")
+    → require(script.Parent:WaitForChild("BaseCharacterController")
+
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule
     → require(CommonUtils:WaitForChild("ConnectionUtil")
     → require(CommonUtils:WaitForChild("FlagUtil")
@@ -1089,15 +1149,16 @@ Shows require() calls found in decompiled scripts
     → require(script.Parent:WaitForChild("CameraUtils")
     → require(script.Parent:WaitForChild("BaseCamera")
 
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRBaseCamera
-    → require(script.Parent:WaitForChild("CameraInput")
-    → require(script.Parent:WaitForChild("ZoomController")
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.OrbitalCamera
     → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("CameraUtils")
+    → require(script.Parent:WaitForChild("CameraInput")
     → require(script.Parent:WaitForChild("BaseCamera")
 
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.Invisicam
-    → require(CommonUtils:WaitForChild("FlagUtil")
-    → require(script.Parent:WaitForChild("BaseOcclusion")
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraToggleStateController
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("CameraUI")
+    → require(script.Parent:WaitForChild("CameraUtils")
 
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRVehicleCameraDeprecated
     → require(script.Parent:WaitForChild("VRBaseCamera")
@@ -1108,23 +1169,15 @@ Shows require() calls found in decompiled scripts
     → require(script.Parent.VehicleCamera:FindFirstChild("VehicleCameraConfig")
     → require(LocalPlayer:WaitForChild("PlayerScripts")
 
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraToggleStateController
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRBaseCamera
     → require(script.Parent:WaitForChild("CameraInput")
-    → require(script.Parent:WaitForChild("CameraUI")
-    → require(script.Parent:WaitForChild("CameraUtils")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCamera
-    → require(script.Parent:WaitForChild("CameraInput")
-    → require(script.Parent:WaitForChild("CameraUtils")
-    → require(script.Parent:WaitForChild("VRCameraTeleportDetector")
-    → require(CommonUtils:WaitForChild("FlagUtil")
-    → require(script.Parent:WaitForChild("VRBaseCamera")
-    → require(Players.LocalPlayer:WaitForChild("PlayerScripts")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.Poppercam
-    → require(CommonUtils:WaitForChild("FlagUtil")
     → require(script.Parent:WaitForChild("ZoomController")
-    → require(script.Parent:WaitForChild("BaseOcclusion")
+    → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("BaseCamera")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCameraTeleportDetector.spec
+    → require(CorePackages.Packages.Dev.JestGlobals)
+    → require(script.Parent.VRCameraTeleportDetector)
 
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VehicleCamera
     → require(script.Parent:WaitForChild("BaseCamera")
@@ -1138,8 +1191,10 @@ Shows require() calls found in decompiled scripts
     → require(script.Parent.Parent.CameraUtils)
     → require(script.Parent.VehicleCameraConfig)
 
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.TransparencyController
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.LegacyCamera
     → require(script.Parent:WaitForChild("CameraUtils")
+    → require(script.Parent:WaitForChild("CameraInput")
+    → require(script.Parent:WaitForChild("BaseCamera")
 
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.ZoomController
     → require(script:WaitForChild("Popper")
@@ -1156,24 +1211,21 @@ Shows require() calls found in decompiled scripts
     → require(script.Parent:WaitForChild("VehicleCamera")
     → require(script.Parent:WaitForChild("VRVehicleCameraDeprecated")
 
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.OrbitalCamera
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.TransparencyController
+    → require(script.Parent:WaitForChild("CameraUtils")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.Poppercam
     → require(CommonUtils:WaitForChild("FlagUtil")
-    → require(script.Parent:WaitForChild("CameraUtils")
-    → require(script.Parent:WaitForChild("CameraInput")
-    → require(script.Parent:WaitForChild("BaseCamera")
+    → require(script.Parent:WaitForChild("ZoomController")
+    → require(script.Parent:WaitForChild("BaseOcclusion")
 
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.LegacyCamera
-    → require(script.Parent:WaitForChild("CameraUtils")
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCamera
     → require(script.Parent:WaitForChild("CameraInput")
-    → require(script.Parent:WaitForChild("BaseCamera")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.MouseLockController
+    → require(script.Parent:WaitForChild("CameraUtils")
+    → require(script.Parent:WaitForChild("VRCameraTeleportDetector")
     → require(CommonUtils:WaitForChild("FlagUtil")
-    → require(script.Parent:WaitForChild("CameraUtils")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.VRCameraTeleportDetector.spec
-    → require(CorePackages.Packages.Dev.JestGlobals)
-    → require(script.Parent.VRCameraTeleportDetector)
+    → require(script.Parent:WaitForChild("VRBaseCamera")
+    → require(Players.LocalPlayer:WaitForChild("PlayerScripts")
 
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.BaseCamera
     → require(CommonUtils:WaitForChild("ConnectionUtil")
@@ -1187,67 +1239,21 @@ Shows require() calls found in decompiled scripts
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.CameraInput
     → require(CommonUtils:WaitForChild("FlagUtil")
 
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule
-    → require(script:WaitForChild("Keyboard")
-    → require(script:WaitForChild("Gamepad")
-    → require(script:WaitForChild("DynamicThumbstick")
-    → require(script:WaitForChild("TouchThumbstick")
-    → require(script:WaitForChild("ClickToMoveController")
-    → require(script:WaitForChild("TouchJump")
-    → require(script:WaitForChild("VehicleController")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.TouchJump
-    → require(CommonUtils:WaitForChild("ConnectionUtil")
-    → require(CommonUtils:WaitForChild("CharacterUtil")
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.MouseLockController
     → require(CommonUtils:WaitForChild("FlagUtil")
-    → require(script.Parent:WaitForChild("AvatarAbilitiesInterface")
-    → require(script.Parent:WaitForChild("BaseCharacterController")
+    → require(script.Parent:WaitForChild("CameraUtils")
 
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.Keyboard
-    → require(script.Parent:WaitForChild("BaseCharacterController")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.AvatarAbilitiesInterface
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CameraModule.Invisicam
     → require(CommonUtils:WaitForChild("FlagUtil")
+    → require(script.Parent:WaitForChild("BaseOcclusion")
 
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.TouchThumbstick
-    → require(CommonUtils:WaitForChild("FlagUtil")
-    → require(script.Parent:WaitForChild("AvatarAbilitiesInterface")
-    → require(script.Parent:WaitForChild("BaseCharacterController")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.ClickToMoveDisplay
-    → require(CommonUtils:WaitForChild("FlagUtil")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.ClickToMoveController
-    → require(CommonUtils:WaitForChild("FlagUtil")
-    → require(script.Parent:WaitForChild("ClickToMoveDisplay")
-    → require(script.Parent:WaitForChild("Keyboard")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.PathDisplay
-    → require(CommonUtils:WaitForChild("FlagUtil")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.BaseCharacterController
-    → require(CommonUtils:WaitForChild("ConnectionUtil")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.Gamepad
-    → require(script.Parent:WaitForChild("BaseCharacterController")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.VRNavigation
-    → require(CommonUtils:WaitForChild("FlagUtil")
-    → require(PathDisplay)
-    → require(script.Parent:WaitForChild("BaseCharacterController")
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.ControlModule.DynamicThumbstick
-    → require(CommonUtils:WaitForChild("FlagUtil")
-    → require(script.Parent:WaitForChild("AvatarAbilitiesInterface")
-    → require(script.Parent:WaitForChild("BaseCharacterController")
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CharacterUtil
+    → require(script.Parent:WaitForChild("ConnectionUtil")
 
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CameraWrapper.spec
     → require(CorePackages.Packages.Dev.JestGlobals)
     → require(CorePackages.Workspace.Packages.TestUtils)
     → require(script.Parent.CameraWrapper)
-
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CharacterUtil
-    → require(script.Parent:WaitForChild("ConnectionUtil")
 
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.ConnectionUtil.spec
     → require(CorePackages.Packages.Dev.JestGlobals)
@@ -1257,11 +1263,11 @@ Shows require() calls found in decompiled scripts
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerModule.CommonUtils.CameraWrapper
     → require(script.Parent.ConnectionUtil)
 
-[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.RbxCharacterSounds
-    → require(script:WaitForChild("AtomicBinding")
-
 [StarterPlayer] game.StarterPlayer.StarterPlayerScripts.PlayerScriptsLoader
     → require(script.Parent:WaitForChild("PlayerModule")
+
+[StarterPlayer] game.StarterPlayer.StarterPlayerScripts.RbxCharacterSounds
+    → require(script:WaitForChild("AtomicBinding")
 
 [PlayerGui] game.Players.Palukalima37806.PlayerGui.Display.LocalScript
     → require(ReplicatedStorage.Library)
@@ -1306,62 +1312,167 @@ Shows require() calls found in decompiled scripts
 [PlayerGui] game.Players.Palukalima37806.PlayerGui.TutorialMessages.Messages.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Pineapple Gnome.Handler
+[Backpack] game.Players.Palukalima37806.Backpack.Bunny.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Dragonfruit Gnome.Handler
+[Backpack] game.Players.Palukalima37806.Backpack.Bunny.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Peach Gnome.Handler
+[Backpack] game.Players.Palukalima37806.Backpack.Bunny.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Peach Gnome.Handler
+[Backpack] game.Players.Palukalima37806.Backpack.Turtle.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Pineapple Gnome.Handler
+[Backpack] game.Players.Palukalima37806.Backpack.Frog.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Avocado Gnome.Handler
+[Backpack] game.Players.Palukalima37806.Backpack.Bunny.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Mango Gnome.Handler
+[Backpack] game.Players.Palukalima37806.Backpack.Bunny.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Pepper Gnome.Handler
+[Backpack] game.Players.Palukalima37806.Backpack.Turtle.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Apple Gnome.Handler
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Avocado Gnome.Handler
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Blueberry Gnome.Handler
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Kiwi Gnome.Handler
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Lightning Fruit.LocalScript
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Lightning Fruit.LocalScript
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Lightning Fruit.LocalScript
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Lightning Fruit.LocalScript
+[Backpack] game.Players.Palukalima37806.Backpack.Shadow Gnome.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango.LocalScript
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango.LocalScript
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango.LocalScript
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
     → require(ReplicatedStorage.Library)
 
-[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango.LocalScript
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Shadow Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Moon Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
+    → require(ReplicatedStorage.Library)
+
+[Backpack] game.Players.Palukalima37806.Backpack.Rainbow Mango Gnome.Handler
     → require(ReplicatedStorage.Library)
